@@ -10,7 +10,17 @@ Bu dosya her oturum sonunda güncellenir: ne yapıldı, ne eksik, nasıl test ed
 diziyi TMDB'den doğru şekilde çekip kataloğa ekledi, gerçek bir dosya (2.65GB) yükledi.
 Bu gerçek kullanım 3 kritik bug ortaya çıkardı — üçü de bulunup düzeltildi:
 
-### 3. (en kritik) Paketleme workflow'u ya hiç tetiklenmiyor gibi görünüyordu ya da yanlış HLS üretiyordu
+### 4. workflow_dispatch'e geçince YAML ifadesinde çift tırnak hatası (422) çıktı
+
+v0.2.3'ten hemen sonra kullanıcı gerçek yükleme denedi, `422 Unexpected symbol
+'"workflow_dispatch"'` hatası aldı. GitHub Actions ifade sözdiziminde string'ler TEK
+tırnak ister, ben yanlışlıkla çift tırnak kullanmıştım
+(`github.event_name == "workflow_dispatch"` → `== 'workflow_dispatch'`). Düzeltildi ve
+gerçek bir test dispatch'iyle doğrulandı (artık 422 yok, iş normal başlıyor). **Bu
+düzeltme sadece `.github/workflows/package-media.yml`'de — uygulamaları güncellemeye
+gerek yok, direkt tekrar denenebilir.**
+
+### 3. Paketleme workflow'u ya hiç tetiklenmiyor gibi görünüyordu ya da yanlış HLS üretiyordu
 
 Kullanıcı "hiçbir şey tetiklenmiyor" dedi. İnceleme: `repository_dispatch` **gerçekten
 çalışıyordu** ama GitHub bu repoda **20-30 dakika gecikmeyle** teslim ediyordu (canlı
