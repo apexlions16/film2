@@ -2,7 +2,10 @@
 
 Bu dosya her oturum sonunda güncellenir: ne yapıldı, ne eksik, nasıl test edilir.
 
-## Durum: Faz 0 + Faz 1 — 4 uygulama da CI'da başarıyla derlendi, çoklu-hesap özelliği ekleniyor
+## Durum: Faz 0 + Faz 1 — 4 uygulama da CI'da başarıyla derlendi, çoklu-hesap özelliği tamam
+
+**v0.2.0 Release hazır, 4 uygulama da içinde**: https://github.com/apexlions16/film2/releases/tag/v0.2.0
+(`film2 Player` + `Film2 Studio` Windows installer, `android-player.apk`, `android-studio.apk`)
 
 ### Önemli: gerçek Hugging Face kullanıcı adı `mfilms12`, GitHub'daki `apexlions16` değil
 
@@ -43,8 +46,12 @@ ve daha kapsamlı bir gereksinim — ayrıca eklendi:
   hesapları" listesi (ekle/kaldır, whoami ile doğrulanır, token asla renderer'a gitmez).
   Yükleme akışı failover kullanıyor, hesap değişince kullanıcıya bildiriyor. **`npm run
   build`/`build:win` temiz geçti** (yerelde, C:/D sürücü sorunu haricinde).
-- `apps/android-studio`: Aynı özelliğin Kotlin portu — arka plan ajanına devredildi,
-  sonucu bu dosyanın bir sonraki güncellemesinde (ya da GitHub'daki son commit'lerde).
+- `apps/android-studio`: Aynı özelliğin Kotlin portu tamamlandı, **`./gradlew
+  assembleRelease` ile gerçekten derlendi** (BUILD SUCCESSFUL), kod JS referansıyla
+  satır satır karşılaştırılıp doğrulandı.
+
+**v0.2.0 tag'i atılıp tüm 4 uygulama birlikte yeniden tetiklendi — hepsi başarılı,
+tek Release altında toplandı.**
 
 **Önemli kullanım notu**: Yeni bir Hugging Face hesabı eklediğinizde bunu HEM Studio
 uygulamasının (masaüstü/Android) Ayarlar ekranına HEM de (paketleme pipeline'ının da
@@ -86,17 +93,19 @@ Statik okumayla hiçbiri görünmüyordu, hepsi gerçek çalıştırmada ortaya 
 
 ## Nasıl indirilir / denenir
 
-Masaüstü/Android uygulamalarını GitHub Releases'ten indirip kurmanız yeterli:
-https://github.com/apexlions16/film2/releases (en son: v0.1.8, çoklu-hesap özelliği
-bir sonraki tag'de eklenecek)
+**https://github.com/apexlions16/film2/releases/tag/v0.2.0** — 4 dosya:
+- `film2.Player-0.1.0-setup.exe` — masaüstü izleme uygulaması
+- `Film2.Studio.Setup.0.1.0.exe` — masaüstü içerik yükleme uygulaması
+- `android-player.apk` — Android izleme uygulaması
+- `android-studio.apk` — Android içerik yükleme uygulaması
 
-Credential'sız hızlı doğrulama: `apps/desktop-player`'ı açıp "Demo Stream (test)"
-satırına tıklayın — gerçek oynatma + ses/altyazı track değiştirme çalışır.
+Credential'sız hızlı doğrulama: `film2 Player`'ı kurup açın, "Demo Stream (test)"
+satırına tıklayın — gerçek oynatma + ses/altyazı track değiştirme çalışır. Android
+APK'ları "Bilinmeyen kaynaklardan yükleme"ye izin vererek kurabilirsiniz (Play
+Store'dan değil, kişisel imzayla geliyor).
 
 ## Sıradaki adımlar
 
-- [ ] android-studio'nun çoklu-hesap portunu bitirip derlemesini doğrulamak
-- [ ] Tüm değişiklikleri commit/push edip yeni bir vX.Y.Z tag'iyle 4 uygulamayı da birlikte tekrar derleyip tek Release altında toplamak
 - [ ] Gerçek IMDb linki + gerçek dosya ile Studio → Actions → HF → Player uçtan uca test
 - [ ] `package-media.mjs`'deki ffmpeg komutunu gerçek çok-sesli bir dosyayla doğrulamak
 - [ ] Android HF upload (LFS) akışını gerçek token ile doğrulamak
