@@ -22,8 +22,12 @@ android {
 
     buildTypes {
         release {
-            // No keystore/signing config yet (secrets arrive later per handoff notes).
-            // assembleDebug is the safe local verification target until then.
+            // Gercek imzalama secret'i (ANDROID_KEYSTORE_BASE64 vb.) yoksa Android
+            // tamamen imzasiz APK'yi kurmayi reddediyor ("App not installed"). AGP'nin
+            // otomatik uretilen debug keystore'uyla imzalayarak her zaman kurulabilir
+            // bir APK garanti ediyoruz; CI'da gercek keystore secret'lari eklenirse
+            // build-android.yml zaten apksigner ile ustune gercek imza atiyor.
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
