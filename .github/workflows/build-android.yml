@@ -10,9 +10,13 @@ on:
       - "v*"
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         app: [android-player, android-studio]
     runs-on: ubuntu-latest

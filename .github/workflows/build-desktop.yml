@@ -10,9 +10,13 @@ on:
       - "v*"
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         app: [desktop-player, desktop-studio]
     runs-on: windows-latest
@@ -21,10 +25,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
+      # --workspaces=false: npm workspace hoisting node_modules/electron'u repo
+      # kokune tasiyor, electron-builder ise electron surumunu uygulama klasorunun
+      # KENDI node_modules'inden okumaya calisiyor ve bulamayip hata veriyor
+      # (electron-builder/issues/3984). Yerel, izole bir kurulum bunu onluyor.
       - name: Bagimliliklari kur
-        run: npm install
+        run: npm install --workspaces=false
         working-directory: apps/${{ matrix.app }}
 
       - name: Windows installer derle
