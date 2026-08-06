@@ -1,0 +1,32 @@
+node_modules/
+dist/
+build/
+out/
+release/
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Android
+apps/android-player/.gradle/
+apps/android-player/build/
+apps/android-player/app/build/
+apps/android-player/local.properties
+apps/android-studio/.gradle/
+apps/android-studio/build/
+apps/android-studio/app/build/
+apps/android-studio/local.properties
+*.iml
+.idea/
+.gradle/
+captures/
+*.jks
+*.keystore
+
+# Electron
+apps/desktop-player/dist/
+apps/desktop-player/release/
+apps/desktop-studio/dist/
+apps/desktop-studio/release/

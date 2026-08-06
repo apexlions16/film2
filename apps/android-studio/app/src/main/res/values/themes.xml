@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base platform theme. Real theming lives in Compose (ui/theme/Theme.kt). -->
+    <style name="Theme.Film2Studio" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/studio_dark</item>
+        <item name="android:statusBarColor">@color/studio_dark</item>
+        <item name="android:navigationBarColor">@color/studio_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

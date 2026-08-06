@@ -1,0 +1,10 @@
+{
+  "name": "@film2/tmdb-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test:manual": "node test.mjs"
+  }
+}

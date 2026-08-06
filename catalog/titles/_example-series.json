@@ -1,0 +1,56 @@
+{
+  "_comment": "Dizi semasi ornegi. Studio, TMDB'den sezon/bolum listesini cekip her bolume ayri asset/shardId/status atar; bolumler bagimsiz paketlenir.",
+  "id": "_example-series",
+  "type": "series",
+  "imdbId": "tt0000001",
+  "tmdbId": 0,
+  "title": "Ornek Dizi",
+  "originalTitle": "Ornek Dizi",
+  "overview": "Sezon ve bolum metadatasi TMDB'den otomatik cekilir.",
+  "releaseYear": 2023,
+  "genres": ["Drama", "Mystery"],
+  "posterUrl": "",
+  "backdropUrl": "",
+  "cast": [
+    { "name": "Oyuncu Adi", "character": "Karakter Adi", "profileUrl": "" }
+  ],
+  "crew": [
+    { "name": "Yaratici Adi", "job": "Creator", "profileUrl": "" }
+  ],
+  "status": "pending",
+  "manualEntry": false,
+  "createdAt": "2026-08-06T00:00:00.000Z",
+  "updatedAt": "2026-08-06T00:00:00.000Z",
+  "seasons": [
+    {
+      "seasonNumber": 1,
+      "name": "Sezon 1",
+      "overview": "",
+      "posterUrl": "",
+      "episodes": [
+        {
+          "episodeNumber": 1,
+          "title": "Bolum 1",
+          "overview": "",
+          "airDate": "2023-01-01",
+          "stillUrl": "",
+          "runtimeMinutes": 42,
+          "status": "pending",
+          "shardId": "apexlions16/film2-media-01",
+          "asset": null
+        },
+        {
+          "episodeNumber": 2,
+          "title": "Bolum 2",
+          "overview": "",
+          "airDate": "2023-01-08",
+          "stillUrl": "",
+          "runtimeMinutes": 44,
+          "status": "pending",
+          "shardId": "apexlions16/film2-media-01",
+          "asset": null
+        }
+      ]
+    }
+  ]
+}

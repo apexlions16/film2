@@ -1,0 +1,11 @@
+{
+  "name": "@film2/catalog-schema",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "types": "src/types.ts",
+  "dependencies": {
+    "ajv": "^8.17.1"
+  }
+}

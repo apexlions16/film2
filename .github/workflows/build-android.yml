@@ -1,0 +1,61 @@
+name: Build Android APKs
+
+# main'e push ya da "v*" tag'i atildiginda android-player ve android-studio icin
+# release APK uretir. Tag pushlaninca GitHub Release'e otomatik eklenir.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/android-player/**"
+      - "apps/android-studio/**"
+      - ".github/workflows/build-android.yml"
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        app: [android-player, android-studio]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Gradle ile derle
+        working-directory: apps/${{ matrix.app }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease
+
+      - name: APK'yi imzala
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > /tmp/release.keystore
+          $ANDROID_HOME/build-tools/*/apksigner sign \
+            --ks /tmp/release.keystore \
+            --ks-pass pass:"$ANDROID_KEYSTORE_PASSWORD" \
+            --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --key-pass pass:"$ANDROID_KEY_PASSWORD" \
+            apps/${{ matrix.app }}/app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-apk
+          path: apps/${{ matrix.app }}/app/build/outputs/apk/release/*.apk
+
+      - name: Release'e ekle
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: apps/${{ matrix.app }}/app/build/outputs/apk/release/*.apk

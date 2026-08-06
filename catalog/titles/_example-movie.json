@@ -1,0 +1,27 @@
+{
+  "_comment": "Bu dosya sema ornegidir, gercek katalogda listelenmez (dosya adi alt cizgi ile basliyor). Studio uygulamasi bir IMDb linki isleyince ayni sekilde ama _ olmadan catalog/titles/{id}.json uretir.",
+  "id": "_example-movie",
+  "type": "movie",
+  "imdbId": "tt0000000",
+  "tmdbId": 0,
+  "title": "Ornek Film",
+  "originalTitle": "Ornek Film",
+  "overview": "Studio uygulamasindan IMDb linki girildiginde TMDB'den cekilen metadata bu sekle oturur.",
+  "releaseYear": 2024,
+  "genres": ["Drama"],
+  "runtimeMinutes": 95,
+  "posterUrl": "",
+  "backdropUrl": "",
+  "cast": [
+    { "name": "Oyuncu Adi", "character": "Karakter Adi", "profileUrl": "" }
+  ],
+  "crew": [
+    { "name": "Yonetmen Adi", "job": "Director", "profileUrl": "" }
+  ],
+  "status": "pending",
+  "manualEntry": false,
+  "createdAt": "2026-08-06T00:00:00.000Z",
+  "updatedAt": "2026-08-06T00:00:00.000Z",
+  "shardId": "apexlions16/film2-media-01",
+  "asset": null
+}

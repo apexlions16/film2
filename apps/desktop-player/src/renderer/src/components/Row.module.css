@@ -1,0 +1,51 @@
+/* Defined locally (not in global.css) — Vite's CSS Modules scoping rewrites
+   `animation-name` references inside module files to a locally-hashed name,
+   which would never match a @keyframes rule declared in the shared,
+   unscoped global.css. Keeping the definition and the reference in the same
+   file guarantees the hashes line up. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.row {
+  padding: 0 56px;
+  margin-bottom: 34px;
+  opacity: 0;
+  animation: fade-up 0.55s var(--ease-out) forwards;
+}
+
+.heading {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-dim);
+  margin: 0 0 14px;
+}
+
+.track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: 6px;
+  margin: 0 -4px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.track::-webkit-scrollbar {
+  height: 6px;
+}
+
+@media (max-width: 900px) {
+  .row {
+    padding: 0 20px;
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@film2/hf-storage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test:manual": "node test.mjs"
+  },
+  "dependencies": {
+    "@huggingface/hub": "^1.1.2"
+  }
+}

@@ -1,0 +1,16 @@
+.app {
+  min-height: 100dvh;
+  padding-bottom: 64px;
+}
+
+.rows {
+  margin-top: 36px;
+}
+
+.skeletonWrap {
+  padding-top: 0;
+}
+
+.errorHeroSpacer {
+  height: 64px;
+}

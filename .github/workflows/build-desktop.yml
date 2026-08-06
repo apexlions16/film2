@@ -1,0 +1,47 @@
+name: Build desktop apps
+
+# main'e push ya da "v*" tag'i atildiginda desktop-player ve desktop-studio icin
+# Windows installer'lari uretir. Tag pushlaninca GitHub Release'e otomatik eklenir.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/desktop-player/**"
+      - "apps/desktop-studio/**"
+      - "packages/**"
+      - ".github/workflows/build-desktop.yml"
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        app: [desktop-player, desktop-studio]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Bagimliliklari kur
+        run: npm install
+        working-directory: apps/${{ matrix.app }}
+
+      - name: Windows installer derle
+        run: npm run build:win
+        working-directory: apps/${{ matrix.app }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app }}-windows
+          path: apps/${{ matrix.app }}/release/*.exe
+
+      - name: Release'e ekle
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: apps/${{ matrix.app }}/release/*.exe

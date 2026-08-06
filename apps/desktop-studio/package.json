@@ -1,0 +1,64 @@
+{
+  "name": "@film2/desktop-studio",
+  "productName": "Film2 Studio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Film2 icerik ekibi icin ingest/admin araci — IMDb/TMDB metadata cekme, Hugging Face yukleme, katalog commit.",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build && tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "preview": "electron-vite preview",
+    "build:win": "electron-vite build && electron-builder --win nsis"
+  },
+  "dependencies": {
+    "@fontsource-variable/outfit": "^5.1.0",
+    "@film2/catalog-client": "^0.1.0",
+    "@film2/catalog-schema": "^0.1.0",
+    "@film2/hf-storage": "^0.1.0",
+    "@film2/tmdb-client": "^0.1.0",
+    "@huggingface/hub": "^1.1.2",
+    "electron-store": "^8.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.5",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^32.2.6",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "build": {
+    "appId": "com.apexlions16.film2studio",
+    "productName": "Film2 Studio",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

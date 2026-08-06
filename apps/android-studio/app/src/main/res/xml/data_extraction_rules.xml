@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Tokens (TMDB/HF/GitHub PAT) live in DataStore — never eligible for cloud backup. -->
+        <exclude domain="sharedpref" />
+        <exclude domain="file" path="datastore" />
+    </cloud-backup>
+</data-extraction-rules>

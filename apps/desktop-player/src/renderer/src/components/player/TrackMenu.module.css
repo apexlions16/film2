@@ -1,0 +1,99 @@
+.wrap {
+  position: relative;
+}
+
+.trigger {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  min-width: 88px;
+  transition:
+    background 0.2s var(--ease-out),
+    border-color 0.2s var(--ease-out);
+}
+
+.trigger:hover,
+.triggerOpen {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--accent-dim);
+}
+
+.triggerLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+
+.triggerValue {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Local keyframes — see Row.module.css (renderer/src/components) for why
+   these must be declared per module file rather than shared from
+   global.css. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  min-width: 170px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 20px 36px -14px rgba(0, 0, 0, 0.6);
+  animation: fade-up 0.18s var(--ease-out) both;
+  z-index: 5;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.item {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  text-align: left;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+.itemActive {
+  color: var(--accent-strong);
+  font-weight: 600;
+}

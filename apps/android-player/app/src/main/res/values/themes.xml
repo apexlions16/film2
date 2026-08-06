@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base platform theme. All real theming (colors, typography, motion) lives in
+         Compose (ui/theme/Theme.kt) — this XML theme only needs to exist for the
+         manifest's windowBackground/splash handoff before Compose takes over. -->
+    <style name="Theme.Film2Player" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/near_black</item>
+        <item name="android:statusBarColor">@color/near_black</item>
+        <item name="android:navigationBarColor">@color/near_black</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

@@ -1,0 +1,51 @@
+name: Package media (HLS)
+
+# Studio uygulamasi (desktop veya Android) ham dosyalari Hugging Face'e yukledikten sonra
+# bu workflow'u repository_dispatch ile tetikler. ffmpeg ile HLS paketler, sonucu Hugging
+# Face'e yukler ve catalog/titles/{id}.json'u gunceller.
+on:
+  repository_dispatch:
+    types: [package-media]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: ffmpeg kontrolu
+        run: |
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update && sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version
+
+      - name: Bagimliliklari kur
+        run: npm install --workspaces=false --no-save @huggingface/hub
+
+      - name: Medyayi paketle ve yukle
+        id: package
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          node .github/scripts/package-media.mjs '${{ toJson(github.event.client_payload) }}' > /tmp/result.json
+          cat /tmp/result.json
+
+      - name: Katalogu guncelle
+        run: node .github/scripts/update-catalog.mjs "$(cat /tmp/result.json)"
+
+      - name: Commit ve push
+        run: |
+          git config user.name "film2-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add catalog/
+          git diff --cached --quiet || git commit -m "chore(catalog): pakete hazir icerik guncellendi (${{ github.event.client_payload.titleId }})"
+          git push

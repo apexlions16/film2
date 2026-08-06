@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/apexlions16/film2/packages/catalog-schema/title.schema.json",
+  "title": "Film2 Title",
+  "type": "object",
+  "required": ["id", "type", "imdbId", "title", "overview", "genres", "cast", "crew", "status", "createdAt", "updatedAt"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "type": { "enum": ["movie", "series"] },
+    "imdbId": { "type": "string", "pattern": "^tt[0-9]+$" },
+    "tmdbId": { "type": "integer" },
+    "title": { "type": "string" },
+    "originalTitle": { "type": "string" },
+    "overview": { "type": "string" },
+    "releaseYear": { "type": "integer" },
+    "genres": { "type": "array", "items": { "type": "string" } },
+    "runtimeMinutes": { "type": "integer" },
+    "posterUrl": { "type": "string" },
+    "backdropUrl": { "type": "string" },
+    "logoUrl": { "type": "string" },
+    "cast": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "character"],
+        "properties": {
+          "name": { "type": "string" },
+          "character": { "type": "string" },
+          "profileUrl": { "type": "string" }
+        }
+      }
+    },
+    "crew": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "job"],
+        "properties": {
+          "name": { "type": "string" },
+          "job": { "type": "string" },
+          "profileUrl": { "type": "string" }
+        }
+      }
+    },
+    "status": { "enum": ["pending", "processing", "ready", "error"] },
+    "manualEntry": { "type": "boolean" },
+    "createdAt": { "type": "string" },
+    "updatedAt": { "type": "string" },
+    "shardId": { "type": "string" },
+    "asset": {
+      "type": "object",
+      "required": ["masterPlaylistUrl", "audioLanguages", "subtitleLanguages"],
+      "properties": {
+        "masterPlaylistUrl": { "type": "string" },
+        "durationSeconds": { "type": "number" },
+        "audioLanguages": { "type": "array", "items": { "type": "string" } },
+        "subtitleLanguages": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "seasons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["seasonNumber", "name", "episodes"],
+        "properties": {
+          "seasonNumber": { "type": "integer" },
+          "name": { "type": "string" },
+          "overview": { "type": "string" },
+          "posterUrl": { "type": "string" },
+          "episodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["episodeNumber", "title", "status"],
+              "properties": {
+                "episodeNumber": { "type": "integer" },
+                "title": { "type": "string" },
+                "overview": { "type": "string" },
+                "airDate": { "type": "string" },
+                "stillUrl": { "type": "string" },
+                "runtimeMinutes": { "type": "integer" },
+                "status": { "enum": ["pending", "processing", "ready", "error"] },
+                "shardId": { "type": "string" },
+                "asset": {
+                  "type": "object",
+                  "required": ["masterPlaylistUrl", "audioLanguages", "subtitleLanguages"],
+                  "properties": {
+                    "masterPlaylistUrl": { "type": "string" },
+                    "durationSeconds": { "type": "number" },
+                    "audioLanguages": { "type": "array", "items": { "type": "string" } },
+                    "subtitleLanguages": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
