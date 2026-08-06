@@ -4,7 +4,7 @@
   "manualEntry": false,
   "status": "pending",
   "createdAt": "2026-08-06T22:51:57.795Z",
-  "updatedAt": "2026-08-06T22:52:00.815Z",
+  "updatedAt": "2026-08-06T23:18:39.055Z",
   "type": "series",
   "tmdbId": 76579,
   "title": "TOLGSHOW",
@@ -60,7 +60,15 @@
           "airDate": "2018-01-01",
           "stillUrl": "https://image.tmdb.org/t/p/w500/ghVv9M63MqO1jNRebVWSKxWCfDf.jpg",
           "runtimeMinutes": 92,
-          "status": "pending"
+          "status": "ready",
+          "shardId": "mfilms12/film2-media-01",
+          "asset": {
+            "masterPlaylistUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/tolgshow-7827/s1e1/master.m3u8",
+            "audioLanguages": [
+              "und"
+            ],
+            "subtitleLanguages": []
+          }
         },
         {
           "episodeNumber": 2,
