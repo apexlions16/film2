@@ -4,6 +4,7 @@
 import { writeFile, mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { loadShardRegistry, getActiveShard, uploadFileToShard } from "./src/index.js";
 
 const token = process.env.HF_TOKEN;
@@ -12,7 +13,7 @@ if (!token) {
   process.exit(1);
 }
 
-const registry = await loadShardRegistry(new URL("../../catalog/shards.json", import.meta.url).pathname);
+const registry = await loadShardRegistry(fileURLToPath(new URL("../../catalog/shards.json", import.meta.url)));
 const shard = getActiveShard(registry);
 console.log("Aktif shard:", shard.id);
 
