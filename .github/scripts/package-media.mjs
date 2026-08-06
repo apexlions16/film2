@@ -16,6 +16,9 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { createWriteStream } from "node:fs";
+import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -73,13 +76,15 @@ function tokenForNamespace(namespace) {
   return account.token;
 }
 
+// NOT: buyuk film dosyalarini (birkac GB) res.arrayBuffer() ile tek seferde bellege
+// almak Actions runner'inda hafiza tasmasina yol acabilir — bunun yerine yanit govdesi
+// dogrudan diske akitiliyor (stream), bellek kullanimi dosya boyutundan bagimsiz kaliyor.
 async function downloadFromShard(repoPath, destPath) {
   const url = resolveUrl(shardId, repoPath);
   const token = tokenForNamespace(namespaceOf(shardId));
   const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
   if (!res.ok) throw new Error(`Indirme basarisiz (${res.status}): ${url}`);
-  const buffer = Buffer.from(await res.arrayBuffer());
-  await writeFile(destPath, buffer);
+  await pipeline(Readable.fromWeb(res.body), createWriteStream(destPath));
   return destPath;
 }
 

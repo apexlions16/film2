@@ -1,6 +1,13 @@
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, stat } from "node:fs/promises";
+import { openAsBlob } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { uploadFiles } from "@huggingface/hub";
+
+// NOT: Node'un fs.readFile/readFileSync'i dosyayi TAMAMEN bellege okuyor ve 2 GiB
+// (2**31-1 bayt) uzerindeki dosyalarda "File size (...) is greater than 2 GiB" hatasi
+// veriyor — film dosyalari rahatlikla bunu asiyor. openAsBlob() diskten TEMBEL (lazy)
+// okuyan bir Blob dondurur: boyut siniri yok, dosyayi bellege yuklemeden HTTP govdesine
+// akitir. Gercek 2.65GB'lik bir dosyayla bu hata canli olarak dogrulanip duzeltildi.
 
 /**
  * Hugging Face dataset repo'sundaki bir dosyaya cozumlenmis (resolve) mutlak URL uretir.
@@ -44,9 +51,9 @@ export async function uploadDirectoryToShard({ localDir, repoPrefix, shardId, to
   for (const localPath of localFiles) {
     const relPath = relative(localDir, localPath).split(sep).join("/");
     const repoPath = `${repoPrefix}/${relPath}`;
-    const buffer = await readFile(localPath);
-    totalBytes += buffer.byteLength;
-    files.push({ path: repoPath, content: new Blob([buffer]) });
+    const blob = await openAsBlob(localPath);
+    totalBytes += blob.size;
+    files.push({ path: repoPath, content: blob });
     uploadedPaths.push(repoPath);
   }
 
@@ -75,12 +82,12 @@ export async function uploadDirectoryToShard({ localDir, repoPrefix, shardId, to
  */
 export async function uploadFileToShard({ localPath, repoPath, shardId, token }) {
   const info = await stat(localPath);
-  const buffer = await readFile(localPath);
+  const blob = await openAsBlob(localPath);
 
   await uploadFiles({
     repo: { type: "dataset", name: shardId },
     accessToken: token,
-    files: [{ path: repoPath, content: new Blob([buffer]) }],
+    files: [{ path: repoPath, content: blob }],
   });
 
   return { bytes: info.size, url: resolveUrl(shardId, repoPath) };
