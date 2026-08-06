@@ -1,8 +1,9 @@
 appId: com.apexlions16.film2player
 productName: film2 Player
+electronVersion: 43.3.0
 directories:
   buildResources: build
-  output: dist
+  output: release
 files:
   - out/**/*
   - package.json
