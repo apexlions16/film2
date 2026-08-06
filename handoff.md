@@ -2,10 +2,27 @@
 
 Bu dosya her oturum sonunda güncellenir: ne yapıldı, ne eksik, nasıl test edilir.
 
-## Durum: Faz 0 + Faz 1 — 4 uygulama da CI'da başarıyla derlendi, çoklu-hesap özelliği tamam
+## Durum: Faz 0 + Faz 1 — 4 uygulama da CI'da başarıyla derlendi, gerçek kullanımdan bug'lar düzeltiliyor
 
-**v0.2.0 Release hazır, 4 uygulama da içinde**: https://github.com/apexlions16/film2/releases/tag/v0.2.0
-(`film2 Player` + `Film2 Studio` Windows installer, `android-player.apk`, `android-studio.apk`)
+**Kullanıcı gerçekten kullanmaya başladı**: `desktop-studio` ile "TOLGSHOW" adlı bir
+diziyi TMDB'den doğru şekilde çekip kataloğa ekledi (`catalog/titles/tolgshow-7827.json`,
+2 sezon, otomatik commit — akış uçtan uca çalıştı). Sonra gerçek bir dosya (2.65GB)
+yüklemeye çalışınca **"File size (...) is greater than 2 GiB"** hatası aldı.
+
+### Bulunan ve düzeltilen kritik bug: 2 GiB üzeri dosyalar yüklenemiyordu
+
+Hata Hugging Face'ten değil, Node.js'in `fs.readFile()`'ının kendi sınırından
+geliyordu — dosyayı tamamen belleğe okumaya çalışıyor ve 2**31-1 bayt üzerinde
+reddediyordu. Film dosyaları bunu kolayca aşıyor. `packages/hf-storage/src/upload.js`
+`openAsBlob()` (diskten tembel/lazy okuyan Blob, boyut sınırı yok) kullanacak şekilde
+düzeltildi; `package-media.mjs`'deki indirme tarafı da benzer sebeple (Actions
+runner'ında hafıza taşması riski) stream'e çevrildi. **Gerçek 2.3GB'lik dosyalarla
+hem upload hem download canlı test edildi, ikisi de başarılı.** v0.2.1 ile masaüstü
+uygulamaları bu düzeltmeyle yeniden derlendi.
+
+**v0.2.1 Release**: https://github.com/apexlions16/film2/releases/tag/v0.2.1
+(`film2 Player` + `Film2 Studio` — büyük dosya düzeltmesiyle; Android APK'lar bu JS
+düzeltmesinden etkilenmiyor, v0.2.0'daki hâlâ geçerli)
 
 ### Önemli: gerçek Hugging Face kullanıcı adı `mfilms12`, GitHub'daki `apexlions16` değil
 
