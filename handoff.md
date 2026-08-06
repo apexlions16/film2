@@ -2,76 +2,73 @@
 
 Bu dosya her oturum sonunda güncellenir: ne yapıldı, ne eksik, nasıl test edilir.
 
-## Durum: Faz 0 + Faz 1 devam ediyor (ilk oturum)
+## Durum: Faz 0 + Faz 1 — canlı credential'larla doğrulandı, Actions build'leri devrede
 
-### Tamamlandı ve doğrulandı (offline, gerçek credential olmadan)
+### Önemli: gerçek Hugging Face kullanıcı adı `mfilms12`, GitHub'daki `apexlions16` değil
 
-- Repo iskeleti: `apps/`, `packages/`, `catalog/`, `.github/workflows`, `docs/`
-- `packages/catalog-schema` — `Title`/`Season`/`Episode` TS tipleri + JSON Schema doğrulama (`validateTitle`). Test edildi: geçerli/geçersiz title doğru ayrıştırıldı.
-- `packages/tmdb-client` — `imdbLinkToId`, `slugify` (Türkçe ı/İ dahil), `findByImdbId`, `fetchTitleFromImdbLink`. `imdbLinkToId`/`slugify` offline test edildi. **TMDB'ye gerçek çağrı henüz test edilmedi — TMDB_API_KEY gerekiyor.**
-- `packages/hf-storage` — shard registry yönetimi (`getActiveShard`, `ensureShardCapacity`, `recordUsage`), upload fonksiyonları (`uploadFileToShard`, `uploadDirectoryToShard`), `resolveUrl`. Registry mantığı offline test edildi (eşik altında yeni shard açmıyor, kullanım sayacı doğru artıyor). **Gerçek Hugging Face upload/create-repo henüz test edilmedi — HF_TOKEN gerekiyor.**
-- `packages/catalog-client` — player uygulamalarının GitHub'dan katalog okuması (`listTitleIds`, `getTitle`, `listTitles`).
-- `catalog/shards.json` — ilk shard kaydı (`apexlions16/film2-media-01`, eşik 300GB, ayarlanabilir).
-- `catalog/titles/_example-movie.json`, `_example-series.json` — şema örnekleri (`_` ile başladığı için gerçek katalogda listelenmez).
-- `.github/workflows/package-media.yml` + `.github/scripts/package-media.mjs` + `update-catalog.mjs` — `repository_dispatch` ile tetiklenen ffmpeg/HLS paketleme pipeline'ı. **Henüz gerçek dosyayla hiç çalıştırılmadı — yazıldı ama canlı test edilmedi.**
-- `.github/workflows/build-desktop.yml` — Electron Windows installer derleme + Release'e ekleme.
-- `.github/workflows/build-android.yml` — Gradle APK derleme + (opsiyonel) imzalama + Release'e ekleme.
-- `apps/desktop-player` (Electron) — Netflix-tarzı browse (asimetrik hero, tür satırları, hover mikro-animasyon), sezon/bölüm seçici, hls.js player ile canlı ses/altyazı track değiştirme, "Demo Stream (test)" satırı (`test-streams.mux.dev` çoklu-ses HLS test akışı). `npm install` + `npm run typecheck` + `npm run build` **temiz gecti**. Renderer taraf ayrıca Browser pane'de bizzat açılıp mock katalogla görsel olarak da doğrulandı; bu sırada 2 gerçek bug bulunup düzeltildi (CSS Modules `@keyframes` kapsam sorunu yüzünden satırlar/empty-state/player kontrolleri görünmez kalıyordu; poster placeholder renk üretimi bazen mora düşebiliyordu, iki sıcak tona sabitlendi).
-- `apps/desktop-studio` (Electron) — IMDb link -> TMDB önizleme/manuel form, sezon/bölüm editörü, dosya yükleme (birleşik/ayrı), GitHub Contents API ile katalog commit, `repository_dispatch` tetikleme — hepsi Electron main process'te (token'lar renderer'a hiç sızmıyor, IPC ile izole). `npm install` + `npm run build` **temiz gecti**. Gerçek token'larla network akışı henüz canlı test edilmedi (beklenen).
-- `apps/android-player` (Kotlin/Compose + Media3) — aynı Netflix-tarzı UI dili, ExoPlayer ile HLS + track selector bottom sheet, aynı demo akış satırı. **Gerçekten derlendi**: ajan ortamda Android SDK yokken bir tane kurup `./gradlew assembleDebug` ve `assembleRelease` (CI'nin çalıştırdığı komutun birebir aynısı) ile gerçek APK üretti, `lintVitalRelease` de gecti.
-- `apps/android-studio` (Kotlin/Compose) — TMDB/GitHub/HF akışlarının Kotlin karşılığı, DataStore ile yerel token saklama, WorkManager ile arka planda (bloklamayan) yükleme + `repository_dispatch`. **Gerçekten derlendi** (aynı yöntemle, gerçek APK üretti).
+İlk taslakta shard namespace'i yanlışlıkla GitHub kullanıcı adıyla aynı varsayılmıştı.
+Gerçek HF hesabı `mfilms12` çıktı, `catalog/shards.json` ve örnek title dosyaları
+düzeltildi. İlk gerçek shard repo'su oluşturuldu ve doğrulandı:
+https://huggingface.co/datasets/mfilms12/film2-media-01
 
-### Bilinen riskler / ilk canlı testte doğrulanması gerekenler
+### Tamamlandı ve gerçek credential'larla canlı doğrulandı
 
-1. **`package-media.mjs` içindeki ffmpeg `-var_stream_map` komutu** — çoklu ses track'li HLS üretimi ffmpeg sürümüne göre hassas davranabilir. `master.m3u8`'in tam olarak nereye yazıldığı (kod içinde not düşüldü) ilk gerçek dosya yüklemesinde kontrol edilmeli.
-2. **Hugging Face upload protokolü (Android tarafı, `apps/android-studio/.../hf/HfUploader.kt`)** — `@huggingface/hub` npm paketi (masaüstü) resmi ve güvenilir, ama Android'de eşdeğer resmi SDK yok; Kotlin tarafı HF'nin commit/preupload/LFS API'sini elle uyguluyor (kod içinde `// TODO: verify against docs` notlarıyla isaretlendi), gerçek token ile doğrulanmadı.
-3. **GitHub Contents API ile commit** (Studio uygulamaları) — dosya boyutu sınırı var (~1MB, base64 encode ile Contents API üzerinden gönderilen dosyalar için); bu sadece `catalog/titles/{id}.json` ve `catalog/shards.json` gibi küçük JSON dosyaları için kullanılıyor, büyük medya dosyaları için değil (onlar doğrudan Hugging Face'e gidiyor) — tasarım gereği sorun olmamalı ama ilk testte doğrulanmalı.
-4. **Android proje yolu** — repo yolu Türkçe karakter içerdiği (`KENDİ PROJELERİM`) için Android Gradle Plugin varsayılan olarak hata veriyordu; her iki `apps/android-*/gradle.properties` dosyasina `android.overridePathCheck=true` eklendi. Repoyu farklı (ASCII) bir yola klonlarsanız bu ayar zararsızdır, kaldırmaya gerek yok.
-5. **Studio uygulamalarında (masaüstü + Android) cast/crew/sezon-bölüm listeleri** üst seviye alanlar kadar detaylı düzenlenebilir değil (başlık/özet/tarih gibi alanlar editable, ama tek tek oyuncu satırı düzenleme yok) — ilk sürüm için kabul edilebilir, istenirse sonraki oturumda genişletilir.
+- `packages/catalog-schema` — offline test edildi (geçerli/geçersiz title doğru ayrıştı).
+- `packages/tmdb-client` — **gerçek TMDB API key ile canlı test edildi**: `tt0111161` linkinden "Esaretin Bedeli" (The Shawshank Redemption) metadata'sı (oyuncu, poster, backdrop, tür, süre) doğru şekilde çekildi. Türkçe `ı`/`İ` slugify hatası bulunup düzeltildi.
+- `packages/hf-storage` — **gerçek HF write token ile canlı test edildi**: `mfilms12/film2-media-01` repo'su oluşturuldu, test dosyası yüklendi, `resolveUrl` ile üretilen link üzerinden dosya gerçekten indirilebildi. `test.mjs`'de Windows'a özgü bir path bug'ı (`URL.pathname` yerine `fileURLToPath` gerekiyordu) bulunup düzeltildi.
+- `packages/catalog-client`, `catalog/shards.json`, `catalog/titles/_example-*.json` — tamam.
+- `.github/workflows/package-media.yml` + scriptler — yazıldı, henüz gerçek medya dosyasıyla hiç çalıştırılmadı (aşağıya bakın).
+- `apps/desktop-player`, `apps/desktop-studio` (Electron) — `npm install`/`build` temiz, player Browser pane'de görsel doğrulandı (2 bug bulunup düzeltildi: CSS keyframe kapsamı, mor renk ihlali).
+- `apps/android-player`, `apps/android-studio` (Kotlin/Compose) — ikisi de gerçekten derlendi (`assembleRelease`).
 
-## Gerekli secret/credential'lar
+### GitHub Actions — artık tüm build'ler buradan (kullanıcı talebi)
 
-### GitHub repo secrets (Settings → Secrets and variables → Actions)
-- `HF_TOKEN` — Hugging Face **write** token (package-media.yml ffmpeg pipeline'ının HF'ye yazması için)
-- `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` — opsiyonel, APK imzalamak için (yoksa imzasız APK üretilir, cihaza kurulabilir ama Play Store'a yüklenemez — kişisel kullanım için imzasız da yeterli)
+- `HF_TOKEN` ve `TMDB_API_KEY` repo secret'ı olarak eklendi (`gh secret list` ile doğrulandı).
+- **Bulunan ve düzeltilen 2 gerçek workflow bug'ı** (ikisi de sadece `gh api`/`gh run list` ile canlı test edilerek ortaya çıktı, statik okumayla görünmüyordu):
+  1. `push: {tags: [...], paths: [...]}` birlikte kullanılınca tag push'ları workflow'u **hiç tetiklemiyordu** (v0.1.0 tag'i push edildi, `gh api .../actions/runs` `total_count: 0` döndü). `paths` filtresi tag tetikleyicisinden tamamen kaldırıldı — artık `build-desktop.yml`/`build-android.yml` sadece tag push veya elle `workflow_dispatch` ile çalışıyor.
+  2. `build-android.yml`'de `if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}` GitHub tarafından reddediliyordu (`HTTP 422: Unrecognized named-value: 'secrets'` — step-level `if` içinde `secrets` context'i doğrudan kullanılamıyor). Önce bir adımda `GITHUB_OUTPUT`'a yazılıp sonraki adımın `if`'inde `steps.keystore_check.outputs.present` ile okunacak şekilde düzeltildi.
+- v0.1.2 tag'i bu düzeltmelerle atıldı, `build-desktop.yml` (ref v0.1.1) ve `build-android.yml` (ref v0.1.2) `workflow_dispatch` ile elle tetiklendi — imzasız APK/installer üretip GitHub Release'e eklemeleri bekleniyor. Sonucu bu oturumun sonunda ya da GitHub'da Actions sekmesinden görebilirsiniz: https://github.com/apexlions16/film2/actions
+- **Bundan sonra**: yeni bir `vX.Y.Z` tag'i push ettiğinizde (kendi makinenizden, `workflow` scope'lu bir token/normal git ile) otomatik build+Release beklenir — ama bizim ortamımızdaki `gh` OAuth token'ı `workflow` scope'suz olduğu için tag push'ları Actions'ı tetiklemedi, ben `gh workflow run ... --ref <tag>` (workflow_dispatch, tag ref'i ile — böylece Release'e ekleme adımı da çalışıyor) ile elle tetikledim. Kendi git/GitHub Desktop'ınızdan attığınız tag'ler muhtemelen sorunsuz tetikler; sorun yaşarsanız Actions sekmesinden "Run workflow" ile elle de tetikleyebilirsiniz.
+
+### Bilinen riskler / sıradaki canlı testte doğrulanması gerekenler
+
+1. **`package-media.mjs` ffmpeg `-var_stream_map` komutu** — henüz gerçek çok-sesli bir dosyayla hiç çalıştırılmadı. İlk gerçek içerik yüklemesinde doğrulanmalı.
+2. **Android Hugging Face upload (LFS) akışı** (`HfUploader.kt`) — gerçek token ile henüz test edilmedi, kod içinde TODO notlarıyla işaretli.
+3. **GitHub Contents API commit boyut sınırı** (~1MB, base64) — sadece küçük JSON dosyaları için kullanılıyor, tasarım gereği sorun olmamalı.
+4. **Android proje yolu** — repo yolu Türkçe karakter içerdiği için `android.overridePathCheck=true` eklendi, dokunmayın.
+5. Studio'larda cast/crew/sezon-bölüm listeleri tek tek satır bazında düzenlenemiyor, sadece üst seviye alanlar editable — ileride genişletilebilir.
+
+## Secret/credential durumu
+
+### GitHub repo secrets — TAMAM
+- `HF_TOKEN` ✅ eklendi
+- `TMDB_API_KEY` ✅ eklendi
+- `ANDROID_KEYSTORE_BASE64`/`ANDROID_KEYSTORE_PASSWORD`/`ANDROID_KEY_ALIAS`/`ANDROID_KEY_PASSWORD` — opsiyonel, yok; APK'lar şimdilik imzasız üretiliyor (cihaza kurulabilir, Play Store'a yüklenemez — kişisel kullanım için sorun değil)
 
 ### Studio uygulamaları içinde (yerel ayarlar, repoya asla commitlenmez)
-- TMDB API key — https://www.themoviedb.org/settings/api
-- Hugging Face write token — https://huggingface.co/settings/tokens
-- GitHub PAT (repo scope) — https://github.com/settings/tokens (Contents API + repository_dispatch tetiklemek için)
+- TMDB API key — sohbette paylaştığınız v3 API Anahtarı (repo secret olarak zaten eklendi, Studio'nun Ayarlar ekranına ayrıca siz gireceksiniz — bu dosyaya veya repoya asla yazılmaz)
+- Hugging Face write token — sohbette paylaştığınız `hf_...` token (repo secret olarak zaten eklendi, Studio Ayarlar ekranına aynı şekilde siz gireceksiniz)
+- GitHub PAT (repo scope) — Studio'nun Contents API + `repository_dispatch` çağırması için kendi PAT'ınızı üretmeniz gerekiyor: https://github.com/settings/tokens (gh CLI'nin kendi token'ı `workflow` scope'suz olduğu için Studio'nun kendi PAT'ini üretmesi daha saglam)
 
-## Yerelde nasıl test edilir
+## Yerelde nasıl test edilir (opsiyonel — artık ana yol GitHub Actions)
 
 ```bash
-# Kök bağımlılıklar (packages/* için)
-npm install
+npm install   # kok, packages/* icin
 
-# tmdb-client canlı test (gerçek TMDB key ile)
-cd packages/tmdb-client
-TMDB_API_KEY=xxxx IMDB_LINK="https://www.imdb.com/title/tt0111161/" node test.mjs
-
-# hf-storage canlı test (gerçek HF write token ile, kucuk bir test dosyasi yukler)
-cd packages/hf-storage
-HF_TOKEN=hf_xxxx node test.mjs
-
-# Electron player
+# Electron player — credential gerektirmez, "Demo Stream (test)" satırı calisir
 cd apps/desktop-player && npm install && npm run dev
 
 # Electron studio
 cd apps/desktop-studio && npm install && npm run dev
-
-# Android (Android Studio ile ac, ya da:)
-cd apps/android-player && ./gradlew assembleDebug
-cd apps/android-studio && ./gradlew assembleDebug
 ```
 
-Masaüstü uygulamalarında ("Demo Stream (test)" satırına tıklayarak) hiçbir credential girmeden player'ın gerçekten çalıştığını (oynatma + ses/altyazı track değiştirme) doğrulayabilirsiniz — bu ilk denenmesi gereken şey.
+Android için artık yerel `./gradlew` yerine GitHub Actions'taki `build-android.yml`
+sonucu (Release altındaki APK) indirilip kurulabilir.
 
-## Sıradaki adımlar (bu oturuma sığmadı)
+## Sıradaki adımlar
 
-- [ ] Gerçek IMDb linki + gerçek dosya ile uçtan uca test (Studio → Actions → HF → Player)
-- [ ] `package-media.mjs`'deki ffmpeg komutunu gerçek çok-sesli bir dosyayla doğrula
-- [ ] Android Hugging Face upload (LFS) akışını gerçek token ile doğrula
-- [ ] Push sonrası GitHub Actions workflow'larının gerçekten tetiklendiğini doğrula (`gh workflow list`)
-- [ ] v0.1.0 tag'i atıp build-desktop.yml/build-android.yml'nin Release oluşturduğunu doğrula
+- [ ] `build-desktop.yml`/`build-android.yml` (v0.1.2) çalışmasını bekleyip Release linkini paylaşmak
+- [ ] Gerçek IMDb linki + gerçek dosya ile Studio → Actions → HF → Player uçtan uca test
+- [ ] `package-media.mjs`'deki ffmpeg komutunu gerçek çok-sesli bir dosyayla doğrulamak
+- [ ] Android HF upload (LFS) akışını gerçek token ile doğrulamak
 - [ ] İndirme (offline izleme) özelliği — kullanıcı "şimdilik gerek yok" dedi, ileride eklenecek
