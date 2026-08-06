@@ -2,85 +2,101 @@
 
 Bu dosya her oturum sonunda güncellenir: ne yapıldı, ne eksik, nasıl test edilir.
 
-## Durum: Faz 0 + Faz 1 — canlı credential'larla doğrulandı, Actions build'leri devrede
+## Durum: Faz 0 + Faz 1 — 4 uygulama da CI'da başarıyla derlendi, çoklu-hesap özelliği ekleniyor
 
 ### Önemli: gerçek Hugging Face kullanıcı adı `mfilms12`, GitHub'daki `apexlions16` değil
 
 İlk taslakta shard namespace'i yanlışlıkla GitHub kullanıcı adıyla aynı varsayılmıştı.
-Gerçek HF hesabı `mfilms12` çıktı, `catalog/shards.json` ve örnek title dosyaları
-düzeltildi. İlk gerçek shard repo'su oluşturuldu ve doğrulandı:
-https://huggingface.co/datasets/mfilms12/film2-media-01
+Gerçek HF hesabı `mfilms12` çıktı, `catalog/shards.json` düzeltildi. İlk gerçek shard
+repo'su: https://huggingface.co/datasets/mfilms12/film2-media-01
 
-### Çoklu-shard (depolama dolunca otomatik yeni Hugging Face dataset açma) — canlı doğrulandı
+### v0.1.8: tüm 4 uygulama GitHub Actions'ta başarıyla derlendi ✅
 
-İstenen özellik: bir HF dataset repo'su dolunca otomatik yeni bir tane açılıp yeni
-yüklemeler oraya yönlenecek, eski içerik eski yerinden okunmaya devam edecek. Bu
-zaten `packages/hf-storage`'da (`ensureShardCapacity`) vardı ve hem `apps/desktop-studio`
-(`src/main/hf.ts`) hem `apps/android-studio` (`ShardRegistryManager.kt`) hem de
-paketleme pipeline'ı (`.github/scripts/package-media.mjs`) bunu upload öncesi çağırıyor
-— kodu tekrar okuyup doğruladım. Ayrıca **gerçek bir testle kanıtladım**: eşiği geçici
-olarak düşürüp `ensureShardCapacity`'yi gerçek HF token'ıyla çalıştırdım,
-`mfilms12/film2-media-02` gerçekten oluştu, eski shard pasifleşti/yenisi aktifleşti,
-sonra test repo'sunu sildim (gerçek `catalog/shards.json` hiç değişmedi, hâlâ sadece
-`-01` var). Mekanizma çalışıyor; yeni shard'lar gerçek kullanım sırasında otomatik
-açılacak, siz hiçbir şey yapmayacaksınız.
+- `apps/desktop-player`, `apps/desktop-studio` (Electron) — Windows installer, Release'e eklendi.
+- `apps/android-player`, `apps/android-studio` (Kotlin) — imzalı (debug keystore) APK, Release'e eklendi, gerçekten kurulabilir.
 
-### Tamamlandı ve gerçek credential'larla canlı doğrulandı
+desktop-studio'nun derlenmesi 5 farklı gerçek CI hatasından geçti (bkz. asagidaki debug
+gunlugu) — en inatçısı electron-builder'ın kendi `app-builder-bin` aracını kendi kendine
+silmesiydi, yerelde bizzat tekrar tekrar calistirarak bulundu.
 
-- `packages/tmdb-client` — gerçek TMDB key ile canlı test edildi (tt0111161 → doğru metadata). Türkçe ı/İ slugify hatası düzeltildi.
-- `packages/hf-storage` — gerçek HF token ile canlı test edildi (repo oluşturma, upload, indirme). Windows path bug'ı düzeltildi.
-- `apps/android-player`, `apps/android-studio` — **GitHub Actions'ta gerçekten derlendi VE Release'e yüklendi, ikisi de indirilip kurulabilir durumda.**
-- `apps/desktop-player` — **GitHub Actions'ta gerçekten derlendi, installer üretti.**
-- `apps/desktop-studio` — deniyoruz, bkz. aşağıdaki "CI debug günlüğü" — sürekli yeni gerçek hatalar çıktı, her biri düzeltildi, son deneme (v0.1.7) sonucu bekleniyor.
+### Yeni özellik (bu oturumun ikinci yarısı): farklı Hugging Face HESABINA otomatik failover
 
-### CI debug günlüğü — GitHub Actions üzerinde canlı çalıştırarak bulunan gerçek hatalar
+Kullanıcı netleştirdi: "aynı hesapta yeni repo açma" yetmiyor — Hugging Face **hesabı**
+tamamen dolarsa, kullanıcı **başka bir hesap** açıp token'ını eklediğinde sistem bunu
+tanıyıp otomatik oraya geçmeli. Bu, önceki "aynı hesapta yeni shard" özelliğinden farklı
+ve daha kapsamlı bir gereksinim — ayrıca eklendi:
+
+- `packages/hf-storage`: `ensureShardCapacity` artık tek token yerine öncelik sıralı
+  hesap listesi alıyor (`[{namespace, token}]`). Hugging Face'in gerçek "kota doldu"
+  hatasını (`isQuotaExceededError` — HTTP 402/403 ya da mesajda "quota"/"storage limit")
+  tanıyor; aktif shard'ın hesabında yeni repo açmaya çalışıyor, o da kota hatası verirse
+  listede SIRADAKI FARKLI hesaba geçiyor. `resolveHfAccount(token)` (whoami) ile token
+  yapıştırılınca hangi hesap olduğu otomatik tespit ediliyor — kullanıcı adı elle
+  yazılmıyor. `uploadFileWithFailover`/`uploadDirectoryWithFailover` gerçek yükleme
+  sırasında da aynı kontrolü yapıp gerekirse hesap değiştiriyor. **Gerçek token'larla
+  canlı test edildi**: quota-hatası tanıma, aynı-hesapta yeni shard açma, boş-hesap-listesi
+  hata mesajı hepsi doğrulandı.
+- `.github/scripts/package-media.mjs` + `package-media.yml`: `HF_ACCOUNTS_JSON` secret'ı
+  (opsiyonel, coklu hesap: `[{"namespace":"...","token":"hf_..."}]`) `HF_TOKEN`'a ek
+  olarak destekleniyor.
+- `apps/desktop-studio`: Ayarlar ekranında artık tek token yerine "Hugging Face
+  hesapları" listesi (ekle/kaldır, whoami ile doğrulanır, token asla renderer'a gitmez).
+  Yükleme akışı failover kullanıyor, hesap değişince kullanıcıya bildiriyor. **`npm run
+  build`/`build:win` temiz geçti** (yerelde, C:/D sürücü sorunu haricinde).
+- `apps/android-studio`: Aynı özelliğin Kotlin portu — arka plan ajanına devredildi,
+  sonucu bu dosyanın bir sonraki güncellemesinde (ya da GitHub'daki son commit'lerde).
+
+**Önemli kullanım notu**: Yeni bir Hugging Face hesabı eklediğinizde bunu HEM Studio
+uygulamasının (masaüstü/Android) Ayarlar ekranına HEM de (paketleme pipeline'ının da
+görebilmesi için) GitHub'daki `HF_ACCOUNTS_JSON` secret'ına eklemeniz gerekiyor —
+ikisi senkron tutulmalı.
+
+### CI debug günlüğü — GitHub Actions üzerinde canlı çalıştırarak bulunan gerçek hatalar (v0.1.0 → v0.1.8)
 
 Statik okumayla hiçbiri görünmüyordu, hepsi gerçek çalıştırmada ortaya çıktı:
 
-1. **Tag push + `paths` filtresi birlikte kullanılınca workflow hiç tetiklenmiyordu** (v0.1.0: 0 run). `paths` filtresi tag tetikleyicisinden kaldırıldı.
-2. **`if: ${{ secrets.X != '' }}` step-level'da reddediliyordu** (HTTP 422). Onceki adımda `GITHUB_OUTPUT`'a yazılıp `steps.*.outputs` ile okunacak sekilde duzeltildi.
-3. **Repo'nun `default_workflow_permissions` ayarı "read"** — Release oluşturma 403 ile patlıyordu. `permissions: contents: write` eklendi.
-4. **`--workspaces=false` ile izole npm kurulumu**, desktop-studio'nun kendi `@film2/*` paketlerini npm registry'den çekmeye çalışıp 404 almasına sebep oldu (bu paketler gerçek npm paketi değil, workspace symlink'i). Normal workspace kurulumuna dönüldü.
-5. **electron-builder `node_modules`'ten electron sürümünü auto-detect edemiyordu** (hoisting yüzünden). `electronVersion` her iki app'te elle sabitlendi (43.3.0 / 32.2.6).
-6. **desktop-player çıktısı `dist/`'e yazılıyordu ama workflow `release/*.exe` bekliyordu.** electron-builder.yml düzeltildi.
-7. **Android release APK tamamen imzasız üretiliyordu — Android "App not installed" diyip reddediyordu.** Kullanıcı bunu bizzat bildirdi. Her iki Android app'te release buildType artık AGP'nin otomatik ürettiği debug keystore'uyla imzalanıyor (gerçek `ANDROID_KEYSTORE_BASE64` secret'ı eklenirse CI zaten üstüne gerçek imza atıyor).
-8. **İki APK da aynı varsayılan dosya adıyla ("app-release.apk") aynı Release'e yüklenince biri diğerinin üzerine yazılıyordu** — v0.1.5 Release'inde sadece 1 apk vardı. Her app artık kendi benzersiz adına (`android-player.apk` / `android-studio.apk`) yeniden adlandırılıyor. v0.1.6'da doğrulandı: ikisi de Release'de.
-9. **desktop-studio'nun `build:win`'i 3 ayrı denemede aynı `app-builder-bin ENOENT` hatasıyla patladı** (rastgele değil, deterministik). Sebep: package.json'daki `@film2/*` girdileri "dependencies" altındaydı, electron-builder onları gerçek npm paketi sanıp kendi paketleme aracıyla işlemeye çalışıyordu. Bu paketler zaten Rollup ile derleme anında bundle içine gömülüyor, çalışma zamanında ayrıca node_modules'te durmalarına gerek yok — `devDependencies`'e taşındı (v0.1.7).
-
-**v0.1.7 şu an test ediliyor** — desktop-player zaten defalarca başarılı oldu, desktop-studio'nun bu son düzeltmeyle geçip geçmediği bu oturumun sonunda ya da https://github.com/apexlions16/film2/actions adresinden görülebilir.
+1. Tag push + `paths` filtresi birlikte kullanılınca workflow hiç tetiklenmiyordu — `paths` kaldırıldı.
+2. `if: ${{ secrets.X != '' }}` step-level'da reddediliyordu (HTTP 422) — `GITHUB_OUTPUT` + `steps.*.outputs` ile düzeltildi.
+3. Repo'nun `default_workflow_permissions` ayarı "read" — Release oluşturma 403 veriyordu — `permissions: contents: write` eklendi.
+4. `--workspaces=false`, desktop-studio'nun `@film2/*` paketlerini npm registry'den çekmeye çalışmasına sebep oldu — sonra `file:../../packages/X` protokolüyle düzgün çözüldü (bkz. madde 9).
+5. electron-builder `node_modules`'ten electron sürümünü auto-detect edemiyordu — `electronVersion` elle sabitlendi.
+6. desktop-player çıktısı `dist/`'e yazılıyordu, workflow `release/*.exe` bekliyordu — düzeltildi.
+7. Android release APK imzasızdı, Android kurmayı reddediyordu (**kullanıcı bildirdi**) — debug keystore ile imzalama eklendi.
+8. İki APK aynı dosya adıyla ayni Release'e yüklenince biri kayboluyordu — her app kendi benzersiz adına (`android-player.apk`/`android-studio.apk`) yeniden adlandırılıyor.
+9. desktop-studio `build:win` 4 ayrı denemede farklı hatalarla patladı, sonuncusu (`app-builder-bin` kendi kendini silmesi) yerelde bizzat tekrar tekrar çalıştırılarak bulundu — `@film2/*` bağımlılıkları `file:` protokolüne çevrildi, her app kendi izole `node_modules`'una kavuştu.
 
 ### Bilinen riskler / sıradaki canlı testte doğrulanması gerekenler
 
-1. **`package-media.mjs` ffmpeg `-var_stream_map` komutu** — henüz gerçek çok-sesli bir dosyayla hiç çalıştırılmadı.
-2. **Android Hugging Face upload (LFS) akışı** (`HfUploader.kt`) — gerçek token ile henüz test edilmedi, kod içinde TODO notlarıyla işaretli.
-3. **Android proje yolu** — repo yolu Türkçe karakter içerdiği için `android.overridePathCheck=true` eklendi, dokunmayın.
-4. Studio'larda cast/crew/sezon-bölüm listeleri tek tek satır bazında düzenlenemiyor, sadece üst seviye alanlar editable.
+1. `package-media.mjs` ffmpeg `-var_stream_map` komutu — henüz gerçek çok-sesli bir dosyayla hiç çalıştırılmadı.
+2. Android Hugging Face upload (LFS) akışı (`HfUploader.kt`) — gerçek token ile henüz test edilmedi, kod içinde TODO notlarıyla işaretli.
+3. Android proje yolu Türkçe karakter içerdiği için `android.overridePathCheck=true` eklendi, dokunmayın.
+4. Studio'larda cast/crew/sezon-bölüm listeleri tek tek satır bazında düzenlenemiyor.
+5. Failover sırasında TEK bir yükleme batch'i içinde hesap değişirse (nadir), pipeline'a tek bir `shardId` gönderiliyor — dosyaların hepsinin aynı shard'da olduğu varsayılıyor. Pratikte nadir (birkaç dosya tek seferde yükleniyor); tam çözüm için payload şemasının dosya-başına-shardId taşıyacak şekilde genişletilmesi gerekir.
 
 ## Secret/credential durumu
 
 ### GitHub repo secrets — TAMAM
 - `HF_TOKEN` ✅, `TMDB_API_KEY` ✅ eklendi
-- `ANDROID_KEYSTORE_BASE64`/`ANDROID_KEYSTORE_PASSWORD`/`ANDROID_KEY_ALIAS`/`ANDROID_KEY_PASSWORD` — opsiyonel, yok; APK'lar artık debug keystore ile her zaman kurulabilir imzalı üretiliyor (Play Store'a yüklenemez ama kişisel kullanım için sorun değil)
+- `HF_ACCOUNTS_JSON` — opsiyonel, birden fazla Hugging Face hesabı eklediğinizde kullanılır (yoksa tek `HF_TOKEN` yeterli)
+- `ANDROID_KEYSTORE_BASE64`/vb. — opsiyonel, yok; APK'lar debug keystore ile her zaman kurulabilir üretiliyor
 
 ### Studio uygulamaları içinde (yerel ayarlar, repoya asla commitlenmez)
-- TMDB API key, Hugging Face write token — sohbette paylaştığınız değerler (repo secret olarak zaten eklendi), Studio'nun Ayarlar ekranına ayrıca siz gireceksiniz
-- GitHub PAT (repo scope) — Studio'nun Contents API + `repository_dispatch` çağırması için kendi PAT'ınızı üretmeniz gerekiyor: https://github.com/settings/tokens
+- TMDB API key, Hugging Face hesap(lar)ı — Studio'nun Ayarlar ekranından girilir/eklenir
+- GitHub PAT (repo scope) — https://github.com/settings/tokens
 
-## Yerelde nasıl test edilir (opsiyonel — artık ana yol GitHub Actions)
+## Nasıl indirilir / denenir
 
-```bash
-npm install   # kok, packages/* icin
+Masaüstü/Android uygulamalarını GitHub Releases'ten indirip kurmanız yeterli:
+https://github.com/apexlions16/film2/releases (en son: v0.1.8, çoklu-hesap özelliği
+bir sonraki tag'de eklenecek)
 
-# Electron player — credential gerektirmez, "Demo Stream (test)" satırı calisir
-cd apps/desktop-player && npm install && npm run dev
-```
-
-Masaüstü/Android uygulamalarını artık GitHub Releases'ten indirip kurmanız yeterli:
-https://github.com/apexlions16/film2/releases
+Credential'sız hızlı doğrulama: `apps/desktop-player`'ı açıp "Demo Stream (test)"
+satırına tıklayın — gerçek oynatma + ses/altyazı track değiştirme çalışır.
 
 ## Sıradaki adımlar
 
-- [ ] v0.1.7'nin desktop-studio'da da geçtiğini doğrulamak, geçerse temiz bir vX.Y.Z ile son bir kez tüm 4 uygulamayı birlikte tetikleyip tek bir Release altında toplamak
+- [ ] android-studio'nun çoklu-hesap portunu bitirip derlemesini doğrulamak
+- [ ] Tüm değişiklikleri commit/push edip yeni bir vX.Y.Z tag'iyle 4 uygulamayı da birlikte tekrar derleyip tek Release altında toplamak
 - [ ] Gerçek IMDb linki + gerçek dosya ile Studio → Actions → HF → Player uçtan uca test
 - [ ] `package-media.mjs`'deki ffmpeg komutunu gerçek çok-sesli bir dosyayla doğrulamak
 - [ ] Android HF upload (LFS) akışını gerçek token ile doğrulamak
