@@ -1,0 +1,301 @@
+{
+  "id": "tolgshow-7827",
+  "imdbId": "tt7827112",
+  "manualEntry": false,
+  "status": "pending",
+  "createdAt": "2026-08-06T22:51:57.795Z",
+  "updatedAt": "2026-08-06T22:52:00.815Z",
+  "type": "series",
+  "tmdbId": 76579,
+  "title": "TOLGSHOW",
+  "originalTitle": "TOLGSHOW",
+  "overview": "Tolga Çevik’in merakla beklenen yeni programı TOLGSHOW yayına hazır! Doğaçlama sahnelediği ‘Arkadaşım’ karakteriyle 10 yıldır milyonları güldüren Tolga Çevik yeni programında sürpriz konuklar da ağırlayacak. ‘Gizemli Yönetmen’ Fırat Parlak ve ‘Minik Müzisyen’ Özer Atik’in de yer aldığı TOLGSHOW yine yanlış anlamalar, bilinmezlikler, didişmeler ve kahkahalar arasında geçecek.",
+  "releaseYear": 2018,
+  "genres": [
+    "Komedi",
+    "Talk"
+  ],
+  "posterUrl": "https://image.tmdb.org/t/p/w780/cpIuEqufA0efZ6mbB5GDMbifSzM.jpg",
+  "backdropUrl": "https://image.tmdb.org/t/p/w1280/1vxXE7ZfKuXBP7FoPlDVJGKdegc.jpg",
+  "cast": [
+    {
+      "name": "Tolga Çevik",
+      "character": "Arkadaşım",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/btsEAsTYeMk5YSFy0br0u4y4GcL.jpg"
+    },
+    {
+      "name": "Özer Atik",
+      "character": "Minik",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/fXnAJxR7uZTHgVNeANsXpnyc00f.jpg"
+    },
+    {
+      "name": "Fırat Parlak",
+      "character": "Yönetmen",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ebGjbXwfvgt08D5viQjG6B7iIhq.jpg"
+    }
+  ],
+  "crew": [
+    {
+      "name": "Fırat Parlak",
+      "job": "Writer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ebGjbXwfvgt08D5viQjG6B7iIhq.jpg"
+    },
+    {
+      "name": "Tolga Çevik",
+      "job": "Writer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/btsEAsTYeMk5YSFy0br0u4y4GcL.jpg"
+    }
+  ],
+  "seasons": [
+    {
+      "seasonNumber": 1,
+      "name": "Sezon 1",
+      "overview": "",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/mEd39AicKW5VotPTe4wM1jRvjJx.jpg",
+      "episodes": [
+        {
+          "episodeNumber": 1,
+          "title": "1. Bölüm",
+          "overview": "",
+          "airDate": "2018-01-01",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/ghVv9M63MqO1jNRebVWSKxWCfDf.jpg",
+          "runtimeMinutes": 92,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 2,
+          "title": "2. Bölüm",
+          "overview": "",
+          "airDate": "2018-01-08",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/uiZFTpklEkW5YpUaXMJevGce90z.jpg",
+          "runtimeMinutes": 114,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 3,
+          "title": "3. Bölüm",
+          "overview": "",
+          "airDate": "2018-01-14",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/72SRvAGtibAQ1KNzZz2apZvxANW.jpg",
+          "runtimeMinutes": 91,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 4,
+          "title": "4. Bölüm",
+          "overview": "",
+          "airDate": "2018-01-21",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/5aH4qON12U0WstGIm0ZleL7dkXo.jpg",
+          "runtimeMinutes": 86,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 5,
+          "title": "5. Bölüm",
+          "overview": "",
+          "airDate": "2018-01-28",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/5APw26d27U9EFna4gs2FF3MNOE3.jpg",
+          "runtimeMinutes": 76,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 6,
+          "title": "6. Bölüm",
+          "overview": "",
+          "airDate": "2018-02-22",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/wPT40YJo5RMwX9R6sdUNeO2AzTJ.jpg",
+          "runtimeMinutes": 81,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 7,
+          "title": "7. Bölüm",
+          "overview": "",
+          "airDate": "2018-02-25",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/lbdLjXxAsn7fJosFk3I7V5vatqX.jpg",
+          "runtimeMinutes": 71,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 8,
+          "title": "8. Bölüm",
+          "overview": "",
+          "airDate": "2018-03-04",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/suRV7nnLJc1diKQl2VCHcmQu2E1.jpg",
+          "runtimeMinutes": 80,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 9,
+          "title": "9. Bölüm",
+          "overview": "",
+          "airDate": "2018-03-11",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/xnD5DuiiiIaMVdhfHAHYhoiasYW.jpg",
+          "runtimeMinutes": 76,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 10,
+          "title": "10. Bölüm",
+          "overview": "",
+          "airDate": "2018-03-18",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/qogIsM4GOv3B7lD3cQyHs9zqaal.jpg",
+          "runtimeMinutes": 79,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 11,
+          "title": "11. Bölüm",
+          "overview": "",
+          "airDate": "2018-03-25",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/8kVOi5CK6OmHE0WbH2H2etySb17.jpg",
+          "runtimeMinutes": 81,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 12,
+          "title": "12. Bölüm",
+          "overview": "",
+          "airDate": "2018-04-01",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/8dJCvZ0bBL514TwIArc2hMonKaD.jpg",
+          "runtimeMinutes": 82,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 13,
+          "title": "13. Bölüm",
+          "overview": "",
+          "airDate": "2018-04-08",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/jmeULFVGr61UjnrbrwJpVeKNJgd.jpg",
+          "runtimeMinutes": 78,
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "seasonNumber": 2,
+      "name": "Sezon 2",
+      "overview": "",
+      "posterUrl": "https://image.tmdb.org/t/p/w780/mEd39AicKW5VotPTe4wM1jRvjJx.jpg",
+      "episodes": [
+        {
+          "episodeNumber": 1,
+          "title": "14. Bölüm",
+          "overview": "",
+          "airDate": "2018-06-30",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/4KZDzDoxfDZ412oSxygpQfSf8fE.jpg",
+          "runtimeMinutes": 97,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 2,
+          "title": "15. Bölüm",
+          "overview": "",
+          "airDate": "2018-07-07",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/4jSPxILFepr5wrDquTo8imgbjDo.jpg",
+          "runtimeMinutes": 94,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 3,
+          "title": "16. Bölüm",
+          "overview": "",
+          "airDate": "2018-07-14",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/600tzQmqvgDBpLxWCJFXPowwgv9.jpg",
+          "runtimeMinutes": 97,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 4,
+          "title": "17. Bölüm",
+          "overview": "",
+          "airDate": "2018-07-21",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/rQIonNfXy2l6a6GwomcBHl2J4xs.jpg",
+          "runtimeMinutes": 91,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 5,
+          "title": "18. Bölüm",
+          "overview": "",
+          "airDate": "2018-07-28",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/5Kwukb3jna3nuqpUr1pzUdWOnnC.jpg",
+          "runtimeMinutes": 83,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 6,
+          "title": "19. Bölüm",
+          "overview": "",
+          "airDate": "2018-08-04",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/72XTwsdJaffaS5L2qvDnDNLCM72.jpg",
+          "runtimeMinutes": 103,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 7,
+          "title": "20. Bölüm",
+          "overview": "",
+          "airDate": "2018-08-11",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/2FlU5peB8SrMhc1uoW0S8AoROBf.jpg",
+          "runtimeMinutes": 100,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 8,
+          "title": "21. Bölüm",
+          "overview": "",
+          "airDate": "2018-08-18",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/xLZHm4tPsYJWCOpexFpvX32LYaL.jpg",
+          "runtimeMinutes": 90,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 9,
+          "title": "22. Bölüm",
+          "overview": "",
+          "airDate": "2018-08-25",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/uwkpSzfIA1hy6NHToI1cGbTzHtE.jpg",
+          "runtimeMinutes": 86,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 10,
+          "title": "23. Bölüm",
+          "overview": "",
+          "airDate": "2018-09-01",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/mHEl2W5JDg2oyikTrX9N0yjYXpZ.jpg",
+          "runtimeMinutes": 93,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 11,
+          "title": "24. Bölüm",
+          "overview": "",
+          "airDate": "2018-09-08",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/dXYvWluABJ0bCTalqXTlTQAmxyK.jpg",
+          "runtimeMinutes": 97,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 12,
+          "title": "25. Bölüm",
+          "overview": "",
+          "airDate": "2018-09-15",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/g160SF88Cfs5uncJzjCEe2FHHXZ.jpg",
+          "runtimeMinutes": 95,
+          "status": "pending"
+        },
+        {
+          "episodeNumber": 13,
+          "title": "26. Bölüm",
+          "overview": "",
+          "airDate": "2018-09-21",
+          "stillUrl": "https://image.tmdb.org/t/p/w500/jSPJLw6Pic6ej8pLFoZb1GLbZsu.jpg",
+          "runtimeMinutes": 113,
+          "status": "pending"
+        }
+      ]
+    }
+  ]
+}
