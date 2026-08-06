@@ -14,16 +14,16 @@
   },
   "dependencies": {
     "@fontsource-variable/outfit": "^5.1.0",
-    "@film2/catalog-client": "^0.1.0",
-    "@film2/catalog-schema": "^0.1.0",
-    "@film2/hf-storage": "^0.1.0",
-    "@film2/tmdb-client": "^0.1.0",
     "@huggingface/hub": "^1.1.2",
     "electron-store": "^8.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@film2/catalog-client": "^0.1.0",
+    "@film2/catalog-schema": "^0.1.0",
+    "@film2/hf-storage": "^0.1.0",
+    "@film2/tmdb-client": "^0.1.0",
     "@types/node": "^20.16.5",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
