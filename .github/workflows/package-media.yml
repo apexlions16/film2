@@ -54,7 +54,7 @@ jobs:
           # hesap eklediginizde bu secret'i de guncelleyin (Studio ayarlariyla senkron).
           HF_ACCOUNTS_JSON: ${{ secrets.HF_ACCOUNTS_JSON }}
         run: |
-          node .github/scripts/package-media.mjs '${{ github.event_name == "workflow_dispatch" && github.event.inputs.payload || toJson(github.event.client_payload) }}' > /tmp/result.json
+          node .github/scripts/package-media.mjs '${{ github.event_name == 'workflow_dispatch' && github.event.inputs.payload || toJson(github.event.client_payload) }}' > /tmp/result.json
           cat /tmp/result.json
 
       - name: Katalogu guncelle
