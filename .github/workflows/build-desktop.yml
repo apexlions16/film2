@@ -27,13 +27,14 @@ jobs:
         with:
           node-version: "22"
 
-      # NOT: --workspaces=false denendi ama desktop-studio kendi @film2/* paketlerini
-      # (workspace symlink'i olmadan) npm registry'den cekmeye calisip 404 aliyordu.
-      # Bunun yerine normal workspace kurulumu birakildi, electron-builder'in
-      # node_modules'ten surum auto-detect etme sorunu electronVersion'i elle
-      # sabitleyerek cozuldu (bkz. electron-builder.yml / package.json "build").
+      # --workspaces=false: kok workspace hoisting'i electron-builder'in "installing
+      # production dependencies" adimini bozuyordu (app-builder-bin'i kendi kendine
+      # silip hemen sonra ona ihtiyac duyuyordu — gercek CI + yerelde tekrar tekrar
+      # dogrulandi). Her app kendi izole node_modules'una sahip olunca sorun cozuluyor.
+      # @film2/* paketleri artik "file:../../packages/X" protokoluyle referans veriliyor,
+      # bu sayede workspace hoisting olmadan da duzgun yerel kurulum yapabiliyor.
       - name: Bagimliliklari kur
-        run: npm install
+        run: npm install --workspaces=false
         working-directory: apps/${{ matrix.app }}
 
       - name: Windows installer derle

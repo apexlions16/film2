@@ -11,44 +11,60 @@ Gerçek HF hesabı `mfilms12` çıktı, `catalog/shards.json` ve örnek title do
 düzeltildi. İlk gerçek shard repo'su oluşturuldu ve doğrulandı:
 https://huggingface.co/datasets/mfilms12/film2-media-01
 
+### Çoklu-shard (depolama dolunca otomatik yeni Hugging Face dataset açma) — canlı doğrulandı
+
+İstenen özellik: bir HF dataset repo'su dolunca otomatik yeni bir tane açılıp yeni
+yüklemeler oraya yönlenecek, eski içerik eski yerinden okunmaya devam edecek. Bu
+zaten `packages/hf-storage`'da (`ensureShardCapacity`) vardı ve hem `apps/desktop-studio`
+(`src/main/hf.ts`) hem `apps/android-studio` (`ShardRegistryManager.kt`) hem de
+paketleme pipeline'ı (`.github/scripts/package-media.mjs`) bunu upload öncesi çağırıyor
+— kodu tekrar okuyup doğruladım. Ayrıca **gerçek bir testle kanıtladım**: eşiği geçici
+olarak düşürüp `ensureShardCapacity`'yi gerçek HF token'ıyla çalıştırdım,
+`mfilms12/film2-media-02` gerçekten oluştu, eski shard pasifleşti/yenisi aktifleşti,
+sonra test repo'sunu sildim (gerçek `catalog/shards.json` hiç değişmedi, hâlâ sadece
+`-01` var). Mekanizma çalışıyor; yeni shard'lar gerçek kullanım sırasında otomatik
+açılacak, siz hiçbir şey yapmayacaksınız.
+
 ### Tamamlandı ve gerçek credential'larla canlı doğrulandı
 
-- `packages/catalog-schema` — offline test edildi (geçerli/geçersiz title doğru ayrıştı).
-- `packages/tmdb-client` — **gerçek TMDB API key ile canlı test edildi**: `tt0111161` linkinden "Esaretin Bedeli" (The Shawshank Redemption) metadata'sı (oyuncu, poster, backdrop, tür, süre) doğru şekilde çekildi. Türkçe `ı`/`İ` slugify hatası bulunup düzeltildi.
-- `packages/hf-storage` — **gerçek HF write token ile canlı test edildi**: `mfilms12/film2-media-01` repo'su oluşturuldu, test dosyası yüklendi, `resolveUrl` ile üretilen link üzerinden dosya gerçekten indirilebildi. `test.mjs`'de Windows'a özgü bir path bug'ı (`URL.pathname` yerine `fileURLToPath` gerekiyordu) bulunup düzeltildi.
-- `packages/catalog-client`, `catalog/shards.json`, `catalog/titles/_example-*.json` — tamam.
-- `.github/workflows/package-media.yml` + scriptler — yazıldı, henüz gerçek medya dosyasıyla hiç çalıştırılmadı (aşağıya bakın).
-- `apps/desktop-player`, `apps/desktop-studio` (Electron) — `npm install`/`build` temiz, player Browser pane'de görsel doğrulandı (2 bug bulunup düzeltildi: CSS keyframe kapsamı, mor renk ihlali).
-- `apps/android-player`, `apps/android-studio` (Kotlin/Compose) — ikisi de gerçekten derlendi (`assembleRelease`).
+- `packages/tmdb-client` — gerçek TMDB key ile canlı test edildi (tt0111161 → doğru metadata). Türkçe ı/İ slugify hatası düzeltildi.
+- `packages/hf-storage` — gerçek HF token ile canlı test edildi (repo oluşturma, upload, indirme). Windows path bug'ı düzeltildi.
+- `apps/android-player`, `apps/android-studio` — **GitHub Actions'ta gerçekten derlendi VE Release'e yüklendi, ikisi de indirilip kurulabilir durumda.**
+- `apps/desktop-player` — **GitHub Actions'ta gerçekten derlendi, installer üretti.**
+- `apps/desktop-studio` — deniyoruz, bkz. aşağıdaki "CI debug günlüğü" — sürekli yeni gerçek hatalar çıktı, her biri düzeltildi, son deneme (v0.1.7) sonucu bekleniyor.
 
-### GitHub Actions — artık tüm build'ler buradan (kullanıcı talebi)
+### CI debug günlüğü — GitHub Actions üzerinde canlı çalıştırarak bulunan gerçek hatalar
 
-- `HF_TOKEN` ve `TMDB_API_KEY` repo secret'ı olarak eklendi (`gh secret list` ile doğrulandı).
-- **Bulunan ve düzeltilen 2 gerçek workflow bug'ı** (ikisi de sadece `gh api`/`gh run list` ile canlı test edilerek ortaya çıktı, statik okumayla görünmüyordu):
-  1. `push: {tags: [...], paths: [...]}` birlikte kullanılınca tag push'ları workflow'u **hiç tetiklemiyordu** (v0.1.0 tag'i push edildi, `gh api .../actions/runs` `total_count: 0` döndü). `paths` filtresi tag tetikleyicisinden tamamen kaldırıldı — artık `build-desktop.yml`/`build-android.yml` sadece tag push veya elle `workflow_dispatch` ile çalışıyor.
-  2. `build-android.yml`'de `if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}` GitHub tarafından reddediliyordu (`HTTP 422: Unrecognized named-value: 'secrets'` — step-level `if` içinde `secrets` context'i doğrudan kullanılamıyor). Önce bir adımda `GITHUB_OUTPUT`'a yazılıp sonraki adımın `if`'inde `steps.keystore_check.outputs.present` ile okunacak şekilde düzeltildi.
-- v0.1.2 tag'i bu düzeltmelerle atıldı, `build-desktop.yml` (ref v0.1.1) ve `build-android.yml` (ref v0.1.2) `workflow_dispatch` ile elle tetiklendi — imzasız APK/installer üretip GitHub Release'e eklemeleri bekleniyor. Sonucu bu oturumun sonunda ya da GitHub'da Actions sekmesinden görebilirsiniz: https://github.com/apexlions16/film2/actions
-- **Bundan sonra**: yeni bir `vX.Y.Z` tag'i push ettiğinizde (kendi makinenizden, `workflow` scope'lu bir token/normal git ile) otomatik build+Release beklenir — ama bizim ortamımızdaki `gh` OAuth token'ı `workflow` scope'suz olduğu için tag push'ları Actions'ı tetiklemedi, ben `gh workflow run ... --ref <tag>` (workflow_dispatch, tag ref'i ile — böylece Release'e ekleme adımı da çalışıyor) ile elle tetikledim. Kendi git/GitHub Desktop'ınızdan attığınız tag'ler muhtemelen sorunsuz tetikler; sorun yaşarsanız Actions sekmesinden "Run workflow" ile elle de tetikleyebilirsiniz.
+Statik okumayla hiçbiri görünmüyordu, hepsi gerçek çalıştırmada ortaya çıktı:
+
+1. **Tag push + `paths` filtresi birlikte kullanılınca workflow hiç tetiklenmiyordu** (v0.1.0: 0 run). `paths` filtresi tag tetikleyicisinden kaldırıldı.
+2. **`if: ${{ secrets.X != '' }}` step-level'da reddediliyordu** (HTTP 422). Onceki adımda `GITHUB_OUTPUT`'a yazılıp `steps.*.outputs` ile okunacak sekilde duzeltildi.
+3. **Repo'nun `default_workflow_permissions` ayarı "read"** — Release oluşturma 403 ile patlıyordu. `permissions: contents: write` eklendi.
+4. **`--workspaces=false` ile izole npm kurulumu**, desktop-studio'nun kendi `@film2/*` paketlerini npm registry'den çekmeye çalışıp 404 almasına sebep oldu (bu paketler gerçek npm paketi değil, workspace symlink'i). Normal workspace kurulumuna dönüldü.
+5. **electron-builder `node_modules`'ten electron sürümünü auto-detect edemiyordu** (hoisting yüzünden). `electronVersion` her iki app'te elle sabitlendi (43.3.0 / 32.2.6).
+6. **desktop-player çıktısı `dist/`'e yazılıyordu ama workflow `release/*.exe` bekliyordu.** electron-builder.yml düzeltildi.
+7. **Android release APK tamamen imzasız üretiliyordu — Android "App not installed" diyip reddediyordu.** Kullanıcı bunu bizzat bildirdi. Her iki Android app'te release buildType artık AGP'nin otomatik ürettiği debug keystore'uyla imzalanıyor (gerçek `ANDROID_KEYSTORE_BASE64` secret'ı eklenirse CI zaten üstüne gerçek imza atıyor).
+8. **İki APK da aynı varsayılan dosya adıyla ("app-release.apk") aynı Release'e yüklenince biri diğerinin üzerine yazılıyordu** — v0.1.5 Release'inde sadece 1 apk vardı. Her app artık kendi benzersiz adına (`android-player.apk` / `android-studio.apk`) yeniden adlandırılıyor. v0.1.6'da doğrulandı: ikisi de Release'de.
+9. **desktop-studio'nun `build:win`'i 3 ayrı denemede aynı `app-builder-bin ENOENT` hatasıyla patladı** (rastgele değil, deterministik). Sebep: package.json'daki `@film2/*` girdileri "dependencies" altındaydı, electron-builder onları gerçek npm paketi sanıp kendi paketleme aracıyla işlemeye çalışıyordu. Bu paketler zaten Rollup ile derleme anında bundle içine gömülüyor, çalışma zamanında ayrıca node_modules'te durmalarına gerek yok — `devDependencies`'e taşındı (v0.1.7).
+
+**v0.1.7 şu an test ediliyor** — desktop-player zaten defalarca başarılı oldu, desktop-studio'nun bu son düzeltmeyle geçip geçmediği bu oturumun sonunda ya da https://github.com/apexlions16/film2/actions adresinden görülebilir.
 
 ### Bilinen riskler / sıradaki canlı testte doğrulanması gerekenler
 
-1. **`package-media.mjs` ffmpeg `-var_stream_map` komutu** — henüz gerçek çok-sesli bir dosyayla hiç çalıştırılmadı. İlk gerçek içerik yüklemesinde doğrulanmalı.
+1. **`package-media.mjs` ffmpeg `-var_stream_map` komutu** — henüz gerçek çok-sesli bir dosyayla hiç çalıştırılmadı.
 2. **Android Hugging Face upload (LFS) akışı** (`HfUploader.kt`) — gerçek token ile henüz test edilmedi, kod içinde TODO notlarıyla işaretli.
-3. **GitHub Contents API commit boyut sınırı** (~1MB, base64) — sadece küçük JSON dosyaları için kullanılıyor, tasarım gereği sorun olmamalı.
-4. **Android proje yolu** — repo yolu Türkçe karakter içerdiği için `android.overridePathCheck=true` eklendi, dokunmayın.
-5. Studio'larda cast/crew/sezon-bölüm listeleri tek tek satır bazında düzenlenemiyor, sadece üst seviye alanlar editable — ileride genişletilebilir.
+3. **Android proje yolu** — repo yolu Türkçe karakter içerdiği için `android.overridePathCheck=true` eklendi, dokunmayın.
+4. Studio'larda cast/crew/sezon-bölüm listeleri tek tek satır bazında düzenlenemiyor, sadece üst seviye alanlar editable.
 
 ## Secret/credential durumu
 
 ### GitHub repo secrets — TAMAM
-- `HF_TOKEN` ✅ eklendi
-- `TMDB_API_KEY` ✅ eklendi
-- `ANDROID_KEYSTORE_BASE64`/`ANDROID_KEYSTORE_PASSWORD`/`ANDROID_KEY_ALIAS`/`ANDROID_KEY_PASSWORD` — opsiyonel, yok; APK'lar şimdilik imzasız üretiliyor (cihaza kurulabilir, Play Store'a yüklenemez — kişisel kullanım için sorun değil)
+- `HF_TOKEN` ✅, `TMDB_API_KEY` ✅ eklendi
+- `ANDROID_KEYSTORE_BASE64`/`ANDROID_KEYSTORE_PASSWORD`/`ANDROID_KEY_ALIAS`/`ANDROID_KEY_PASSWORD` — opsiyonel, yok; APK'lar artık debug keystore ile her zaman kurulabilir imzalı üretiliyor (Play Store'a yüklenemez ama kişisel kullanım için sorun değil)
 
 ### Studio uygulamaları içinde (yerel ayarlar, repoya asla commitlenmez)
-- TMDB API key — sohbette paylaştığınız v3 API Anahtarı (repo secret olarak zaten eklendi, Studio'nun Ayarlar ekranına ayrıca siz gireceksiniz — bu dosyaya veya repoya asla yazılmaz)
-- Hugging Face write token — sohbette paylaştığınız `hf_...` token (repo secret olarak zaten eklendi, Studio Ayarlar ekranına aynı şekilde siz gireceksiniz)
-- GitHub PAT (repo scope) — Studio'nun Contents API + `repository_dispatch` çağırması için kendi PAT'ınızı üretmeniz gerekiyor: https://github.com/settings/tokens (gh CLI'nin kendi token'ı `workflow` scope'suz olduğu için Studio'nun kendi PAT'ini üretmesi daha saglam)
+- TMDB API key, Hugging Face write token — sohbette paylaştığınız değerler (repo secret olarak zaten eklendi), Studio'nun Ayarlar ekranına ayrıca siz gireceksiniz
+- GitHub PAT (repo scope) — Studio'nun Contents API + `repository_dispatch` çağırması için kendi PAT'ınızı üretmeniz gerekiyor: https://github.com/settings/tokens
 
 ## Yerelde nasıl test edilir (opsiyonel — artık ana yol GitHub Actions)
 
@@ -57,17 +73,14 @@ npm install   # kok, packages/* icin
 
 # Electron player — credential gerektirmez, "Demo Stream (test)" satırı calisir
 cd apps/desktop-player && npm install && npm run dev
-
-# Electron studio
-cd apps/desktop-studio && npm install && npm run dev
 ```
 
-Android için artık yerel `./gradlew` yerine GitHub Actions'taki `build-android.yml`
-sonucu (Release altındaki APK) indirilip kurulabilir.
+Masaüstü/Android uygulamalarını artık GitHub Releases'ten indirip kurmanız yeterli:
+https://github.com/apexlions16/film2/releases
 
 ## Sıradaki adımlar
 
-- [ ] `build-desktop.yml`/`build-android.yml` (v0.1.2) çalışmasını bekleyip Release linkini paylaşmak
+- [ ] v0.1.7'nin desktop-studio'da da geçtiğini doğrulamak, geçerse temiz bir vX.Y.Z ile son bir kez tüm 4 uygulamayı birlikte tetikleyip tek bir Release altında toplamak
 - [ ] Gerçek IMDb linki + gerçek dosya ile Studio → Actions → HF → Player uçtan uca test
 - [ ] `package-media.mjs`'deki ffmpeg komutunu gerçek çok-sesli bir dosyayla doğrulamak
 - [ ] Android HF upload (LFS) akışını gerçek token ile doğrulamak

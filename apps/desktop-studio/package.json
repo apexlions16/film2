@@ -20,10 +20,10 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@film2/catalog-client": "^0.1.0",
-    "@film2/catalog-schema": "^0.1.0",
-    "@film2/hf-storage": "^0.1.0",
-    "@film2/tmdb-client": "^0.1.0",
+    "@film2/catalog-client": "file:../../packages/catalog-client",
+    "@film2/catalog-schema": "file:../../packages/catalog-schema",
+    "@film2/hf-storage": "file:../../packages/hf-storage",
+    "@film2/tmdb-client": "file:../../packages/tmdb-client",
     "@types/node": "^20.16.5",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
