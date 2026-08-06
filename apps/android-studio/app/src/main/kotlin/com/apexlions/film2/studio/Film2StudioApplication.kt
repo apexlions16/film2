@@ -27,9 +27,8 @@ class Film2StudioApplication : Application() {
     val packageMediaDispatcher: PackageMediaDispatcher by lazy { PackageMediaDispatcher() }
 
     /** New instance per call: HuggingFaceUploader materializes SAF Uris via this app's
-     *  cacheDir and shouldn't be shared across unrelated upload jobs. */
-    fun newHfUploader(): HuggingFaceUploader = HuggingFaceUploader(
-        tokenProvider = { settingsRepository.currentTokens().huggingFaceToken },
-        context = this,
-    )
+     *  cacheDir and shouldn't be shared across unrelated upload jobs. Token is no longer
+     *  fixed at construction time — which account's token to use is decided dynamically
+     *  per shard during failover (see uploadFileWithFailover), so it's passed per-call. */
+    fun newHfUploader(): HuggingFaceUploader = HuggingFaceUploader(context = this)
 }

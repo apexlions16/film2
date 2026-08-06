@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit
  */
 interface HfUploader {
     suspend fun uploadFile(
+        token: String,
         shardId: String,
         repoPath: String,
         localUri: Uri,
@@ -53,7 +54,6 @@ fun resolveHfUrl(shardId: String, pathInRepo: String): String =
  * need an explicit "complete multipart upload" call with collected ETags.
  */
 class HuggingFaceUploader(
-    private val tokenProvider: suspend () -> String?,
     private val context: Context,
     private val httpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
@@ -65,13 +65,13 @@ class HuggingFaceUploader(
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
     override suspend fun uploadFile(
+        token: String,
         shardId: String,
         repoPath: String,
         localUri: Uri,
         onProgress: (Long, Long) -> Unit,
     ): String = withContext(Dispatchers.IO) {
-        val token = tokenProvider()
-        require(!token.isNullOrBlank()) { "Hugging Face yazma tokeni ayarlanmamis (Ayarlar ekranindan girin)" }
+        require(token.isNotBlank()) { "Hugging Face yazma tokeni ayarlanmamis (Ayarlar ekranindan girin)" }
 
         val size = querySize(localUri)
         if (size <= SMALL_FILE_THRESHOLD_BYTES) {
@@ -130,7 +130,10 @@ class HuggingFaceUploader(
 
         val preuploadResult = httpClient.newCall(preuploadRequest).execute().use { response ->
             if (!response.isSuccessful) {
-                throw HfUploadException("Hugging Face preupload basarisiz (${response.code}): ${response.body?.string().orEmpty()}")
+                throw HfUploadException(
+                    "Hugging Face preupload basarisiz (${response.code}): ${response.body?.string().orEmpty()}",
+                    statusCode = response.code,
+                )
             }
             json.decodeFromString(PreuploadResponse.serializer(), response.body?.string().orEmpty())
         }
@@ -185,7 +188,10 @@ class HuggingFaceUploader(
                             .build()
                         httpClient.newCall(request).execute().use { response ->
                             if (!response.isSuccessful) {
-                                throw HfUploadException("LFS parca yuklemesi basarisiz (${response.code}) [$index]")
+                                throw HfUploadException(
+                                    "LFS parca yuklemesi basarisiz (${response.code}) [$index]",
+                                    statusCode = response.code,
+                                )
                             }
                         }
                         uploaded += (end - start)
@@ -208,7 +214,10 @@ class HuggingFaceUploader(
                         .build()
                     httpClient.newCall(request).execute().use { response ->
                         if (!response.isSuccessful) {
-                            throw HfUploadException("LFS yuklemesi basarisiz (${response.code}): ${response.body?.string().orEmpty()}")
+                            throw HfUploadException(
+                                "LFS yuklemesi basarisiz (${response.code}): ${response.body?.string().orEmpty()}",
+                                statusCode = response.code,
+                            )
                         }
                     }
                     onProgress(size, size)
@@ -233,7 +242,10 @@ class HuggingFaceUploader(
 
         httpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                throw HfUploadException("Hugging Face commit basarisiz (${response.code}): ${response.body?.string().orEmpty()}")
+                throw HfUploadException(
+                    "Hugging Face commit basarisiz (${response.code}): ${response.body?.string().orEmpty()}",
+                    statusCode = response.code,
+                )
             }
         }
     }
@@ -291,7 +303,7 @@ class HuggingFaceUploader(
     }
 }
 
-class HfUploadException(message: String) : Exception(message)
+class HfUploadException(message: String, val statusCode: Int? = null) : Exception(message)
 
 /** minSdk-safe equivalent of InputStream.readNBytes (that method needs API 33+). */
 private fun readExactly(input: java.io.InputStream, count: Int): ByteArray {

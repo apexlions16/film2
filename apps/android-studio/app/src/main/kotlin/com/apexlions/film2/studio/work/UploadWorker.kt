@@ -16,6 +16,8 @@ import com.apexlions.film2.studio.R
 import com.apexlions.film2.studio.dispatch.MediaKind
 import com.apexlions.film2.studio.dispatch.PackageMediaRequest
 import com.apexlions.film2.studio.dispatch.UploadMode
+import com.apexlions.film2.studio.hf.HfAccountEntry
+import com.apexlions.film2.studio.hf.uploadFileWithFailover
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -85,14 +87,21 @@ class UploadWorker(
 
     private suspend fun runUpload(app: Film2StudioApplication, spec: UploadJobSpec) {
         val tokens = app.settingsRepository.currentTokens()
-        val hfToken = tokens.huggingFaceToken
+        val hfAccounts = app.settingsRepository.currentHfAccounts()
+            .map { HfAccountEntry(namespace = it.namespace, token = it.token) }
         val githubToken = tokens.githubPat
-        requireNotNull(hfToken) { "Hugging Face tokeni ayarlanmamis" }
+        require(hfAccounts.isNotEmpty()) {
+            "Hicbir Hugging Face hesabi eklenmemis. Once Ayarlar ekranindan en az bir hesap ekleyin."
+        }
         requireNotNull(githubToken) { "GitHub PAT ayarlanmamis" }
 
         val registry = app.githubClient.getShardRegistry()
-        val capacityChecked = app.shardRegistryManager.ensureCapacity(registry, hfToken)
-        val shard = app.shardRegistryManager.getActiveShard(capacityChecked)
+        // Kapasite onceden (esik bazli) kontrol edilir; asil "hesap gercekten dolu" durumu
+        // (HF'nin gercek kota hatasi) her dosya yuklemesinde uploadFileWithFailover
+        // tarafindan ayrica yakalanip otomatik siradaki hesaba gecilir.
+        val capacityChecked = app.shardRegistryManager.ensureCapacity(registry, hfAccounts)
+        var currentRegistry = capacityChecked.registry
+        var shard = app.shardRegistryManager.getActiveShard(currentRegistry)
 
         val incomingPrefix = if (spec.kind == "episode") {
             "incoming/${spec.titleId}/s${spec.seasonNumber}e${spec.episodeNumber}"
@@ -106,22 +115,25 @@ class UploadWorker(
 
         spec.files.forEachIndexed { index, file ->
             val repoPath = "$incomingPrefix/${file.fileName}"
-            var lastKnownTotal = 0L
-            uploader.uploadFile(
-                shardId = shard.id,
-                repoPath = repoPath,
+            val result = uploadFileWithFailover(
+                uploader = uploader,
+                shardRegistryManager = app.shardRegistryManager,
                 localUri = Uri.parse(file.uri),
+                repoPath = repoPath,
+                registry = currentRegistry,
+                accounts = hfAccounts,
                 onProgress = { sent, total ->
-                    lastKnownTotal = total
                     val overallPercent = (((index * 100) + if (total > 0) (sent * 100 / total).toInt() else 0) / totalFiles)
                     setForegroundAsync(buildForegroundInfo(overallPercent))
                     setProgressAsync(workDataOf(KEY_PROGRESS_PERCENT to overallPercent))
                 },
             )
-            totalBytesUploaded += lastKnownTotal
+            currentRegistry = result.registry
+            shard = result.shard
+            totalBytesUploaded += result.bytes
         }
 
-        val withUsage = app.shardRegistryManager.recordUsage(capacityChecked, shard.id, totalBytesUploaded)
+        val withUsage = app.shardRegistryManager.recordUsage(currentRegistry, shard.id, totalBytesUploaded)
         app.githubClient.putShardRegistry(withUsage)
 
         val combinedFile = spec.files.firstOrNull { it.role == "combined" }?.fileName
