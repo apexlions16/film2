@@ -3,6 +3,7 @@ package com.apexlions.film2.player.navigation
 /** Route definitions for the player app's small nav graph (browse -> detail -> player). */
 object Destinations {
     const val BROWSE = "browse"
+    const val SEARCH = "search"
 
     const val TITLE_DETAIL_ROUTE = "title/{titleId}"
     fun titleDetail(titleId: String) = "title/$titleId"

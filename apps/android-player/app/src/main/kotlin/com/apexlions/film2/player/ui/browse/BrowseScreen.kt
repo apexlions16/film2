@@ -9,13 +9,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,6 +39,7 @@ import com.apexlions.film2.player.ui.common.CatalogErrorState
 @Composable
 fun BrowseScreen(
     onTitleSelected: (Title) -> Unit,
+    onSearchClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val application = LocalContext.current.applicationContext as Film2PlayerApplication
@@ -64,6 +74,22 @@ fun BrowseScreen(
                     onSelect = onTitleSelected,
                 )
             }
+        }
+
+        IconButton(
+            onClick = onSearchClick,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(top = 4.dp, end = 8.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.55f)),
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = "Ara",
+                tint = MaterialTheme.colorScheme.onBackground,
+            )
         }
     }
 }

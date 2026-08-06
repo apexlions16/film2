@@ -9,6 +9,7 @@ import androidx.navigation.navArgument
 import com.apexlions.film2.player.ui.browse.BrowseScreen
 import com.apexlions.film2.player.ui.detail.TitleDetailScreen
 import com.apexlions.film2.player.ui.player.PlayerScreen
+import com.apexlions.film2.player.ui.search.SearchScreen
 
 @Composable
 fun Film2PlayerNavGraph() {
@@ -20,6 +21,16 @@ fun Film2PlayerNavGraph() {
                 onTitleSelected = { title ->
                     navController.navigate(Destinations.titleDetail(title.id))
                 },
+                onSearchClick = { navController.navigate(Destinations.SEARCH) },
+            )
+        }
+
+        composable(Destinations.SEARCH) {
+            SearchScreen(
+                onTitleSelected = { title ->
+                    navController.navigate(Destinations.titleDetail(title.id))
+                },
+                onBack = { navController.popBackStack() },
             )
         }
 
