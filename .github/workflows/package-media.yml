@@ -35,6 +35,10 @@ jobs:
         id: package
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          # Coklu Hugging Face hesabi (opsiyonel): '[{"namespace":"...","token":"hf_..."}]'
+          # Bir hesabin kotasi dolunca otomatik siradaki hesaba gecmek icin. Yeni bir
+          # hesap eklediginizde bu secret'i de guncelleyin (Studio ayarlariyla senkron).
+          HF_ACCOUNTS_JSON: ${{ secrets.HF_ACCOUNTS_JSON }}
         run: |
           node .github/scripts/package-media.mjs '${{ toJson(github.event.client_payload) }}' > /tmp/result.json
           cat /tmp/result.json

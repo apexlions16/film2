@@ -9,6 +9,11 @@ const api: StudioApi = {
     getValues: () => ipcRenderer.invoke("settings:getValues"),
     save: (values) => ipcRenderer.invoke("settings:save", values),
   },
+  hfAccounts: {
+    list: () => ipcRenderer.invoke("hfAccounts:list"),
+    add: (token) => ipcRenderer.invoke("hfAccounts:add", token),
+    remove: (namespace) => ipcRenderer.invoke("hfAccounts:remove", namespace),
+  },
   tmdb: {
     fetchFromImdb: (imdbLinkOrId) => ipcRenderer.invoke("tmdb:fetchFromImdb", imdbLinkOrId),
   },

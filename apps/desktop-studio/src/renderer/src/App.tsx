@@ -33,14 +33,14 @@ export function App() {
 
   useEffect(() => {
     if (hasAutoRedirected || !presence) return;
-    const complete = presence.tmdbApiKey && presence.hfToken && presence.githubToken;
+    const complete = presence.tmdbApiKey && presence.hfAccountsCount > 0 && presence.githubToken;
     if (!complete) {
       setRoute({ name: "settings" });
     }
     setHasAutoRedirected(true);
   }, [presence, hasAutoRedirected]);
 
-  const gated = presence ? !(presence.tmdbApiKey && presence.hfToken && presence.githubToken) : false;
+  const gated = presence ? !(presence.tmdbApiKey && presence.hfAccountsCount > 0 && presence.githubToken) : false;
 
   const goToUpload = (target: UploadRouteTarget) => setRoute({ name: "upload", ...target });
 

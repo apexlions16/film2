@@ -9,7 +9,7 @@ import type {
   UploadStartRequest,
   UploadStartResponse,
 } from "@shared/types";
-import { getPresence, getSettings, saveSettings } from "./settings";
+import { addHfAccount, getPresence, getSettings, listHfAccounts, removeHfAccount, saveSettings } from "./settings";
 import { fetchTitleByImdb } from "./tmdb";
 import { getTitle, listTitles, saveTitle } from "./catalog";
 import { pickFiles } from "./files";
@@ -44,6 +44,31 @@ export function registerIpcHandlers(win: BrowserWindow): void {
   ipcMain.handle("settings:save", async (_event, values) => {
     try {
       return ok(saveSettings(values));
+    } catch (err) {
+      return fail(err);
+    }
+  });
+
+  ipcMain.handle("hfAccounts:list", async () => {
+    try {
+      return ok(listHfAccounts());
+    } catch (err) {
+      return fail(err);
+    }
+  });
+
+  ipcMain.handle("hfAccounts:add", async (_event, token: string) => {
+    try {
+      return ok(await addHfAccount(token));
+    } catch (err) {
+      return fail(err);
+    }
+  });
+
+  ipcMain.handle("hfAccounts:remove", async (_event, namespace: string) => {
+    try {
+      removeHfAccount(namespace);
+      return ok(undefined);
     } catch (err) {
       return fail(err);
     }

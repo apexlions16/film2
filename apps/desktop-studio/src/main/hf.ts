@@ -2,12 +2,7 @@
 // package-media repository_dispatch tetikleme orkestrasyonu. Hicbir adim GitHub Actions
 // isinin BITMESINI beklemez — dispatch atildiktan sonra hemen doner ("İşleniyor…").
 import { basename, extname } from "node:path";
-import {
-  ensureShardCapacity,
-  getActiveShard,
-  recordUsage,
-  uploadFileToShard,
-} from "@film2/hf-storage";
+import { ensureShardCapacity, getActiveShard, uploadFileWithFailover } from "@film2/hf-storage";
 import type {
   DispatchPackageMediaPayload,
   ShardRegistry,
@@ -16,7 +11,7 @@ import type {
   UploadTarget,
 } from "@shared/types";
 import { dispatchRepositoryEvent, getJsonFile, putJsonFile } from "./github";
-import { getSettings } from "./settings";
+import { getSettings, getHfAccountsWithTokens } from "./settings";
 
 const SHARDS_PATH = "catalog/shards.json";
 const DISPATCH_EVENT_TYPE = "package-media";
@@ -88,8 +83,11 @@ export async function uploadAndDispatch(
   onProgress: (event: UploadProgressEvent) => void,
 ): Promise<{ uploadId: string; shardId: string }> {
   const uploadId = `${target.titleId}-${Date.now()}`;
-  const { hfToken, githubToken } = getSettings();
-  if (!hfToken) throw new Error("Hugging Face token ayarlanmamis. Once Ayarlar ekranindan girin.");
+  const { githubToken } = getSettings();
+  const accounts = getHfAccountsWithTokens();
+  if (accounts.length === 0) {
+    throw new Error("Hicbir Hugging Face hesabi eklenmemis. Once Ayarlar ekranindan en az bir hesap ekleyin.");
+  }
   if (!githubToken) throw new Error("GitHub token ayarlanmamis. Once Ayarlar ekranindan girin.");
 
   const planned = planFiles(selection);
@@ -99,11 +97,14 @@ export async function uploadAndDispatch(
   if (!shardsFile) {
     throw new Error("catalog/shards.json GitHub'da bulunamadi — repo bozuk olabilir.");
   }
-  const registry = shardsFile.data;
+  let updatedRegistry = shardsFile.data;
 
-  const { registry: updatedRegistry } = await ensureShardCapacity(registry, hfToken);
-  const targetShard = getActiveShard(updatedRegistry);
+  // Kapasite onceden (esik bazli) kontrol edilir; asil "hesap gercekten dolu" durumu
+  // (HF'nin gercek kota hatasi) her dosya yuklemesinde uploadFileWithFailover
+  // tarafindan ayrica yakalanip otomatik siradaki hesaba gecilir.
+  ({ registry: updatedRegistry } = await ensureShardCapacity(updatedRegistry, accounts));
   const incomingPrefix = incomingPrefixFor(target);
+  let targetShard = getActiveShard(updatedRegistry);
 
   let completed = 0;
   for (const file of planned) {
@@ -118,13 +119,24 @@ export async function uploadAndDispatch(
     });
 
     const repoPath = `${incomingPrefix}/${file.repoFileName}`;
-    const { bytes } = await uploadFileToShard({
+    const uploadResult = await uploadFileWithFailover({
       localPath: file.localPath,
       repoPath,
-      shardId: targetShard.id,
-      token: hfToken,
+      registry: updatedRegistry,
+      accounts,
     });
-    recordUsage(updatedRegistry, targetShard.id, bytes);
+    updatedRegistry = uploadResult.registry;
+    targetShard = uploadResult.shard;
+    if (uploadResult.rotatedAccount) {
+      onProgress({
+        uploadId,
+        phase: "uploading",
+        fileName,
+        completedFiles: completed,
+        totalFiles,
+        message: `Hesap dolu, farkli bir Hugging Face hesabina gecildi (${targetShard.id}).`,
+      });
+    }
 
     completed += 1;
     onProgress({ uploadId, phase: "uploading", fileName, completedFiles: completed, totalFiles });
@@ -156,7 +168,11 @@ export async function uploadAndDispatch(
     else if (isSubtitleRole(file.role)) subtitleFiles[file.role.subtitle] = file.repoFileName;
   }
 
-  // .github/scripts/package-media.mjs'in bekledigi client_payload sekliyle birebir eslesir.
+  // NOT (bilinen sinir durum): eger yukleme SIRASINDA hesap rotasyonu olduysa (bir dosya
+  // eski shard'a, bir sonraki yeni shard'a gittiyse) burada tek bir shardId gonderiliyor —
+  // package-media.mjs tum incoming dosyalarin AYNI shard'da oldugunu varsayiyor. Pratikte
+  // bir title'in birkac dosyasi tek seferde yuklendigi icin nadir bir durum; cozmek icin
+  // her dosyanin kendi shardId'sini tasiyacak sekilde payload semasini genisletmek gerekir.
   const payload: DispatchPackageMediaPayload = {
     titleId: target.titleId,
     kind: target.kind,

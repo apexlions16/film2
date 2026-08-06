@@ -14,7 +14,7 @@ const NAV_ITEMS: Array<{ name: Route["name"]; label: string; icon: string }> = [
 ];
 
 export function Sidebar({ route, presence, onNavigate }: SidebarProps) {
-  const allSet = presence ? presence.tmdbApiKey && presence.hfToken && presence.githubToken : null;
+  const allSet = presence ? presence.tmdbApiKey && presence.hfAccountsCount > 0 && presence.githubToken : null;
 
   return (
     <aside className="sidebar">

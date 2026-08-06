@@ -4,7 +4,12 @@
 // indirir, ffmpeg ile coklu ses track + WebVTT altyazi destekli HLS'e paketler, sonucu
 // ayni (ya da gerekirse yeni) shard'a yukler ve catalog/titles/{id}.json'u gunceller.
 //
-// Beklenen ortam degiskenleri: HF_TOKEN
+// Beklenen ortam degiskenleri:
+//   HF_TOKEN — tek hesaplik kurulum (varsayilan, bu proje simdilik boyle)
+//   HF_ACCOUNTS_JSON — coklu Hugging Face hesabi: '[{"namespace":"...","token":"hf_..."}, ...]'
+//     Herhangi bir hesabin depolama kotasi dolarsa pipeline otomatik olarak listedeki
+//     siradaki hesaba gecer (bkz. packages/hf-storage/src/failover.js). HF_TOKEN'in
+//     ait oldugu hesap bu listede yoksa otomatik olarak listeye eklenir.
 // Beklenen girdi: process.argv[2] = repository_dispatch client_payload'un JSON string'i
 // (workflow bunu `github.event.client_payload` uzerinden gecirir)
 
@@ -18,11 +23,10 @@ import { fileURLToPath } from "node:url";
 import {
   loadShardRegistry,
   saveShardRegistry,
-  getActiveShard,
-  ensureShardCapacity,
-  recordUsage,
+  namespaceOf,
   resolveUrl,
-  uploadDirectoryToShard,
+  resolveHfAccount,
+  uploadDirectoryWithFailover,
 } from "../../packages/hf-storage/src/index.js";
 
 const execFileAsync = promisify(execFile);
@@ -30,10 +34,24 @@ const execFileAsync = promisify(execFile);
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const SHARDS_JSON = join(REPO_ROOT, "catalog", "shards.json");
 const HF_TOKEN = process.env.HF_TOKEN;
+const HF_ACCOUNTS_JSON = process.env.HF_ACCOUNTS_JSON;
 
-if (!HF_TOKEN) {
-  console.error("HF_TOKEN eksik.");
+if (!HF_TOKEN && !HF_ACCOUNTS_JSON) {
+  console.error("HF_TOKEN veya HF_ACCOUNTS_JSON eksik.");
   process.exit(1);
+}
+
+/** @returns {Promise<{ namespace: string, token: string }[]>} */
+async function resolveAccounts() {
+  const accounts = HF_ACCOUNTS_JSON ? JSON.parse(HF_ACCOUNTS_JSON) : [];
+  if (HF_TOKEN && !accounts.some((a) => a.token === HF_TOKEN)) {
+    const { namespace } = await resolveHfAccount(HF_TOKEN);
+    accounts.push({ namespace, token: HF_TOKEN });
+  }
+  if (accounts.length === 0) {
+    throw new Error("Kullanilabilir hicbir Hugging Face hesabi cozumlenemedi.");
+  }
+  return accounts;
 }
 
 const payload = JSON.parse(process.argv[2] ?? "{}");
@@ -44,9 +62,21 @@ if (!titleId || !shardId || !incomingPrefix || !mode) {
   process.exit(1);
 }
 
+/** @type {{ namespace: string, token: string }[]} */
+let accounts = [];
+
+function tokenForNamespace(namespace) {
+  const account = accounts.find((a) => a.namespace === namespace);
+  if (!account) {
+    throw new Error(`"${namespace}" hesabi icin bir Hugging Face token'i bulunamadi (HF_ACCOUNTS_JSON'a eklenmemis).`);
+  }
+  return account.token;
+}
+
 async function downloadFromShard(repoPath, destPath) {
   const url = resolveUrl(shardId, repoPath);
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${HF_TOKEN}` } });
+  const token = tokenForNamespace(namespaceOf(shardId));
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
   if (!res.ok) throw new Error(`Indirme basarisiz (${res.status}): ${url}`);
   const buffer = Buffer.from(await res.arrayBuffer());
   await writeFile(destPath, buffer);
@@ -130,6 +160,8 @@ async function patchMasterWithSubtitles(masterPath, subtitleLangs) {
 }
 
 async function main() {
+  accounts = await resolveAccounts();
+
   const workDir = await mkdtemp(join(tmpdir(), "film2-package-"));
   const outDir = join(workDir, "out");
   await mkdir(outDir, { recursive: true });
@@ -169,19 +201,19 @@ async function main() {
   await muxToHls({ workDir, videoInput: videoLocal, audioInputs, outDir });
   await patchMasterWithSubtitles(join(outDir, "master.m3u8"), subtitleLangs);
 
-  // Shard doluluk kontrolu + gerekirse yeni shard acma
+  // Aktif shard'a yukler; shard doluysa (ya da HF gercek bir kota hatasi verirse)
+  // otomatik olarak siradaki kayitli Hugging Face hesabina/shard'ina geçer.
   const registry = await loadShardRegistry(SHARDS_JSON);
-  const { registry: updatedRegistry } = await ensureShardCapacity(registry, HF_TOKEN);
-  const targetShard = getActiveShard(updatedRegistry);
-
   const repoPrefix = kind === "episode" ? `media/${titleId}/s${seasonNumber}e${episodeNumber}` : `media/${titleId}`;
-  const { totalBytes } = await uploadDirectoryToShard({
+  const { shard: targetShard, registry: updatedRegistry, rotatedAccount } = await uploadDirectoryWithFailover({
     localDir: outDir,
     repoPrefix,
-    shardId: targetShard.id,
-    token: HF_TOKEN,
+    registry,
+    accounts,
   });
-  recordUsage(updatedRegistry, targetShard.id, totalBytes);
+  if (rotatedAccount) {
+    console.log(`Hesap dolu, yeni Hugging Face hesabina gecildi: ${targetShard.id}`);
+  }
   await saveShardRegistry(SHARDS_JSON, updatedRegistry);
 
   const masterPlaylistUrl = resolveUrl(targetShard.id, `${repoPrefix}/master.m3u8`);

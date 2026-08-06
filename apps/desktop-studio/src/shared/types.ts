@@ -24,10 +24,11 @@ export type {
   ShardRegistry,
 };
 
-/** Studio ayarlar ekraninda toplanan uc token. Sadece electron-store'da (userData) saklanir. */
+/** Studio ayarlar ekraninda toplanan token'lar. Sadece electron-store'da (userData) saklanir.
+ * Hugging Face artik TEK token degil, BIRDEN COK hesap (bkz. HfAccount) olarak tutulur —
+ * bir hesabin deposu dolunca digerine otomatik gecilebilsin diye. */
 export interface StudioSettings {
   tmdbApiKey: string;
-  hfToken: string;
   githubToken: string;
 }
 
@@ -37,8 +38,15 @@ export type SettingsField = keyof StudioSettings;
  * gostermek zorunda degiliz (input'lar odaklaninca mevcut degeri main'den ayrica cekeriz). */
 export interface SettingsPresence {
   tmdbApiKey: boolean;
-  hfToken: boolean;
   githubToken: boolean;
+  hfAccountsCount: number;
+}
+
+/** Kayitli bir Hugging Face hesabi. Token renderer'a ASLA gonderilmez — sadece main
+ * process icinde tutulur, sadece namespace/fullname gosterilir. */
+export interface HfAccount {
+  namespace: string;
+  fullname?: string;
 }
 
 export interface AppError {
@@ -117,6 +125,12 @@ export interface StudioApi {
     getPresence: () => Promise<IpcResult<SettingsPresence>>;
     getValues: () => Promise<IpcResult<StudioSettings>>;
     save: (values: Partial<StudioSettings>) => Promise<IpcResult<SettingsPresence>>;
+  };
+  hfAccounts: {
+    list: () => Promise<IpcResult<HfAccount[]>>;
+    /** Token'i dogrular (whoami), hesabi kaydeder, gorunur ozetini dondurur. */
+    add: (token: string) => Promise<IpcResult<HfAccount>>;
+    remove: (namespace: string) => Promise<IpcResult<void>>;
   };
   tmdb: {
     fetchFromImdb: (imdbLinkOrId: string) => Promise<IpcResult<Title | null>>;
