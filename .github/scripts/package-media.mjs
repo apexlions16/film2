@@ -99,26 +99,54 @@ async function ffprobeStreams(filePath) {
   return parsed.streams ?? [];
 }
 
-/** v:0 tekrarli, her ses track'i icin ayri variant olusturan standart ffmpeg pattern. */
-function buildVarStreamMap(audioCount) {
-  const parts = [];
-  for (let i = 0; i < audioCount; i++) {
-    parts.push(`v:0,a:${i},name:trk${i},agroup:aud`);
-  }
+// NOT: ilk versiyon "v:0,a:N,agroup:aud" (video her ses icin TEKRARLANIYOR) pattern'i
+// kullaniyordu. Bu YANLIS: ffmpeg ayni video stream'i birden fazla variant'ta gorunce
+// "Same elementary stream found more than once" hatasiyla direkt REDDEDIYOR — coklu
+// sesli gercek bir dosyayla yerelde denenip dogrulandi. Dogru HLS "alternate audio"
+// yapisi: TEK video-only variant + her dil icin AYRI, audio-only bir "agroup" uyesi.
+// hls.js/ExoPlayer'in track-secici API'leri (audioTracks/audioTrack) sadece bu yapiyi
+// (EXT-X-MEDIA:TYPE=AUDIO satirlari) tanir — onceki yapi bunlari ayri "kalite seviyesi"
+// sanardi, ses degistirme hic calismazdi. Yerelde sentetik 2 dilli bir dosyayla
+// (Turkce/Ingilizce) uretilen master.m3u8 dogru EXT-X-MEDIA satirlarini urettigi
+// dogrulandi.
+function buildVarStreamMap(audioInputs) {
+  const parts = audioInputs.map((audio, i) => {
+    const nameTag = (audio.lang || `trk${i}`).replace(/[^a-zA-Z0-9]/g, "").slice(0, 12) || `trk${i}`;
+    const defaultFlag = i === 0 ? ",default:yes" : "";
+    return `a:${i},agroup:aud,name:${nameTag},language:${audio.lang || "und"}${defaultFlag}`;
+  });
+  parts.push("v:0,agroup:aud");
   return parts.join(" ");
 }
 
-// NOT: master.m3u8'in tam olarak nereye yazildigi ffmpeg surumune gore degisebilir
-// (outDir mi, outDir/variant_%v mi). Ilk gercek dosya yuklemesinde bunu dogrulayip
-// gerekirse master.m3u8'i outDir koküne tasiyan bir adim eklemek gerekebilir — bkz. handoff.md.
 async function muxToHls({ workDir, videoInput, audioInputs, outDir }) {
   await mkdir(outDir, { recursive: true });
   const args = ["-y"];
-  args.push("-i", videoInput);
-  for (const audio of audioInputs) args.push("-i", audio.path);
+
+  // Girdi dosyalarini tekillestir: "combined" modda tum ses track'leri AYNI dosyadan
+  // (videoInput) farkli stream index'leriyle gelir — o dosyayi ffmpeg'e birden fazla
+  // kez ayri -i olarak vermek (eskiden oldugu gibi) her seferinde stream a:0'i (ilk ses
+  // track'ini) seciyordu, yani tum diller yanlislikla AYNI sesi alıyordu. "separate"
+  // modda ise her ses ayri bir dosyadir.
+  const inputPaths = [videoInput];
+  const audioInputIndex = audioInputs.map((audio) => {
+    let idx = inputPaths.indexOf(audio.path);
+    if (idx === -1) {
+      inputPaths.push(audio.path);
+      idx = inputPaths.length - 1;
+    }
+    return idx;
+  });
+  for (const p of inputPaths) args.push("-i", p);
 
   args.push("-map", "0:v:0");
-  audioInputs.forEach((_, i) => args.push("-map", `${i + 1}:a:0`));
+  audioInputs.forEach((audio, i) => {
+    const inputIdx = audioInputIndex[i];
+    // combined modda audio.streamIndex o dosyadaki KESIN stream numarasidir (orn. 0:2);
+    // separate modda her ses kendi ayri dosyasinin ilk (ve tek) ses stream'idir (N:a:0).
+    const selector = audio.streamIndex !== undefined ? `${inputIdx}:${audio.streamIndex}` : `${inputIdx}:a:0`;
+    args.push("-map", selector);
+  });
 
   args.push(
     "-c:v", "copy",
@@ -129,7 +157,7 @@ async function muxToHls({ workDir, videoInput, audioInputs, outDir }) {
     "-hls_flags", "independent_segments",
     "-hls_segment_type", "mpegts",
     "-master_pl_name", "master.m3u8",
-    "-var_stream_map", buildVarStreamMap(audioInputs.length),
+    "-var_stream_map", buildVarStreamMap(audioInputs),
     join(outDir, "variant_%v", "stream.m3u8"),
   );
 

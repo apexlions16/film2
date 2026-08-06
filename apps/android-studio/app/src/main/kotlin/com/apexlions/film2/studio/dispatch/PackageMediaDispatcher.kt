@@ -26,9 +26,9 @@ enum class UploadMode(val wireValue: String) {
 }
 
 /**
- * Everything needed to trigger .github/workflows/package-media.yml via repository_dispatch.
+ * Everything needed to trigger .github/workflows/package-media.yml via workflow_dispatch.
  * Field names and shape are load-bearing — .github/scripts/package-media.mjs destructures
- * this exact object out of `github.event.client_payload`.
+ * this exact object out of the `payload` input (JSON string).
  */
 data class PackageMediaRequest(
     val titleId: String,
@@ -44,9 +44,22 @@ data class PackageMediaRequest(
     val subtitleFiles: Map<String, String> = emptyMap(),
 )
 
-/** Posts the repository_dispatch event that kicks off HLS packaging for one movie/episode. */
+/**
+ * Triggers package-media.yml via workflow_dispatch (kicks off HLS packaging for one
+ * movie/episode).
+ *
+ * NOTE: this used to POST to `/dispatches` (repository_dispatch). That call DOES
+ * eventually work, but was confirmed live (on the desktop side, same repo) to be
+ * delivered by GitHub with a 20-30 MINUTE delay — a real, reproducible delay, not a
+ * one-off fluke. `workflow_dispatch` (POST to
+ * `/actions/workflows/{file}/dispatches`, the same endpoint `gh workflow run` uses)
+ * fired instantly and reliably every time it was tested. So this now uses that endpoint
+ * instead, passing the payload as a single JSON-string `inputs.payload` (GitHub
+ * workflow_dispatch inputs must be simple types, not nested JSON).
+ */
 class PackageMediaDispatcher(
     private val repo: String = "apexlions16/film2",
+    private val defaultBranch: String = "main",
     private val httpClient: OkHttpClient = OkHttpClient(),
 ) {
     private val json = Json { encodeDefaults = true; explicitNulls = false }
@@ -67,39 +80,40 @@ class PackageMediaDispatcher(
     )
 
     @Serializable
-    private data class DispatchWire(
-        @SerialName("event_type") val eventType: String = "package-media",
-        @SerialName("client_payload") val clientPayload: ClientPayloadWire,
+    private data class WorkflowDispatchInputs(val payload: String)
+
+    @Serializable
+    private data class WorkflowDispatchWire(
+        val ref: String,
+        val inputs: WorkflowDispatchInputs,
     )
 
     suspend fun dispatch(request: PackageMediaRequest, githubToken: String) = withContext(Dispatchers.IO) {
-        val wire = DispatchWire(
-            clientPayload = ClientPayloadWire(
-                titleId = request.titleId,
-                kind = request.kind.wireValue,
-                seasonNumber = request.seasonNumber,
-                episodeNumber = request.episodeNumber,
-                shardId = request.shardId,
-                mode = request.mode.wireValue,
-                incomingPrefix = request.incomingPrefix,
-                combinedFile = request.combinedFile,
-                videoFile = request.videoFile,
-                audioFiles = request.audioFiles,
-                subtitleFiles = request.subtitleFiles,
-            ),
+        val payloadWire = ClientPayloadWire(
+            titleId = request.titleId,
+            kind = request.kind.wireValue,
+            seasonNumber = request.seasonNumber,
+            episodeNumber = request.episodeNumber,
+            shardId = request.shardId,
+            mode = request.mode.wireValue,
+            incomingPrefix = request.incomingPrefix,
+            combinedFile = request.combinedFile,
+            videoFile = request.videoFile,
+            audioFiles = request.audioFiles,
+            subtitleFiles = request.subtitleFiles,
         )
-        // GitHub's dispatches API expects "event_type"/"client_payload" (snake_case) at the
-        // top level, matching the workflow's `on: repository_dispatch: types: [package-media]`.
-        val bodyJson = json.encodeToString(DispatchWire.serializer(), wire)
+        val payloadJson = json.encodeToString(ClientPayloadWire.serializer(), payloadWire)
+        val wire = WorkflowDispatchWire(ref = defaultBranch, inputs = WorkflowDispatchInputs(payload = payloadJson))
+        val bodyJson = json.encodeToString(WorkflowDispatchWire.serializer(), wire)
 
-        val request2 = Request.Builder()
-            .url("https://api.github.com/repos/$repo/dispatches")
+        val httpRequest = Request.Builder()
+            .url("https://api.github.com/repos/$repo/actions/workflows/package-media.yml/dispatches")
             .header("Authorization", "Bearer $githubToken")
             .header("Accept", "application/vnd.github+json")
             .post(bodyJson.toRequestBody("application/json".toMediaType()))
             .build()
 
-        httpClient.newCall(request2).execute().use { response ->
+        httpClient.newCall(httpRequest).execute().use { response ->
             if (!response.isSuccessful) {
                 throw PackageMediaDispatchException(
                     "package-media dispatch basarisiz: ${response.code} ${response.body?.string().orEmpty()}",

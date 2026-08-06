@@ -1,11 +1,25 @@
 name: Package media (HLS)
 
 # Studio uygulamasi (desktop veya Android) ham dosyalari Hugging Face'e yukledikten sonra
-# bu workflow'u repository_dispatch ile tetikler. ffmpeg ile HLS paketler, sonucu Hugging
+# bu workflow'u workflow_dispatch ile tetikler. ffmpeg ile HLS paketler, sonucu Hugging
 # Face'e yukler ve catalog/titles/{id}.json'u gunceller.
+#
+# NOT: Once repository_dispatch kullaniliyordu ama bu repoda push/repository_dispatch
+# tetikleyicileri GERCEKTEN CALISIYOR ama GitHub bunlari 20-30 DAKIKA gecikmeyle teslim
+# ediyor (canli olarak dogrulandi — v0.1.8/v0.2.0 push-tetikli kosumlar gercekten olustu,
+# sadece cok gec). workflow_dispatch ise bu oturumda defalarca ANINDA ve guvenilir
+# calisti, o yuzden asil tetikleyici bu oldu. repository_dispatch da geriye donuk
+# uyumluluk icin birakildi (gecikmeli de olsa calisir) ama Studio uygulamalari artik
+# workflow_dispatch kullaniyor.
 on:
   repository_dispatch:
     types: [package-media]
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: "package-media.mjs client_payload JSON metni"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -40,7 +54,7 @@ jobs:
           # hesap eklediginizde bu secret'i de guncelleyin (Studio ayarlariyla senkron).
           HF_ACCOUNTS_JSON: ${{ secrets.HF_ACCOUNTS_JSON }}
         run: |
-          node .github/scripts/package-media.mjs '${{ toJson(github.event.client_payload) }}' > /tmp/result.json
+          node .github/scripts/package-media.mjs '${{ github.event_name == "workflow_dispatch" && github.event.inputs.payload || toJson(github.event.client_payload) }}' > /tmp/result.json
           cat /tmp/result.json
 
       - name: Katalogu guncelle
@@ -50,6 +64,7 @@ jobs:
         run: |
           git config user.name "film2-bot"
           git config user.email "actions@users.noreply.github.com"
+          TITLE_ID=$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/result.json','utf-8')).titleId)")
           git add catalog/
-          git diff --cached --quiet || git commit -m "chore(catalog): pakete hazir icerik guncellendi (${{ github.event.client_payload.titleId }})"
+          git diff --cached --quiet || git commit -m "chore(catalog): pakete hazir icerik guncellendi ($TITLE_ID)"
           git push

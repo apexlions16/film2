@@ -97,21 +97,28 @@ export async function putJsonFile(
 }
 
 /**
- * repository_dispatch event'i tetikler (orn. "package-media"). package-media.mjs'in
- * bekledigi client_payload sekliyle BIREBIR eslesmeli — bkz. .github/scripts/package-media.mjs.
+ * Bir workflow'u workflow_dispatch ile tetikler (orn. "package-media.yml").
+ *
+ * NOT: Once repository_dispatch kullaniliyordu ama bu repoda canli olarak dogrulandi ki
+ * push/repository_dispatch tetikleyicileri GERCEKTEN CALISIYOR fakat GitHub bunlari
+ * 20-30 DAKIKA gecikmeyle teslim ediyor. workflow_dispatch ise defalarca ANINDA calisti
+ * (gh CLI'nin "Run workflow" butonunun kullandigi ayni API) — o yuzden Studio artik bunu
+ * kullaniyor. `inputs` her zaman string olmali (GitHub workflow_dispatch input tipleri
+ * karmasik JSON kabul etmiyor); package-media.mjs bekledigi payload'i inputs.payload'dan
+ * JSON string olarak okuyor.
  */
-export async function dispatchRepositoryEvent(
-  eventType: string,
-  clientPayload: Record<string, unknown>,
+export async function dispatchWorkflow(
+  workflowFile: string,
+  inputs: Record<string, string>,
   token: string,
 ): Promise<void> {
-  const url = `${API_BASE}/repos/${REPO}/dispatches`;
+  const url = `${API_BASE}/repos/${REPO}/actions/workflows/${workflowFile}/dispatches`;
   const res = await fetch(url, {
     method: "POST",
     headers: { ...authHeaders(token), "Content-Type": "application/json" },
-    body: JSON.stringify({ event_type: eventType, client_payload: clientPayload }),
+    body: JSON.stringify({ ref: BRANCH, inputs }),
   });
   if (!res.ok) {
-    throw new GithubApiError(`GitHub repository_dispatch hatasi (${res.status}): ${await safeText(res)}`, res.status);
+    throw new GithubApiError(`GitHub workflow_dispatch hatasi (${res.status}): ${await safeText(res)}`, res.status);
   }
 }

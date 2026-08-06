@@ -1,5 +1,5 @@
 // Ham medya dosyalarini Hugging Face shard'ina yukleme + shards.json guncelleme +
-// package-media repository_dispatch tetikleme orkestrasyonu. Hicbir adim GitHub Actions
+// package-media workflow_dispatch tetikleme orkestrasyonu. Hicbir adim GitHub Actions
 // isinin BITMESINI beklemez — dispatch atildiktan sonra hemen doner ("İşleniyor…").
 import { basename, extname } from "node:path";
 import { ensureShardCapacity, getActiveShard, uploadFileWithFailover } from "@film2/hf-storage";
@@ -10,11 +10,11 @@ import type {
   UploadProgressEvent,
   UploadTarget,
 } from "@shared/types";
-import { dispatchRepositoryEvent, getJsonFile, putJsonFile } from "./github";
+import { dispatchWorkflow, getJsonFile, putJsonFile } from "./github";
 import { getSettings, getHfAccountsWithTokens } from "./settings";
 
 const SHARDS_PATH = "catalog/shards.json";
-const DISPATCH_EVENT_TYPE = "package-media";
+const PACKAGE_MEDIA_WORKFLOW = "package-media.yml";
 
 function incomingPrefixFor(target: UploadTarget): string {
   if (target.kind === "episode") {
@@ -194,7 +194,7 @@ export async function uploadAndDispatch(
     totalFiles,
     message: "Paketleme workflow'u tetikleniyor...",
   });
-  await dispatchRepositoryEvent(DISPATCH_EVENT_TYPE, payload as unknown as Record<string, unknown>, githubToken);
+  await dispatchWorkflow(PACKAGE_MEDIA_WORKFLOW, { payload: JSON.stringify(payload) }, githubToken);
 
   // NOT: GitHub Actions isinin bitmesi burada BEKLENMEZ — dispatch atildiktan hemen sonra
   // "done" (yukleme+tetikleme tamam, paketleme arka planda) bildirilir.
