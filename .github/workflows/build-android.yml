@@ -30,8 +30,14 @@ jobs:
           chmod +x ./gradlew
           ./gradlew assembleRelease
 
+      - name: Imza secret'i var mi kontrol et
+        id: keystore_check
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: echo "present=$([ -n "$KS" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
       - name: APK'yi imzala
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: steps.keystore_check.outputs.present == 'true'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
