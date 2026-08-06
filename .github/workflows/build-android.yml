@@ -1,14 +1,11 @@
 name: Build Android APKs
 
-# main'e push ya da "v*" tag'i atildiginda android-player ve android-studio icin
-# release APK uretir. Tag pushlaninca GitHub Release'e otomatik eklenir.
+# "v*" tag'i atildiginda (ya da elle workflow_dispatch ile) android-player ve
+# android-studio icin release APK uretir ve GitHub Release'e ekler.
+# NOT: push+tags ile ayni anda paths filtresi kullanmak tag push'larini
+# tetiklememe riski tasiyor (dogrulandi) — bilerek path filtresiz birakildi.
 on:
   push:
-    branches: [main]
-    paths:
-      - "apps/android-player/**"
-      - "apps/android-studio/**"
-      - ".github/workflows/build-android.yml"
     tags:
       - "v*"
   workflow_dispatch: {}
