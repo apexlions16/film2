@@ -1,0 +1,30 @@
+{
+  "heroTitleIds": [],
+  "shelves": [
+    {
+      "id": "today-popular",
+      "title": "Bugün Popüler",
+      "titleIds": [],
+      "enabled": true,
+      "shuffle": true,
+      "maxItems": 20
+    },
+    {
+      "id": "week-popular",
+      "title": "Bu Hafta Popüler",
+      "titleIds": [],
+      "enabled": true,
+      "shuffle": true,
+      "maxItems": 20
+    },
+    {
+      "id": "editors-picks",
+      "title": "Editörün Seçtikleri",
+      "titleIds": [],
+      "enabled": true,
+      "shuffle": false,
+      "maxItems": 20
+    }
+  ],
+  "updatedAt": "2026-08-07T15:48:00Z"
+}
