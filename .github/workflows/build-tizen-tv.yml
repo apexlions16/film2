@@ -1,0 +1,84 @@
+name: Build Tizen TV Player
+
+on:
+  push:
+    branches:
+      - agent/tizen-tv-player
+    paths:
+      - 'apps/tizen-tv-player/**'
+      - '.github/workflows/build-tizen-tv.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate JavaScript syntax
+        run: |
+          node --check apps/tizen-tv-player/js/catalog.js
+          node --check apps/tizen-tv-player/js/player.js
+          node --check apps/tizen-tv-player/js/app.js
+
+      - name: Validate Tizen project structure
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import xml.etree.ElementTree as ET
+
+          root = pathlib.Path('apps/tizen-tv-player')
+          required = [
+              root / 'config.xml',
+              root / 'index.html',
+              root / 'css' / 'app.css',
+              root / 'js' / 'catalog.js',
+              root / 'js' / 'player.js',
+              root / 'js' / 'app.js',
+          ]
+          missing = [str(p) for p in required if not p.is_file()]
+          if missing:
+              raise SystemExit('Missing required files: ' + ', '.join(missing))
+
+          ET.parse(root / 'config.xml')
+          html = (root / 'index.html').read_text(encoding='utf-8')
+          for rel in ['css/app.css', 'js/catalog.js', 'js/player.js', 'js/app.js']:
+              if rel not in html:
+                  raise SystemExit(f'index.html does not reference {rel}')
+          print('Tizen project structure OK')
+          PY
+
+      - name: Build unsigned WGT
+        run: |
+          mkdir -p dist
+          cd apps/tizen-tv-player
+          zip -q -r ../../dist/Film2TV-development-unsigned.wgt . \
+            -x '*.DS_Store' '*.git*' 'README.md'
+          cd ../..
+          sha256sum dist/Film2TV-development-unsigned.wgt | tee dist/SHA256SUMS.txt
+
+      - name: Explain signing requirement
+        run: |
+          cat > dist/SIGNING_REQUIRED.txt <<'EOF'
+          This WGT contains the complete Film2 Samsung Tizen TV player application but is unsigned.
+
+          Samsung TVs require every application to be signed with a valid Samsung/Tizen certificate profile before installation.
+          A physical TV distributor certificate is bound to the target TV DUID, so it cannot be generated safely in GitHub Actions without the owner's Samsung certificate material and target TV DUID.
+
+          Sign this exact project/package with Tizen Studio or the Samsung Tizen TV VS Code extension using your Samsung author + distributor certificate profile. Do not edit the WGT after signing.
+          EOF
+
+      - name: Upload Tizen package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Film2TV-Tizen-development
+          path: |
+            dist/Film2TV-development-unsigned.wgt
+            dist/SHA256SUMS.txt
+            dist/SIGNING_REQUIRED.txt
+          if-no-files-found: error
+          retention-days: 30
