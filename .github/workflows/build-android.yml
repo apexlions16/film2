@@ -1,10 +1,10 @@
 name: Build Android APKs
 
-# Tag/release + PR + direct test-branch build.
 on:
   push:
     branches:
       - "agent/direct-mp4-media"
+      - "agent/netflix-player-ux"
     tags:
       - "v*"
     paths:
@@ -103,10 +103,11 @@ jobs:
           files: ${{ steps.apk.outputs.path }}
 
       - name: Player build durumunu kaydet
-        if: always() && matrix.app == 'android-player' && github.ref == 'refs/heads/agent/direct-mp4-media'
+        if: always() && matrix.app == 'android-player' && (github.ref == 'refs/heads/agent/direct-mp4-media' || github.ref == 'refs/heads/agent/netflix-player-ux')
         run: |
           git config user.name "film2-bot"
           git config user.email "actions@users.noreply.github.com"
+          BRANCH="${GITHUB_REF#refs/heads/}"
           {
             echo "status=${{ job.status }}"
             echo "run_id=${{ github.run_id }}"
@@ -115,5 +116,5 @@ jobs:
           } > .github/android-build-last-status.txt
           git add .github/android-build-last-status.txt
           git diff --cached --quiet || git commit -m "chore(ci): player build durumu"
-          git pull --rebase origin agent/direct-mp4-media || true
-          git push origin HEAD:agent/direct-mp4-media || true
+          git pull --rebase origin "$BRANCH" || true
+          git push origin HEAD:"$BRANCH" || true
