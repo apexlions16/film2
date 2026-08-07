@@ -12,6 +12,7 @@ import com.apexlions.film2.studio.ui.newtitle.AttachFilesScreen
 import com.apexlions.film2.studio.ui.newtitle.NewTitleScreen
 import com.apexlions.film2.studio.ui.quality.QualityGenerationScreen
 import com.apexlions.film2.studio.ui.settings.SettingsScreen
+import com.apexlions.film2.studio.ui.trailer.TrailerUploadScreen
 
 @Composable
 fun Film2StudioNavGraph() {
@@ -27,6 +28,9 @@ fun Film2StudioNavGraph() {
                 },
                 onGenerateQualities = { titleId, titleType ->
                     navController.navigate(Destinations.quality(titleId, titleType.name))
+                },
+                onManageTrailer = { titleId ->
+                    navController.navigate(Destinations.trailer(titleId))
                 },
             )
         }
@@ -80,6 +84,17 @@ fun Film2StudioNavGraph() {
             QualityGenerationScreen(
                 titleId = titleId,
                 titleType = titleType,
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            route = Destinations.TRAILER_ROUTE,
+            arguments = listOf(navArgument(Destinations.ARG_TITLE_ID) { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val titleId = backStackEntry.arguments?.getString(Destinations.ARG_TITLE_ID).orEmpty()
+            TrailerUploadScreen(
+                titleId = titleId,
                 onBack = { navController.popBackStack() },
             )
         }
