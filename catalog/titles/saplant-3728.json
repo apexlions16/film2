@@ -1,0 +1,169 @@
+{
+  "id": "saplant-3728",
+  "type": "movie",
+  "imdbId": "tt37287335",
+  "tmdbId": 1339713,
+  "title": "Saplantı",
+  "originalTitle": "Obsession",
+  "overview": "​Hoşlandığı kızın kalbini kazanmak için gizemli \"Tek Dilek Söğüdü\"nü (One Wish Willow) kıran umutsuz bir romantik, tam da dilediği şeye kavuşur; ancak çok geçmeden bazı arzuların karanlık ve tekinsiz bir bedeli olduğunu keşfeder.",
+  "releaseYear": 2026,
+  "genres": [
+    "Korku",
+    "Gerilim"
+  ],
+  "runtimeMinutes": 109,
+  "posterUrl": "https://image.tmdb.org/t/p/w780/nriiXc6VbD6qWBj7INOElJbX8mp.jpg",
+  "backdropUrl": "https://image.tmdb.org/t/p/w1280/rZfmzpixLKLR3Hg2u0WgC7XLFl8.jpg",
+  "cast": [
+    {
+      "name": "Michael Johnston",
+      "character": "Bear",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/fbpcCkBzu43kMdlXxEAMuLhseL8.jpg"
+    },
+    {
+      "name": "Inde Navarrette",
+      "character": "Nikki",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/8mYBaOximzwBgXOYRzbS6eUnoMX.jpg"
+    },
+    {
+      "name": "Cooper Tomlinson",
+      "character": "Ian",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/vBMQbYT1DyWPCUp11dIiqZR9zhd.jpg"
+    },
+    {
+      "name": "Megan Lawless",
+      "character": "Sarah",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/6qW63YEgB1qro01sM7T2HvhtFkh.jpg"
+    },
+    {
+      "name": "Andy Richter",
+      "character": "Carter",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/5Qr7N6TzC8cI0ULxDm6EC5GpZ4C.jpg"
+    },
+    {
+      "name": "Haley Fitzgerald",
+      "character": "Viola",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/xbKqZ5Epz0IaSCPLXDnByDACw2X.jpg"
+    },
+    {
+      "name": "Darin Toonder",
+      "character": "Harry",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/bD7Y9T7Y6XwDXjGJ8Suabyt1ZGo.jpg"
+    },
+    {
+      "name": "Anthony Pavone",
+      "character": "Reggie",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/hxiqY9gHgwXGYnXSD11Wacm5Nmi.jpg"
+    },
+    {
+      "name": "Justice",
+      "character": "Joe",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/YFxKf2HHJvyavQf54NO5wXFOJX.jpg"
+    },
+    {
+      "name": "Anthony Casabianca",
+      "character": "Chris",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/xNJUKqKQhMeyZ74erQvETr3AqV0.jpg"
+    },
+    {
+      "name": "Chloe Breen",
+      "character": "Ruthie",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/oKBTQeGcQBM5aHNHwAqVWPjDVfz.jpg"
+    },
+    {
+      "name": "Malcolm Kelner",
+      "character": "Bartender",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/xlojlX1dlu1OY0Vf2owDWv5PV3l.jpg"
+    },
+    {
+      "name": "Charles Santa Cruz",
+      "character": "Background"
+    },
+    {
+      "name": "Alex Maystrik",
+      "character": "Background"
+    },
+    {
+      "name": "Mariana Silva",
+      "character": "Background"
+    },
+    {
+      "name": "Kyle Blumenthal",
+      "character": "Background"
+    },
+    {
+      "name": "Jorge Luquin",
+      "character": "Background"
+    },
+    {
+      "name": "Jose Herrera",
+      "character": "Background"
+    },
+    {
+      "name": "Emilio Flores",
+      "character": "Background",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/j5HG24bZUjr7Nw8NtB4dGENelWx.jpg"
+    },
+    {
+      "name": "Manny Liotta",
+      "character": "Background",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/sMOebSAJzglALejW2rNuPI0ii5r.jpg"
+    }
+  ],
+  "crew": [
+    {
+      "name": "Curry Barker",
+      "job": "Director",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/A16CxGKlkQYryoxGpxzKj4Wxk83.jpg"
+    },
+    {
+      "name": "Curry Barker",
+      "job": "Writer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/A16CxGKlkQYryoxGpxzKj4Wxk83.jpg"
+    },
+    {
+      "name": "James Harris",
+      "job": "Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/saC2CiD6PUazSJEeKJODHoI5VWE.jpg"
+    },
+    {
+      "name": "Ruzanna Kegeyan",
+      "job": "Executive Producer"
+    },
+    {
+      "name": "David Haring",
+      "job": "Executive Producer"
+    },
+    {
+      "name": "Leonora Darby",
+      "job": "Executive Producer"
+    },
+    {
+      "name": "Christian Mercuri",
+      "job": "Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/vISkC384cFXhjKxPbdAhtSyoBDY.jpg"
+    },
+    {
+      "name": "Haley Nicole Johnson",
+      "job": "Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/9TnLydfFTIXNZQWt3wvFCRsr8WK.jpg"
+    },
+    {
+      "name": "Jason Blum",
+      "job": "Executive Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/oOsdVzSXyj1L1mKN3d2QcF01hkc.jpg"
+    },
+    {
+      "name": "Mark Lane",
+      "job": "Executive Producer"
+    },
+    {
+      "name": "Roman Viaris-de-Lesegno",
+      "job": "Producer"
+    }
+  ],
+  "status": "pending",
+  "manualEntry": false,
+  "createdAt": "2026-08-07T10:00:45.970165Z",
+  "updatedAt": "2026-08-07T10:00:51.571803Z"
+}
