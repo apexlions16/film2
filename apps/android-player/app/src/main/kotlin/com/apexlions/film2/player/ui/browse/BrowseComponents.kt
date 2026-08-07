@@ -52,6 +52,7 @@ import coil.compose.AsyncImage
 import com.apexlions.film2.player.catalog.AssetStatus
 import com.apexlions.film2.player.catalog.Title
 import com.apexlions.film2.player.userdata.PlaybackRecord
+import kotlin.math.absoluteValue
 
 private val WatchProgressRed = Color(0xFFE50914)
 
@@ -62,21 +63,35 @@ data class ContinueWatchingUiItem(
     val subtitle: String?,
 )
 
+fun Title.rotatingPoster(nonce: Long = 0L): String? =
+    chooseArtwork((posterUrls + listOfNotNull(posterUrl)).distinct(), nonce, "poster")
+
+fun Title.rotatingBackdrop(nonce: Long = 0L): String? =
+    chooseArtwork((backdropUrls + listOfNotNull(backdropUrl)).distinct(), nonce, "backdrop")
+
+private fun Title.chooseArtwork(pool: List<String>, nonce: Long, salt: String): String? {
+    if (pool.isEmpty()) return null
+    val index = ("$id|$nonce|$salt".hashCode().toLong().absoluteValue % pool.size).toInt()
+    return pool[index]
+}
+
 @Composable
 fun HeroBanner(
     title: Title,
     onPlay: () -> Unit,
     onMoreInfo: () -> Unit,
+    artworkNonce: Long = 0L,
     modifier: Modifier = Modifier,
 ) {
+    val artwork = title.rotatingBackdrop(artworkNonce)
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(480.dp),
     ) {
-        if (title.backdropUrl != null) {
+        if (artwork != null) {
             AsyncImage(
-                model = title.backdropUrl,
+                model = artwork,
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
@@ -135,10 +150,7 @@ fun HeroBanner(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(
                     onClick = onPlay,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black,
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                 ) {
                     Icon(Icons.Filled.PlayArrow, contentDescription = null)
                     Text(" Oynat", fontWeight = FontWeight.SemiBold)
@@ -197,10 +209,7 @@ fun ContinueWatchingRow(
 }
 
 @Composable
-private fun ContinueWatchingCard(
-    item: ContinueWatchingUiItem,
-    onClick: () -> Unit,
-) {
+private fun ContinueWatchingCard(item: ContinueWatchingUiItem, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .width(210.dp)
@@ -225,28 +234,12 @@ private fun ContinueWatchingCard(
             ) {
                 Icon(Icons.Filled.PlayArrow, contentDescription = "Devam et", tint = Color.White, modifier = Modifier.size(30.dp))
             }
-            ProgressLine(
-                progress = item.record.progressFraction,
-                modifier = Modifier.align(Alignment.BottomCenter),
-            )
+            ProgressLine(item.record.progressFraction, Modifier.align(Alignment.BottomCenter))
         }
         Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
-            Text(
-                text = item.title.title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Text(item.title.title, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             item.subtitle?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }
@@ -258,6 +251,7 @@ fun GenreRow(
     titles: List<Title>,
     onSelect: (Title) -> Unit,
     progressByTitle: Map<String, Float> = emptyMap(),
+    artworkNonce: Long = 0L,
     modifier: Modifier = Modifier,
 ) {
     if (titles.isEmpty()) return
@@ -277,6 +271,7 @@ fun GenreRow(
                 PosterCard(
                     title = title,
                     progress = progressByTitle[title.id],
+                    artworkNonce = artworkNonce,
                     onClick = { onSelect(title) },
                 )
             }
@@ -289,6 +284,7 @@ fun PosterCard(
     title: Title,
     onClick: () -> Unit,
     progress: Float? = null,
+    artworkNonce: Long = 0L,
     modifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -298,6 +294,7 @@ fun PosterCard(
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
         label = "posterScale",
     )
+    val poster = title.rotatingPoster(artworkNonce)
 
     Column(
         modifier = modifier
@@ -305,16 +302,12 @@ fun PosterCard(
             .scale(scale)
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = LocalIndication.current,
-                onClick = onClick,
-            ),
+            .clickable(interactionSource = interactionSource, indication = LocalIndication.current, onClick = onClick),
     ) {
         Box(modifier = Modifier.aspectRatio(2f / 3f)) {
-            if (title.posterUrl != null) {
+            if (poster != null) {
                 AsyncImage(
-                    model = title.posterUrl,
+                    model = poster,
                     contentDescription = title.title,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
@@ -334,12 +327,8 @@ fun PosterCard(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            Box(modifier = Modifier.align(Alignment.TopEnd).padding(6.dp)) {
-                StatusBadge(status = title.status)
-            }
-            progress?.takeIf { it > 0.005f }?.let {
-                ProgressLine(progress = it, modifier = Modifier.align(Alignment.BottomCenter))
-            }
+            Box(modifier = Modifier.align(Alignment.TopEnd).padding(6.dp)) { StatusBadge(status = title.status) }
+            progress?.takeIf { it > 0.005f }?.let { ProgressLine(it, Modifier.align(Alignment.BottomCenter)) }
         }
         Text(
             text = title.title,
@@ -355,10 +344,7 @@ fun PosterCard(
 @Composable
 private fun ProgressLine(progress: Float, modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(4.dp)
-            .background(Color.Black.copy(alpha = 0.7f)),
+        modifier = modifier.fillMaxWidth().height(4.dp).background(Color.Black.copy(alpha = 0.7f)),
     ) {
         Box(
             modifier = Modifier
