@@ -3,6 +3,7 @@ package com.apexlions.film2.studio
 import android.app.Application
 import com.apexlions.film2.studio.catalog.GitHubContentsClient
 import com.apexlions.film2.studio.dispatch.PackageMediaDispatcher
+import com.apexlions.film2.studio.dispatch.QualityGenerationDispatcher
 import com.apexlions.film2.studio.hf.CommitRepairingHfUploader
 import com.apexlions.film2.studio.hf.HfUploader
 import com.apexlions.film2.studio.hf.ShardRegistryManager
@@ -26,6 +27,8 @@ class Film2StudioApplication : Application() {
     val shardRegistryManager: ShardRegistryManager by lazy { ShardRegistryManager() }
 
     val packageMediaDispatcher: PackageMediaDispatcher by lazy { PackageMediaDispatcher() }
+
+    val qualityGenerationDispatcher: QualityGenerationDispatcher by lazy { QualityGenerationDispatcher() }
 
     /** New instance per job. CommitRepairingHfUploader keeps the normal uploader as the
      * primary path and only activates its raw-NDJSON fallback for the specific Hub
