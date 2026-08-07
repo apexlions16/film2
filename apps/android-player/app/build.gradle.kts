@@ -12,8 +12,8 @@ android {
         applicationId = "com.apexlions.film2.player"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1.0"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -22,11 +22,6 @@ android {
 
     buildTypes {
         release {
-            // Gercek imzalama secret'i (ANDROID_KEYSTORE_BASE64 vb.) yoksa Android
-            // tamamen imzasiz APK'yi kurmayi reddediyor ("App not installed"). AGP'nin
-            // otomatik uretilen debug keystore'uyla imzalayarak her zaman kurulabilir
-            // bir APK garanti ediyoruz; CI'da gercek keystore secret'lari eklenirse
-            // build-android.yml zaten apksigner ile ustune gercek imza atiyor.
             signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
