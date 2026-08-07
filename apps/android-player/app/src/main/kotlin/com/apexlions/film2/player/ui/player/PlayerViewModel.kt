@@ -44,10 +44,9 @@ sealed interface PlaybackUiState {
  * Iki kaynak MergingMediaSource ile birlestirilmez; dolayisiyla progressive MP4/AAC seek
  * noktalarinin farkli olmasi ana oynaticiyi cokertmez.
  *
- * Onemli: sidecar audio'yu periyodik olarak seek etmek SESI BOZAR. Onceki surum 500 ms'de
- * bir 180 ms'den buyuk drift gordugunde hard seek yapiyordu ve kullanicinin duydugu
- * "dit/klik/glitch" bunun sonucuydu. Bu surum yalnizca gercek bir seek, ilk hazirlanma
- * veya buffer'dan donus aninda konum esler. Normal oynatmada iki ExoPlayer serbest akar.
+ * Sidecar audio normal oynatma boyunca periyodik olarak seek EDILMEZ. Konum yalnizca
+ * kullanici gercek bir seek yaptiginda ve ses ilk hazirlandiginda cok buyuk bir fark
+ * olusmussa tek sefer duzeltilir. Boylece ses decoder/buffer'i tekrar tekrar sifirlanmaz.
  */
 class PlayerViewModel(
     application: Application,
@@ -78,7 +77,6 @@ class PlayerViewModel(
     private var activeAsset: PlayableAsset? = null
     private var directPlayback = false
     private var autoExternalSelectionDone = false
-    private var externalAudioWasBuffering = false
 
     init {
         player.addListener(object : Player.Listener {
@@ -105,8 +103,6 @@ class PlayerViewModel(
                 newPosition: Player.PositionInfo,
                 reason: Int,
             ) {
-                // Kullanici timeline'da ileri/geri sardiginda sidecar sesi BIR KEZ ayni
-                // konuma cek. Normal oynatmada surekli seek yoktur.
                 if (_selectedExternalAudioIndex.value != null) {
                     seekExternalToMain()
                 }
@@ -127,21 +123,16 @@ class PlayerViewModel(
             }
 
             override fun onPlaybackStateChanged(playbackState: Int) {
-                when (playbackState) {
-                    Player.STATE_BUFFERING -> externalAudioWasBuffering = true
-                    Player.STATE_READY -> {
-                        // Ilk acilista ya da ag buffer'indan donuste ana video bu arada
-                        // ilerlemis olabilir. Tek seferlik konum eslemesi yap.
-                        if (externalAudioWasBuffering || externalAudioPlayer.currentPosition <= 0L) {
-                            seekExternalToMain()
-                        } else if (abs(externalAudioPlayer.currentPosition - player.currentPosition) > BUFFER_RECOVERY_DRIFT_MS) {
-                            seekExternalToMain()
-                        }
-                        externalAudioWasBuffering = false
-                        player.volume = 0f
-                        externalAudioPlayer.volume = 1f
-                        syncExternalAudioPlayback()
+                if (playbackState == Player.STATE_READY) {
+                    // Ses dosyasi ilk hazirlanirken ana video cok ilerlediyse BIR KEZ
+                    // yakala. Seek'in kendisinin olusturdugu BUFFERING -> READY dongusunde
+                    // fark artik kucuk olacagi icin ikinci bir seek tetiklenmez.
+                    if (abs(externalAudioPlayer.currentPosition - player.currentPosition) > STARTUP_DRIFT_CORRECTION_MS) {
+                        seekExternalToMain()
                     }
+                    player.volume = 0f
+                    externalAudioPlayer.volume = 1f
+                    syncExternalAudioPlayback()
                 }
             }
         })
@@ -247,7 +238,6 @@ class PlayerViewModel(
         player.playWhenReady = true
     }
 
-    /** Ana MP4/MKV'nin icindeki audio track'i secer. */
     fun selectAudioTrack(group: Tracks.Group, trackIndex: Int) {
         deactivateExternalAudio(restoreMainAudio = true)
         val override = TrackSelectionOverride(group.mediaTrackGroup, trackIndex)
@@ -257,7 +247,6 @@ class PlayerViewModel(
             .build()
     }
 
-    /** Katalogdaki ayri ses dosyasini secip audio-only player'da baslatir. */
     fun selectExternalAudio(index: Int) {
         val asset = activeAsset ?: return
         val track = asset.externalAudioTracks.getOrNull(index) ?: return
@@ -268,12 +257,10 @@ class PlayerViewModel(
         if (!directPlayback) return
 
         _selectedExternalAudioIndex.value = index
-        externalAudioWasBuffering = true
 
-        // Katalogda eski surumlerden kalma yanlis MIME olabilir (ornegin ham .aac dosyasi
-        // audio/mp4 diye yazilmis). MIME'i zorlamiyoruz; Media3 URL uzantisindan/container
-        // imzasindan extractor'i kendisi secsin. Bu mevcut yuklemeleri yeniden yuklemeden
-        // duzeltir.
+        // Katalogda onceki Studio surumlerinden kalmis yanlis MIME olabilir. Ozellikle
+        // ham .aac bir MP4 container degildir. MIME'i zorlamak yerine Media3'e URL/container
+        // uzerinden extractor secimi birakiliyor; mevcut yukleme yeniden gerekmez.
         val item = MediaItem.Builder()
             .setUri(track.url)
             .build()
@@ -287,8 +274,8 @@ class PlayerViewModel(
         externalAudioPlayer.seekTo(player.currentPosition.coerceAtLeast(0L))
         externalAudioPlayer.prepare()
 
-        // Yeni sidecar ses hazir olana kadar ana ses aniden kesilmesin. STATE_READY'de
-        // ana player mute edilir ve sidecar baslatilir.
+        // Ana videoda zaten ses varsa sidecar hazir olana kadar onu birak. Sidecar
+        // STATE_READY oldugunda ana player mute edilip secilen ses baslatilir.
         if (player.currentTracks.groups.none { it.type == C.TRACK_TYPE_AUDIO && it.length > 0 }) {
             player.volume = 0f
         }
@@ -296,7 +283,6 @@ class PlayerViewModel(
 
     private fun deactivateExternalAudio(restoreMainAudio: Boolean) {
         _selectedExternalAudioIndex.value = null
-        externalAudioWasBuffering = false
         externalAudioPlayer.playWhenReady = false
         externalAudioPlayer.pause()
         externalAudioPlayer.stop()
@@ -304,7 +290,6 @@ class PlayerViewModel(
         if (restoreMainAudio) player.volume = 1f
     }
 
-    /** Separate modda ana video sessizse ilk harici sesi otomatik ac. */
     private fun maybeAutoSelectExternalAudio() {
         if (autoExternalSelectionDone || !directPlayback || _selectedExternalAudioIndex.value != null) return
         val asset = activeAsset ?: return
@@ -384,8 +369,6 @@ class PlayerViewModel(
     }
 
     companion object {
-        // Yalnizca buffer'dan donuste cok buyuk kayma varsa hard seek yapilir. Normal
-        // oynatma boyunca periyodik seek YOKTUR.
-        private const val BUFFER_RECOVERY_DRIFT_MS = 1_500L
+        private const val STARTUP_DRIFT_CORRECTION_MS = 1_500L
     }
 }
