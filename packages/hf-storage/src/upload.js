@@ -33,11 +33,18 @@ async function collectFiles(localDir) {
  * @param {string} params.token
  */
 export async function uploadFilesToShard({ files, shardId, token }) {
-  if (!files.length) return { totalBytes: 0, uploadedPaths: [], urls: {} };
+  if (!files.length) {
+    /** @type {Record<string, string>} */
+    const emptyUrls = {};
+    return { totalBytes: 0, uploadedPaths: [], urls: emptyUrls };
+  }
 
   let totalBytes = 0;
+  /** @type {{path:string, content:Blob}[]} */
   const payload = [];
+  /** @type {string[]} */
   const uploadedPaths = [];
+  /** @type {Record<string, string>} */
   const urls = {};
   for (const file of files) {
     const info = await stat(file.localPath);
