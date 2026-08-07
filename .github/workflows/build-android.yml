@@ -1,16 +1,20 @@
 name: Build Android APKs
 
-# "v*" tag'i atildiginda (ya da elle workflow_dispatch ile) android-player ve
-# android-studio icin APK uretir. Tag release'lerinde kalici keystore zorunludur:
-# farkli imzayla uretilen APK eski uygulamanin ustune kurulamaz ve kullanici verisi
-# tasinamaz. Manuel workflow calistirmalari imzasiz/test artifact'i uretebilir.
+# Tag/release + PR + direct test-branch build.
 on:
   push:
+    branches:
+      - "agent/direct-mp4-media"
     tags:
       - "v*"
+    paths:
+      - "apps/android-player/**"
+      - "apps/android-studio/**"
+      - ".github/workflows/build-android.yml"
   pull_request:
     branches: [main]
     paths:
+      - "apps/android-player/**"
       - "apps/android-studio/**"
       - ".github/workflows/build-android.yml"
   workflow_dispatch: {}
