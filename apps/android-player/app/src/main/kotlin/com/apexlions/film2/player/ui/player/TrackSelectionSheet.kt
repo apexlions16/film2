@@ -2,31 +2,46 @@
 
 package com.apexlions.film2.player.ui.player
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.Tracks
 import com.apexlions.film2.player.catalog.VideoVariant
+import com.apexlions.film2.player.userdata.PlaybackAppearanceState
+import com.apexlions.film2.player.userdata.SubtitleBackground
+import com.apexlions.film2.player.userdata.SubtitleEdge
+import com.apexlions.film2.player.userdata.SubtitleTextColor
+import com.apexlions.film2.player.userdata.VideoLayoutMode
 import java.util.Locale
 
 private data class TrackOption(
@@ -68,12 +83,20 @@ fun TrackSelectionSheet(
     tracks: Tracks,
     videoVariants: List<VideoVariant> = emptyList(),
     selectedQualityHeight: Int? = null,
+    appearance: PlaybackAppearanceState,
     onSelectQuality: (VideoVariant) -> Unit,
     onSelectAudio: (Tracks.Group, Int) -> Unit,
     onSelectSubtitle: (Tracks.Group, Int) -> Unit,
     onDisableSubtitles: () -> Unit,
+    onSubtitleSize: (Float) -> Unit,
+    onSubtitlePosition: (Float) -> Unit,
+    onSubtitleTextColor: (SubtitleTextColor) -> Unit,
+    onSubtitleBackground: (SubtitleBackground) -> Unit,
+    onSubtitleEdge: (SubtitleEdge) -> Unit,
+    onVideoLayout: (VideoLayoutMode) -> Unit,
+    onResetSubtitles: () -> Unit,
     onDismiss: () -> Unit,
-    sheetState: SheetState = rememberModalBottomSheetState(),
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
     val audioOptions = optionsForType(tracks, C.TRACK_TYPE_AUDIO)
     val subtitleOptions = optionsForType(tracks, C.TRACK_TYPE_TEXT)
@@ -86,14 +109,7 @@ fun TrackSelectionSheet(
     ) {
         LazyColumn(modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) {
             if (videoVariants.size > 1) {
-                item {
-                    Text(
-                        "Goruntu Kalitesi",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(bottom = 8.dp),
-                    )
-                }
+                item { SectionTitle("Görüntü Kalitesi") }
                 items(videoVariants.sortedByDescending { it.height }, key = { "quality-${it.height}-${it.url}" }) { variant ->
                     TrackRow(
                         label = if (variant.source) "${variant.label} (Kaynak)" else variant.label,
@@ -104,25 +120,19 @@ fun TrackSelectionSheet(
                 item { Divider(modifier = Modifier.padding(vertical = 16.dp)) }
             }
 
+            item { SectionTitle("Ekran Oranı / Yerleşim") }
             item {
-                Text(
-                    "Ses Dili",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp),
+                LayoutChoiceRow(
+                    selected = appearance.videoLayoutMode,
+                    onSelect = onVideoLayout,
                 )
             }
+            item { Divider(modifier = Modifier.padding(vertical = 16.dp)) }
 
+            item { SectionTitle("Ses Dili") }
             if (audioOptions.isEmpty()) {
-                item {
-                    Text(
-                        "Ses track'i bulunamadi",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                item { EmptyMessage("Ses track'i bulunamadı") }
             }
-
             items(audioOptions) { option ->
                 TrackRow(
                     label = option.label,
@@ -132,31 +142,9 @@ fun TrackSelectionSheet(
             }
 
             item { Divider(modifier = Modifier.padding(vertical = 16.dp)) }
-
-            item {
-                Text(
-                    "Altyazi",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp),
-                )
-            }
-            item {
-                TrackRow(
-                    label = "Kapali",
-                    selected = subtitlesOff,
-                    onClick = onDisableSubtitles,
-                )
-            }
-            if (subtitleOptions.isEmpty()) {
-                item {
-                    Text(
-                        "Altyazi bulunamadi",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+            item { SectionTitle("Altyazı") }
+            item { TrackRow(label = "Kapalı", selected = subtitlesOff, onClick = onDisableSubtitles) }
+            if (subtitleOptions.isEmpty()) item { EmptyMessage("Altyazı bulunamadı") }
             items(subtitleOptions) { option ->
                 TrackRow(
                     label = option.label,
@@ -164,16 +152,175 @@ fun TrackSelectionSheet(
                     onClick = { onSelectSubtitle(option.group, option.indexInGroup) },
                 )
             }
+
+            item { Divider(modifier = Modifier.padding(vertical = 16.dp)) }
+            item { SectionTitle("Altyazı Görünümü") }
+            item {
+                SubtitlePreview(appearance)
+            }
+            item {
+                Text("Boyut  •  %${(appearance.subtitleSizeScale * 100).toInt()}", style = MaterialTheme.typography.bodyMedium)
+                Slider(
+                    value = appearance.subtitleSizeScale,
+                    onValueChange = onSubtitleSize,
+                    valueRange = 0.65f..1.75f,
+                )
+            }
+            item {
+                Text("Dikey konum  •  ${positionLabel(appearance.subtitleBottomPaddingFraction)}", style = MaterialTheme.typography.bodyMedium)
+                Slider(
+                    value = appearance.subtitleBottomPaddingFraction,
+                    onValueChange = onSubtitlePosition,
+                    valueRange = 0.02f..0.32f,
+                )
+            }
+            item {
+                ChoiceRow(
+                    title = "Yazı rengi",
+                    options = listOf(
+                        "Beyaz" to SubtitleTextColor.WHITE,
+                        "Sarı" to SubtitleTextColor.YELLOW,
+                        "Cyan" to SubtitleTextColor.CYAN,
+                    ),
+                    selected = appearance.subtitleTextColor,
+                    onSelect = onSubtitleTextColor,
+                )
+            }
+            item {
+                ChoiceRow(
+                    title = "Arka plan",
+                    options = listOf(
+                        "Yok" to SubtitleBackground.NONE,
+                        "Yumuşak" to SubtitleBackground.SOFT,
+                        "Koyu" to SubtitleBackground.STRONG,
+                    ),
+                    selected = appearance.subtitleBackground,
+                    onSelect = onSubtitleBackground,
+                )
+            }
+            item {
+                ChoiceRow(
+                    title = "Kenar",
+                    options = listOf(
+                        "Outline" to SubtitleEdge.OUTLINE,
+                        "Gölge" to SubtitleEdge.SHADOW,
+                        "Yok" to SubtitleEdge.NONE,
+                    ),
+                    selected = appearance.subtitleEdge,
+                    onSelect = onSubtitleEdge,
+                )
+            }
+            item {
+                OutlinedButton(
+                    onClick = onResetSubtitles,
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 28.dp),
+                ) {
+                    Text("Altyazı görünümünü sıfırla")
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun TrackRow(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
+private fun SectionTitle(value: String) {
+    Text(
+        value,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.padding(bottom = 8.dp),
+    )
+}
+
+@Composable
+private fun EmptyMessage(value: String) {
+    Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+}
+
+@Composable
+private fun LayoutChoiceRow(selected: VideoLayoutMode, onSelect: (VideoLayoutMode) -> Unit) {
+    val options = listOf(
+        "Orijinal" to VideoLayoutMode.ORIGINAL_FIT,
+        "Tam Ekran" to VideoLayoutMode.SCREEN_CROP,
+        "Esnet" to VideoLayoutMode.STRETCH,
+        "16:9" to VideoLayoutMode.RATIO_16_9,
+        "4:3" to VideoLayoutMode.RATIO_4_3,
+        "21:9" to VideoLayoutMode.RATIO_21_9,
+    )
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 6.dp)) {
+        items(options) { (label, mode) ->
+            AssistChip(
+                onClick = { onSelect(mode) },
+                label = { Text(label) },
+                leadingIcon = if (selected == mode) {
+                    { Icon(Icons.Filled.Check, contentDescription = null) }
+                } else null,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SubtitlePreview(appearance: PlaybackAppearanceState) {
+    val textColor = when (appearance.subtitleTextColor) {
+        SubtitleTextColor.WHITE -> Color.White
+        SubtitleTextColor.YELLOW -> Color(0xFFFFEB3B)
+        SubtitleTextColor.CYAN -> Color(0xFF80DEEA)
+    }
+    val background = when (appearance.subtitleBackground) {
+        SubtitleBackground.NONE -> Color.Transparent
+        SubtitleBackground.SOFT -> Color.Black.copy(alpha = 0.55f)
+        SubtitleBackground.STRONG -> Color.Black.copy(alpha = 0.86f)
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(Color(0xFF252525), RoundedCornerShape(10.dp))
+            .padding(vertical = 22.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            "Film2 altyazı önizlemesi",
+            color = textColor,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.background(background, RoundedCornerShape(3.dp)).padding(horizontal = 5.dp, vertical = 2.dp),
+        )
+    }
+}
+
+@Composable
+private fun <T> ChoiceRow(
+    title: String,
+    options: List<Pair<String, T>>,
+    selected: T,
+    onSelect: (T) -> Unit,
 ) {
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp)) {
+        Text(title, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom = 6.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            options.forEach { (label, value) ->
+                AssistChip(
+                    onClick = { onSelect(value) },
+                    label = { Text(label) },
+                    leadingIcon = if (selected == value) {
+                        { Icon(Icons.Filled.Check, contentDescription = null) }
+                    } else null,
+                )
+            }
+        }
+    }
+}
+
+private fun positionLabel(value: Float): String = when {
+    value < 0.07f -> "En alt"
+    value < 0.14f -> "Alt"
+    value < 0.22f -> "Orta-alt"
+    else -> "Yukarı"
+}
+
+@Composable
+private fun TrackRow(label: String, selected: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -187,8 +334,6 @@ private fun TrackRow(
             style = MaterialTheme.typography.bodyLarge,
             color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
         )
-        if (selected) {
-            Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        }
+        if (selected) Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
     }
 }
