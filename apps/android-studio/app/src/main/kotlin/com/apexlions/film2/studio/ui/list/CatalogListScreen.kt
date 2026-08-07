@@ -48,6 +48,7 @@ fun CatalogListScreen(
     onOpenSettings: () -> Unit,
     onAttachMedia: (titleId: String, titleType: com.apexlions.film2.studio.catalog.TitleType) -> Unit,
     onGenerateQualities: (titleId: String, titleType: com.apexlions.film2.studio.catalog.TitleType) -> Unit,
+    onManageTrailer: (titleId: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val application = LocalContext.current.applicationContext as Film2StudioApplication
@@ -107,6 +108,7 @@ fun CatalogListScreen(
                                 title = title,
                                 onClick = { onAttachMedia(title.id, title.type) },
                                 onQuality = { onGenerateQualities(title.id, title.type) },
+                                onTrailer = { onManageTrailer(title.id) },
                             )
                         }
                     }
@@ -117,7 +119,12 @@ fun CatalogListScreen(
 }
 
 @Composable
-private fun TitleRow(title: Title, onClick: () -> Unit, onQuality: () -> Unit) {
+private fun TitleRow(
+    title: Title,
+    onClick: () -> Unit,
+    onQuality: () -> Unit,
+    onTrailer: () -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -137,11 +144,23 @@ private fun TitleRow(title: Title, onClick: () -> Unit, onQuality: () -> Unit) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            if (!title.trailerUrl.isNullOrBlank()) {
+                Text(
+                    "Trailer hazir",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
         Column(horizontalAlignment = Alignment.End) {
             StudioStatusBadge(status = title.status)
-            TextButton(onClick = onQuality, enabled = title.status == AssetStatus.READY) {
-                Text("Kalite")
+            Row {
+                TextButton(onClick = onQuality, enabled = title.status == AssetStatus.READY) {
+                    Text("Kalite")
+                }
+                TextButton(onClick = onTrailer) {
+                    Text(if (title.trailerUrl.isNullOrBlank()) "Trailer" else "Trailer Degistir")
+                }
             }
         }
     }
