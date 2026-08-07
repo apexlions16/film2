@@ -64,6 +64,46 @@ function runFfmpeg(args: string[], onMessage?: (message: string) => void): Promi
   });
 }
 
+function addInput(args: string[], path: string): void {
+  // FFmpeg dosyanin uzantisina degil gercek container/stream imzasina bakar.
+  // +genpts, MPEG-TS kaynaklarinda eksik/garip PTS varsa MP4 icin kullanisli zaman damgalari uretir.
+  args.push("-fflags", "+genpts", "-i", path);
+}
+
+async function remuxCombined(
+  uploadId: string,
+  input: string,
+  onMessage?: (message: string) => void,
+): Promise<PreparedMedia> {
+  const root = join(app.getPath("temp"), "film2-studio-fast", uploadId);
+  await mkdir(root, { recursive: true });
+  const output = join(root, `video_${Date.now()}.mp4`);
+  const args: string[] = ["-hide_banner", "-y"];
+  addInput(args, input);
+  args.push(
+    "-map", "0:v:0",
+    "-map", "0:a?",
+    "-c", "copy",
+    "-avoid_negative_ts", "make_zero",
+    "-movflags", "+faststart",
+    output,
+  );
+
+  try {
+    onMessage?.("Gerçek medya formatı analiz ediliyor; uzantı önemsenmeden hızlı MP4 remux deneniyor…");
+    await runFfmpeg(args, onMessage);
+    return {
+      videoPath: output,
+      audioLanguages: [],
+      cleanup: () => rm(root, { recursive: true, force: true }),
+      direct: false,
+    };
+  } catch (error) {
+    await rm(root, { recursive: true, force: true });
+    throw error;
+  }
+}
+
 export async function prepareFastMedia(
   uploadId: string,
   selection: UploadFileSelection,
@@ -72,7 +112,8 @@ export async function prepareFastMedia(
   if (selection.mode === "combined") {
     if (!selection.combinedFile) return null;
     const ext = extname(selection.combinedFile).toLowerCase();
-    // Hazir coklu-track MP4 zaten final konteyner; bir daha kopyalamiyoruz.
+
+    // Gercek MP4 zaten final konteyner; gereksiz yerel kopya yok.
     if (ext === ".mp4" || ext === ".m4v") {
       return {
         videoPath: selection.combinedFile,
@@ -81,30 +122,34 @@ export async function prepareFastMedia(
         direct: true,
       };
     }
-    // MKV vb. container'larda track uyumlulugu degisebildigi icin guvenli server fallback.
-    return null;
+
+    // .mkv yazsa bile gercekte MPEG-TS olabilir. FFmpeg content sniffing ile bunu
+    // otomatik tanir ve H.264/HEVC + AAC gibi MP4-uyumlu streamleri encode etmeden tasir.
+    return remuxCombined(uploadId, selection.combinedFile, onMessage);
   }
 
   if (!selection.videoFile) return null;
-  const videoExt = extname(selection.videoFile).toLowerCase();
-  if (videoExt !== ".mp4" && videoExt !== ".m4v") return null;
-
   const audioEntries = Object.entries(selection.audioFiles);
   if (audioEntries.length === 0) return null;
-  if (audioEntries.some(([, path]) => ![".aac", ".m4a", ".mp4"].includes(extname(path).toLowerCase()))) {
-    return null;
-  }
 
+  // Uzanti filtresi YOK. video.mkv / tr.mkv / en.mkv gercekte MPEG-TS ise FFmpeg
+  // container imzasindan tanir. Uyumlu streamler stream-copy ile tek MP4'e gider.
   const root = join(app.getPath("temp"), "film2-studio-fast", uploadId);
   await mkdir(root, { recursive: true });
   const output = join(root, `video_${Date.now()}.mp4`);
   const languages = audioEntries.map(([language]) => normalizedLanguage(language));
 
-  const args: string[] = ["-hide_banner", "-y", "-i", selection.videoFile];
-  for (const [, path] of audioEntries) args.push("-i", path);
+  const args: string[] = ["-hide_banner", "-y"];
+  addInput(args, selection.videoFile);
+  for (const [, path] of audioEntries) addInput(args, path);
   args.push("-map", "0:v:0");
   audioEntries.forEach((_, index) => args.push("-map", `${index + 1}:a:0`));
-  args.push("-c:v", "copy", "-c:a", "copy", "-movflags", "+faststart");
+  args.push(
+    "-c:v", "copy",
+    "-c:a", "copy",
+    "-avoid_negative_ts", "make_zero",
+    "-movflags", "+faststart",
+  );
   languages.forEach((language, index) => {
     args.push(`-metadata:s:a:${index}`, `language=${language}`);
     args.push(`-metadata:s:a:${index}`, `title=${languageLabel(language)}`);
@@ -113,7 +158,7 @@ export async function prepareFastMedia(
   args.push(output);
 
   try {
-    onMessage?.("Video ve sesler Windows'ta hızlı MP4'e birleştiriliyor (encode yok)…");
+    onMessage?.("Dosyaların gerçek formatı analiz ediliyor; MPEG-TS/MKV/MP4 uzantıdan bağımsız hızlı remux ediliyor (encode yok)…");
     await runFfmpeg(args, onMessage);
     return {
       videoPath: output,
