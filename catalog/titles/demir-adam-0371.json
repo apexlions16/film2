@@ -164,8 +164,37 @@
       "profileUrl": "https://image.tmdb.org/t/p/w300/8MtRRnEHaBSw8Ztdl8saXiw1egP.jpg"
     }
   ],
-  "status": "processing",
+  "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T18:25:39.650811Z",
-  "updatedAt": "2026-08-07T18:26:36.657438Z"
+  "updatedAt": "2026-08-07T18:29:11.071267Z",
+  "shardId": "mfilms12/film2-media-01",
+  "asset": {
+    "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/demir-adam-0371/video_1786127292102.mp4",
+    "durationSeconds": 7561.757,
+    "audioLanguages": [
+      "eng",
+      "tur"
+    ],
+    "subtitleLanguages": [
+      "eng",
+      "tur"
+    ],
+    "externalAudioTracks": [],
+    "externalSubtitleTracks": [
+      {
+        "language": "eng",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/demir-adam-0371/subs_eng_1786127292102_1.vtt",
+        "label": "Ingilizce",
+        "mimeType": "text/vtt"
+      },
+      {
+        "language": "tur",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/demir-adam-0371/subs_tur_1786127292102_2.vtt",
+        "label": "Turkce",
+        "mimeType": "text/vtt"
+      }
+    ],
+    "videoVariants": []
+  }
 }
