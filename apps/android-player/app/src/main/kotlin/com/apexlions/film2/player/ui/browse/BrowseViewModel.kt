@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.apexlions.film2.player.catalog.CatalogRepository
 import com.apexlions.film2.player.catalog.CatalogResult
 import com.apexlions.film2.player.catalog.DemoContent
+import com.apexlions.film2.player.catalog.HomeConfig
 import com.apexlions.film2.player.catalog.Title
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,10 +19,17 @@ class BrowseViewModel(private val repository: CatalogRepository) : ViewModel() {
 
     private val _state = MutableStateFlow<CatalogResult>(CatalogResult.Loading)
     val state: StateFlow<CatalogResult> = _state.asStateFlow()
+
+    private val _homeConfig = MutableStateFlow(HomeConfig.DEFAULT)
+    val homeConfig: StateFlow<HomeConfig> = _homeConfig.asStateFlow()
+
+    /** Her manuel/gercek katalog yenilemesinde artwork havuzundan yeni secim yapilmasini saglar. */
+    private val _artworkNonce = MutableStateFlow(System.currentTimeMillis())
+    val artworkNonce: StateFlow<Long> = _artworkNonce.asStateFlow()
+
     private val refreshMutex = Mutex()
     private var lastRevision: String? = null
 
-    /** The demo row is always present regardless of catalog fetch outcome. */
     val demoTitle: Title = DemoContent.demoTitle
 
     init {
@@ -38,7 +46,6 @@ class BrowseViewModel(private val repository: CatalogRepository) : ViewModel() {
         }
     }
 
-    /** Called by BrowseScreen's foreground poll. No loading flash when only data changed. */
     suspend fun refreshIfChanged() {
         val revision = repository.fetchRevision() ?: return
         val previous = lastRevision
@@ -56,9 +63,12 @@ class BrowseViewModel(private val repository: CatalogRepository) : ViewModel() {
         refreshMutex.withLock {
             if (showLoading) _state.value = CatalogResult.Loading
             val result = repository.fetchTitles()
-            // During silent polling keep the last good catalog on a transient network error.
             if (showLoading || result is CatalogResult.Success) {
                 _state.value = result
+            }
+            if (result is CatalogResult.Success) {
+                _homeConfig.value = repository.fetchHomeConfig()
+                _artworkNonce.value = System.currentTimeMillis()
             }
         }
     }
