@@ -2,9 +2,9 @@
   "id": "ay-sovalyesi-1023",
   "imdbId": "tt10234724",
   "manualEntry": false,
-  "status": "pending",
+  "status": "processing",
   "createdAt": "2026-08-07T19:51:10.235Z",
-  "updatedAt": "2026-08-07T19:51:17.084Z",
+  "updatedAt": "2026-08-07T21:15:00.523Z",
   "type": "series",
   "tmdbId": 92749,
   "title": "Ay Şövalyesi",
@@ -116,7 +116,7 @@
           "airDate": "2022-03-30",
           "stillUrl": "https://image.tmdb.org/t/p/w500/h88DZpKIDo66Tvt556HCvq2BdR0.jpg",
           "runtimeMinutes": 48,
-          "status": "pending"
+          "status": "processing"
         },
         {
           "episodeNumber": 2,
