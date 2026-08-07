@@ -14,6 +14,7 @@
   "runtimeMinutes": 109,
   "posterUrl": "https://image.tmdb.org/t/p/w780/nriiXc6VbD6qWBj7INOElJbX8mp.jpg",
   "backdropUrl": "https://image.tmdb.org/t/p/w1280/rZfmzpixLKLR3Hg2u0WgC7XLFl8.jpg",
+  "trailerUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/trailer.mp4",
   "cast": [
     {
       "name": "Michael Johnston",
@@ -165,11 +166,10 @@
   "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T10:00:45.970165Z",
-  "updatedAt": "2026-08-07T11:02:59.693Z",
+  "updatedAt": "2026-08-07T14:24:31.481242Z",
   "shardId": "mfilms12/film2-media-01",
   "asset": {
     "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/video.mp4",
-    "masterPlaylistUrl": null,
     "audioLanguages": [
       "eng",
       "tur"
@@ -182,16 +182,17 @@
     "externalSubtitleTracks": [
       {
         "language": "eng",
-        "label": "İngilizce",
         "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/subs_ingilizce_4.vtt",
+        "label": "İngilizce",
         "mimeType": "text/vtt"
       },
       {
         "language": "tur",
-        "label": "Türkçe",
         "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/subs_trke_5.vtt",
+        "label": "Türkçe",
         "mimeType": "text/vtt"
       }
-    ]
+    ],
+    "videoVariants": []
   }
 }
