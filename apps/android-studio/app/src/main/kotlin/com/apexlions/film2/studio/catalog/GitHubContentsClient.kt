@@ -16,13 +16,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.time.Instant
 import java.util.Base64
 
-/**
- * Reads AND writes the film2 GitHub catalog via the Contents API.
- *
- * Read calls can work anonymously. Every write call, however, MUST have a non-empty PAT.
- * Keeping these paths separate prevents a missing DataStore value from silently becoming
- * an anonymous PUT which GitHub reports only as a generic 401 "Requires authentication".
- */
 class GitHubContentsClient(
     private val tokenProvider: suspend () -> String?,
     private val repo: String = DEFAULT_REPO,
@@ -38,18 +31,10 @@ class GitHubContentsClient(
     }
 
     @Serializable
-    private data class ContentsEntry(
-        val name: String,
-        val type: String,
-        val sha: String? = null,
-    )
+    private data class ContentsEntry(val name: String, val type: String, val sha: String? = null)
 
     @Serializable
-    private data class ContentsFile(
-        val sha: String? = null,
-        val content: String? = null,
-        val encoding: String? = null,
-    )
+    private data class ContentsFile(val sha: String? = null, val content: String? = null, val encoding: String? = null)
 
     @Serializable
     private data class PutFileRequest(
@@ -62,10 +47,6 @@ class GitHubContentsClient(
     @Serializable
     private data class CatalogRevision(val revision: String)
 
-    /**
-     * Accepts a raw PAT as well as an accidentally pasted `Bearer ...` / `token ...`
-     * value. Quotes/newlines copied from a backup file are removed too.
-     */
     private suspend fun normalizedToken(): String? {
         var value = tokenProvider()?.trim()?.takeIf { it.isNotBlank() } ?: return null
         value = value.removeSurrounding("\"").trim()
@@ -77,45 +58,26 @@ class GitHubContentsClient(
         return value.takeIf { it.isNotBlank() }
     }
 
-    private suspend fun authHeader(
-        builder: Request.Builder,
-        requireAuthentication: Boolean = false,
-    ): Request.Builder {
+    private suspend fun authHeader(builder: Request.Builder, requireAuthentication: Boolean = false): Request.Builder {
         val token = normalizedToken()
         if (requireAuthentication && token == null) {
-            throw GitHubApiException(
-                "GitHub PAT Studio'da kayitli degil. Ayarlar > GitHub PAT alanina token'i girip Kaydet'e basin.",
-            )
+            throw GitHubApiException("GitHub PAT Studio'da kayitli degil. Ayarlar > GitHub PAT alanina token'i girip Kaydet'e basin.")
         }
-        if (token != null) {
-            builder.header("Authorization", "Bearer $token")
-        }
+        if (token != null) builder.header("Authorization", "Bearer $token")
         builder.header("Accept", "application/vnd.github+json")
         builder.header("X-GitHub-Api-Version", "2022-11-28")
         return builder
     }
 
-    /**
-     * Performs a real authenticated request before a long HF upload starts. This lets the
-     * UI fail immediately if the saved PAT disappeared/expired instead of uploading first.
-     */
     suspend fun verifyAuthentication() = withContext(Dispatchers.IO) {
-        val request = authHeader(
-            Request.Builder().url("https://api.github.com/user"),
-            requireAuthentication = true,
-        ).build()
+        val request = authHeader(Request.Builder().url("https://api.github.com/user"), requireAuthentication = true).build()
         httpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
                 val detail = response.body?.string().orEmpty()
-                throw GitHubApiException(
-                    "GitHub PAT dogrulanamadi (${response.code}). Token ayni olsa bile Studio'daki kayitli deger " +
-                        "GitHub'a kimlik dogrulamasi yapamiyor. $detail",
-                )
+                throw GitHubApiException("GitHub PAT dogrulanamadi (${response.code}). $detail")
             }
         }
     }
-
-    // ---- Reads ----
 
     suspend fun listTitleIds(): List<String> = withContext(Dispatchers.IO) {
         val url = "https://api.github.com/repos/$repo/contents/catalog/titles?ref=$branch"
@@ -144,6 +106,18 @@ class GitHubContentsClient(
         ids.map { id -> async { getTitle(id) } }.awaitAll().filterNotNull()
     }
 
+    suspend fun getHomeConfig(): HomeConfig = withContext(Dispatchers.IO) {
+        val nonce = System.currentTimeMillis()
+        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/home.json?v=$nonce"
+        val request = Request.Builder().url(url).header("Cache-Control", "no-cache").build()
+        httpClient.newCall(request).execute().use { response ->
+            if (response.code == 404) return@use HomeConfig.DEFAULT
+            if (!response.isSuccessful) throw GitHubApiException("home.json okunamadi: ${response.code}")
+            runCatching { json.decodeFromString(HomeConfig.serializer(), response.body?.string().orEmpty()) }
+                .getOrDefault(HomeConfig.DEFAULT)
+        }
+    }
+
     suspend fun getShardRegistry(): ShardRegistry = withContext(Dispatchers.IO) {
         val nonce = System.currentTimeMillis()
         val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/shards.json?v=$nonce"
@@ -154,56 +128,40 @@ class GitHubContentsClient(
         }
     }
 
-    // ---- Writes (authentication is mandatory) ----
-
     private suspend fun getFileSha(path: String): String? = withContext(Dispatchers.IO) {
         val url = "https://api.github.com/repos/$repo/contents/$path?ref=$branch"
-        val request = authHeader(
-            Request.Builder().url(url),
-            requireAuthentication = true,
-        ).build()
+        val request = authHeader(Request.Builder().url(url), requireAuthentication = true).build()
         httpClient.newCall(request).execute().use { response ->
             if (response.code == 404) return@use null
             if (!response.isSuccessful) {
-                throw GitHubApiException(
-                    "Dosya bilgisi alinamadi ($path): ${response.code} ${response.body?.string().orEmpty()}",
-                )
+                throw GitHubApiException("Dosya bilgisi alinamadi ($path): ${response.code} ${response.body?.string().orEmpty()}")
             }
             json.decodeFromString(ContentsFile.serializer(), response.body?.string().orEmpty()).sha
         }
     }
 
-    private suspend fun putFile(path: String, contentBytes: ByteArray, commitMessage: String) =
-        withContext(Dispatchers.IO) {
-            val existingSha = getFileSha(path)
-            val base64Content = Base64.getEncoder().encodeToString(contentBytes)
-            val requestPayload = PutFileRequest(
-                message = commitMessage,
-                content = base64Content,
-                branch = branch,
-                sha = existingSha,
-            )
-            val bodyJson = json.encodeToString(PutFileRequest.serializer(), requestPayload)
-            val url = "https://api.github.com/repos/$repo/contents/$path"
-            val request = authHeader(
-                Request.Builder()
-                    .url(url)
-                    .put(bodyJson.toRequestBody("application/json".toMediaType())),
-                requireAuthentication = true,
-            ).build()
-            httpClient.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    throw GitHubApiException(
-                        "GitHub'a yazilamadi ($path): ${response.code} ${response.body?.string().orEmpty()}",
-                    )
-                }
+    private suspend fun putFile(path: String, contentBytes: ByteArray, commitMessage: String) = withContext(Dispatchers.IO) {
+        val existingSha = getFileSha(path)
+        val base64Content = Base64.getEncoder().encodeToString(contentBytes)
+        val requestPayload = PutFileRequest(
+            message = commitMessage,
+            content = base64Content,
+            branch = branch,
+            sha = existingSha,
+        )
+        val bodyJson = json.encodeToString(PutFileRequest.serializer(), requestPayload)
+        val url = "https://api.github.com/repos/$repo/contents/$path"
+        val request = authHeader(
+            Request.Builder().url(url).put(bodyJson.toRequestBody("application/json".toMediaType())),
+            requireAuthentication = true,
+        ).build()
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw GitHubApiException("GitHub'a yazilamadi ($path): ${response.code} ${response.body?.string().orEmpty()}")
             }
         }
+    }
 
-    /**
-     * Player polls only this tiny file. When it changes, the full catalog is refreshed once.
-     * That avoids repeatedly hitting the 60/hour unauthenticated GitHub Contents API limit.
-     */
     private suspend fun touchCatalogVersion() {
         val body = json.encodeToString(
             CatalogRevision.serializer(),
@@ -222,6 +180,17 @@ class GitHubContentsClient(
             path = "catalog/titles/${title.id}.json",
             contentBytes = body.toByteArray(Charsets.UTF_8),
             commitMessage = "chore(catalog): ${title.id} eklendi/guncellendi (android-studio)",
+        )
+        touchCatalogVersion()
+    }
+
+    suspend fun putHomeConfig(config: HomeConfig) {
+        val normalized = config.copy(updatedAt = Instant.now().toString())
+        val body = json.encodeToString(HomeConfig.serializer(), normalized) + "\n"
+        putFile(
+            path = "catalog/home.json",
+            contentBytes = body.toByteArray(Charsets.UTF_8),
+            commitMessage = "chore(catalog): ana sayfa raflari guncellendi",
         )
         touchCatalogVersion()
     }
