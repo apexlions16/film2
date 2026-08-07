@@ -1,0 +1,16 @@
+{
+  "titleId": "saplant-3728",
+  "kind": "movie",
+  "shardId": "mfilms12/film2-media-01",
+  "mode": "separate",
+  "incomingPrefix": "media/saplant-3728",
+  "videoFile": "video.mp4",
+  "audioFiles": {
+    "ingilizce": "audio_ingilizce_2.aac",
+    "trke": "audio_trke_3.aac"
+  },
+  "subtitleFiles": {
+    "ingilizce": "subs_ingilizce_4.vtt",
+    "trke": "subs_trke_5.vtt"
+  }
+}
