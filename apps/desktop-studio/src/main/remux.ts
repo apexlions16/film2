@@ -5,6 +5,7 @@ import { extname, join } from "node:path";
 import ffmpegStatic from "ffmpeg-static";
 import type { UploadFileSelection } from "@shared/types";
 
+// v1.1: input file extensions are advisory only; FFmpeg sniffs the actual container.
 export interface PreparedMedia {
   videoPath: string;
   audioLanguages: string[];
