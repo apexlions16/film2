@@ -10,6 +10,7 @@ import com.apexlions.film2.studio.catalog.TitleType
 import com.apexlions.film2.studio.ui.list.CatalogListScreen
 import com.apexlions.film2.studio.ui.newtitle.AttachFilesScreen
 import com.apexlions.film2.studio.ui.newtitle.NewTitleScreen
+import com.apexlions.film2.studio.ui.quality.QualityGenerationScreen
 import com.apexlions.film2.studio.ui.settings.SettingsScreen
 
 @Composable
@@ -23,6 +24,9 @@ fun Film2StudioNavGraph() {
                 onOpenSettings = { navController.navigate(Destinations.SETTINGS) },
                 onAttachMedia = { titleId, titleType ->
                     navController.navigate(Destinations.attachFiles(titleId, titleType.name))
+                },
+                onGenerateQualities = { titleId, titleType ->
+                    navController.navigate(Destinations.quality(titleId, titleType.name))
                 },
             )
         }
@@ -60,6 +64,23 @@ fun Film2StudioNavGraph() {
                         popUpTo(Destinations.LIST) { inclusive = true }
                     }
                 },
+            )
+        }
+
+        composable(
+            route = Destinations.QUALITY_ROUTE,
+            arguments = listOf(
+                navArgument(Destinations.ARG_TITLE_ID) { type = NavType.StringType },
+                navArgument(Destinations.ARG_TITLE_TYPE) { type = NavType.StringType },
+            ),
+        ) { backStackEntry ->
+            val titleId = backStackEntry.arguments?.getString(Destinations.ARG_TITLE_ID).orEmpty()
+            val titleTypeRaw = backStackEntry.arguments?.getString(Destinations.ARG_TITLE_TYPE).orEmpty()
+            val titleType = runCatching { TitleType.valueOf(titleTypeRaw) }.getOrDefault(TitleType.MOVIE)
+            QualityGenerationScreen(
+                titleId = titleId,
+                titleType = titleType,
+                onBack = { navController.popBackStack() },
             )
         }
     }
