@@ -60,7 +60,7 @@ jobs:
           mkdir -p dist/tizen
           cd apps/tizen-tv-player
           zip -q -r ../../dist/tizen/Film2TV-development-unsigned.wgt . \
-            -x '*.DS_Store' '*.git*' 'README.md'
+            -x '*.DS_Store' '*.git*' 'README.md' 'tools/*'
           cd ../..
           sha256sum dist/tizen/Film2TV-development-unsigned.wgt | tee dist/tizen/SHA256SUMS.txt
 
