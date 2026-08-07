@@ -7,9 +7,10 @@ interface SidebarProps {
   onNavigate: (route: Route) => void;
 }
 
-const NAV_ITEMS: Array<{ name: Route["name"]; label: string; icon: string }> = [
+const NAV_ITEMS: Array<{ name: "catalog" | "add" | "editorial" | "settings"; label: string; icon: string }> = [
   { name: "catalog", label: "Katalog", icon: "▦" },
-  { name: "add", label: "Yeni Icerik Ekle", icon: "+" },
+  { name: "add", label: "Yeni İçerik Ekle", icon: "+" },
+  { name: "editorial", label: "Editoryal / Ana Sayfa", icon: "✦" },
   { name: "settings", label: "Ayarlar", icon: "⚙" },
 ];
 
@@ -29,11 +30,9 @@ export function Sidebar({ route, presence, onNavigate }: SidebarProps) {
             <button
               key={item.name}
               className={`sidebar__link${active ? " sidebar__link--active" : ""}`}
-              onClick={() => onNavigate({ name: item.name } as Route)}
+              onClick={() => onNavigate({ name: item.name })}
             >
-              <span className="sidebar__link-icon" aria-hidden="true">
-                {item.icon}
-              </span>
+              <span className="sidebar__link-icon" aria-hidden="true">{item.icon}</span>
               {item.label}
               {item.name === "settings" && allSet !== null && (
                 <span className={`sidebar__gate-dot ${allSet ? "sidebar__gate-dot--ok" : "sidebar__gate-dot--missing"}`} />
@@ -43,9 +42,7 @@ export function Sidebar({ route, presence, onNavigate }: SidebarProps) {
         })}
       </nav>
       <div className="sidebar__spacer" />
-      <div style={{ padding: "10px 12px", fontSize: 11, color: "var(--text-faint)" }}>
-        apexlions16/film2
-      </div>
+      <div style={{ padding: "10px 12px", fontSize: 11, color: "var(--text-faint)" }}>apexlions16/film2</div>
     </aside>
   );
 }
