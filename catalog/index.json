@@ -1,0 +1,2646 @@
+{
+  "revision": "2026-08-07T21:50:40.826Z",
+  "generatedAt": "2026-08-07T22:00:03.076Z",
+  "count": 5,
+  "titles": [
+    {
+      "id": "ay-sovalyesi-1023",
+      "imdbId": "tt10234724",
+      "manualEntry": false,
+      "status": "ready",
+      "createdAt": "2026-08-07T19:51:10.235Z",
+      "updatedAt": "2026-08-07T21:50:39.840Z",
+      "type": "series",
+      "tmdbId": 92749,
+      "title": "Ay Şövalyesi",
+      "originalTitle": "Moon Knight",
+      "overview": "Yumuşak huylu hediyelik eşya dükkanı çalışanı Steven Grant, bayılmalarla ve başka bir hayatın anılarıyla boğuşmaya başlayınca, çoklu kişilik bozukluğuna sahip olduğunu ve paralı asker Marc Spector ile aynı bedeni paylaştığını keşfeder. Steven/Marc'in düşmanları birleşirken, onlar karmaşık kimliklerinde salınarak Mısır'ın güçlü tanrıları arasında ölümcül bir gizemin içine itilir.",
+      "releaseYear": 2022,
+      "genres": [
+        "Bilim Kurgu & Fantazi",
+        "Gizem",
+        "Aksiyon & Macera"
+      ],
+      "posterUrl": "https://image.tmdb.org/t/p/w780/bJ7GUEAaOuX90Py88wuGWFot4Fs.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/1uegR4uAxRxiMyX4nQnpzbXhrTw.jpg",
+      "cast": [
+        {
+          "name": "Oscar Isaac",
+          "character": "Marc Spector / Steven Grant / Moon Knight / Mr. Knight",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/dW5U5yrIIPmMjRThR9KT2xH6nTz.jpg"
+        },
+        {
+          "name": "Ethan Hawke",
+          "character": "Arthur Harrow",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/oojD9jSshvUT4t6AUySsBxoekHk.jpg"
+        },
+        {
+          "name": "May Calamawy",
+          "character": "Layla El-Faouly",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/5S3nNkH5p85xK7k7AaXBZ0ouyOR.jpg"
+        },
+        {
+          "name": "Ann Akinjirin",
+          "character": "Bobbi",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/o4Tbudvow3rzgxmlilnRral5fpr.jpg"
+        },
+        {
+          "name": "David Ganly",
+          "character": "Billy",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/e9NUAspQ306cmyhkl3gG5LU1LHi.jpg"
+        },
+        {
+          "name": "Karim El Hakim",
+          "character": "Khonshu Performer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/2K3iP4pm6RFZ29kQxjXZQl40hCF.jpg"
+        },
+        {
+          "name": "F. Murray Abraham",
+          "character": "Khonshu (voice)",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/p2RYVGdrcP0m70BkkiKcwyrDeim.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Kevin Feige",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
+        },
+        {
+          "name": "Jeremy Slater",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/iRey6rQs0C2Dd8HAfY6IkDnzqQu.jpg"
+        },
+        {
+          "name": "Grant Curtis",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/j3WoGrmImpEtSWP0FvDl1nHbQWI.jpg"
+        },
+        {
+          "name": "Louis D'Esposito",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ewtzT2ZMIX2DNyGUUkHLn36fjgF.jpg"
+        },
+        {
+          "name": "Victoria Alonso",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/xF7Qe1tqgk9KtY8kThKHBWhMqxc.jpg"
+        },
+        {
+          "name": "Brad Winderbaum",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/5cDwxRkPuRRiHw6TVlaIobnX5aC.jpg"
+        },
+        {
+          "name": "محمد دياب",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/mJ8USiA1sNnexWtDxcDbjTyiNDe.jpg"
+        },
+        {
+          "name": "Oscar Isaac",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/dW5U5yrIIPmMjRThR9KT2xH6nTz.jpg"
+        },
+        {
+          "name": "Peter Cameron",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/cmiMMiN6zC489Re2JQ3RcKsT3A2.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Sezon 1",
+          "overview": "Moon Knight, Oscar Isaac’in canladırdığı Steven Grant isimli çoklu kişilik bozukluğundan müzdarip bir adamın hikayesini anlatıyor. Bushman adında bir terörist tarafından öldürülen eski CIA ajanı Marc Spector, Mısır Ay Tanrısı Konshu tarafından Grant’in bedeninde hayata döndürülmüştür. Kendi halinde bir adam olan Grant, Spector’ın eski düşmanları peşine düşmüşken hem Spector ile karmaşık kimlik bozukluğunu hem de eski Mısır Tanrıları arasındaki ölümcül bir sırrı çözmenin yolunu bulmak zorundadır.",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/zPFm8ZbvdzoViRHnLi8cH7TBS1B.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Japon Balığı Sorunu",
+              "overview": "Sıradan bir işte çalışan yumuşak huylu bir adam olan Steven Grant, içinde yaşayan bir alter ortaya çıkmaya başlayınca hayatının kendisine ait olmayabileceğinden şüphelenmeye başlar.",
+              "airDate": "2022-03-30",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/h88DZpKIDo66Tvt556HCvq2BdR0.jpg",
+              "runtimeMinutes": 48,
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/video_1786137305099.mp4",
+                "audioLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "subtitleLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": [
+                  {
+                    "language": "tur",
+                    "label": "Türkçe",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/subs_tur_1786137305099_1.vtt"
+                  },
+                  {
+                    "language": "eng",
+                    "label": "İngilizce",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/subs_eng_1786137305099_2.vtt"
+                  }
+                ],
+                "videoVariants": []
+              }
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Kostümü Çağır",
+              "overview": "Steven, hayatının kendisine ait olmayabileceği gerçeğinden sarsılırken, tanrıların savaşı ufukta belirirken geçmişten gizemli bir ortak ortaya çıkar.",
+              "airDate": "2022-04-06",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/oLmV6R7PoEMLJJ62bE4idOoG9WX.jpg",
+              "runtimeMinutes": 53,
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e2/video_1786138528954.mp4",
+                "audioLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "subtitleLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": [
+                  {
+                    "language": "tur",
+                    "label": "Türkçe",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e2/subs_tur_1786138528954_1.vtt"
+                  },
+                  {
+                    "language": "eng",
+                    "label": "İngilizce",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e2/subs_eng_1786138528954_2.vtt"
+                  }
+                ],
+                "videoVariants": []
+              }
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Cana Yakın",
+              "overview": "Marc ön planda ve Harrow Ammit'in mezarının yakınındayken, Marc'ın Kahire'ye gitmesi ve Layla ve Steven'la olan farklılıklarını görevlerini tehlikeye atmadan bir kenara bırakması gerekiyor.",
+              "airDate": "2022-04-13",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/xMiab3gxnz9XJpcadVZLkqdrkSu.jpg",
+              "runtimeMinutes": 53,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "Mezar",
+              "overview": "Doğaüstü tehditler onları durdurmaya çalışırken, Marc ve Steven dengeyi bulmalıdır.",
+              "airDate": "2022-04-20",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/ujPdwFsye9ojzFjPTcJ2yk227K7.jpg",
+              "runtimeMinutes": 54,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "Akıl Hastanesi",
+              "overview": "Marc ve Steven, gerçeklerini bulmak ya da geride kalmak için anılarını araştırırlar.",
+              "airDate": "2022-04-27",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/3sFSWqyn3CM7sDJTaLizzrWEhVE.jpg",
+              "runtimeMinutes": 50,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "Tanrılar ve Canavarlar",
+              "overview": "Moon Knight mücadeleye katılırken Marc, Steven ve Khonshu, Ammit'i durdurmak için birlikte çalışmalıdır.",
+              "airDate": "2022-05-04",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/p1ZZRvqhhdQeHowarTcDC4r2Moy.jpg",
+              "runtimeMinutes": 44,
+              "status": "pending"
+            }
+          ]
+        }
+      ],
+      "posterUrls": [],
+      "backdropUrls": []
+    },
+    {
+      "id": "the-flash-3107",
+      "type": "series",
+      "imdbId": "tt3107288",
+      "tmdbId": 60735,
+      "title": "The Flash",
+      "originalTitle": "The Flash",
+      "overview": "Geçmişinde büyük bir trajedi yaşamış Barry Allen, Central City Polis Birimi’nde çalışan ve suçluların arkalarında bıraktıkları ipuçlarını toplayan bir adli laboratuvar asistanıdır. Talihsiz bir yıldırım kazası yaşamasının ardından süper hız gücüne sahip olan Barry, Flash kimliğine bürünür ve kötü adamları adalete teslim etmeyi kendine görev edinir!",
+      "releaseYear": 2014,
+      "genres": [
+        "Dram",
+        "Bilim Kurgu & Fantazi"
+      ],
+      "posterUrl": "https://image.tmdb.org/t/p/w780/yZevl2vHQgmosfwUdVNzviIfaWS.jpg",
+      "posterUrls": [],
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/gFkHcIh7iE5G0oVOgpmY8ONQjhl.jpg",
+      "backdropUrls": [],
+      "cast": [
+        {
+          "name": "Grant Gustin",
+          "character": "Barry Allen / The Flash",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/kEGU1gGySIe63lyL7AnwXEw4rQn.jpg"
+        },
+        {
+          "name": "Candice Patton",
+          "character": "Iris West-Allen",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/t9YV7TTQXkDWLmoHx8Mu3OUHqsP.jpg"
+        },
+        {
+          "name": "Danielle Panabaker",
+          "character": "Khione",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/faX0EDc44GL5ZcsEcxTOBcfWpCP.jpg"
+        },
+        {
+          "name": "Danielle Nicolet",
+          "character": "Cecile Horton",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/xdXUDutVr67zKQXpH50277R4HbQ.jpg"
+        },
+        {
+          "name": "Kayla Compton",
+          "character": "Allegra Garcia",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/s5DQrvszZeLUIGdD9ryl1aMsGQv.jpg"
+        },
+        {
+          "name": "Brandon McKnight",
+          "character": "Chester P. Runk",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/inEnfkpRXSVYaOKK2kpgWrqM26i.jpg"
+        },
+        {
+          "name": "Jon Cor",
+          "character": "Mark Blaine / Chillblaine",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/6xVyHRK971bIBh4cB7zY1nyxhOe.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Joshua V. Gilbert",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/bX2pBoA1YBFkVJWFuoOBOtTTcaN.jpg"
+        },
+        {
+          "name": "Dani Dornfeld Yaroslow",
+          "job": "Producer"
+        },
+        {
+          "name": "Sam Chalsen",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Jonathan Butler",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Eric Wallace",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/jAC9Qmm8qMlJMERSujeA1ErhNEH.jpg"
+        },
+        {
+          "name": "Carl Ogawa",
+          "job": "Producer"
+        },
+        {
+          "name": "Jennifer Lence",
+          "job": "Producer"
+        },
+        {
+          "name": "Geoff Garrett",
+          "job": "Producer"
+        },
+        {
+          "name": "Sarah Schechter",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8UgL2O24cC8SniiryeYmZuafU4G.jpg"
+        },
+        {
+          "name": "Greg Berlanti",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/1T24SiIIDMa9gAmq7QaYwZywq4y.jpg"
+        }
+      ],
+      "status": "ready",
+      "manualEntry": false,
+      "createdAt": "2026-08-07T14:39:40.441735Z",
+      "updatedAt": "2026-08-07T21:22:12.963Z",
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Sezon 1",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/A3H6pewHfoy2bXmNhvycOe0xzlC.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Pilot Bölüm",
+              "overview": "",
+              "airDate": "2014-10-07",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/piyGyhwbqqyIxcyuZXYmDUWSylb.jpg",
+              "runtimeMinutes": 44,
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e1/video_1786116903066.mp4",
+                "durationSeconds": 2673.725045,
+                "audioLanguages": [
+                  "eng",
+                  "tur"
+                ],
+                "subtitleLanguages": [
+                  "eng",
+                  "tur"
+                ],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": [
+                  {
+                    "language": "eng",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e1/subs_eng_1786116903066_1.vtt",
+                    "label": "Ingilizce",
+                    "mimeType": "text/vtt"
+                  },
+                  {
+                    "language": "tur",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e1/subs_tur_1786116903066_2.vtt",
+                    "label": "Turkce",
+                    "mimeType": "text/vtt"
+                  }
+                ],
+                "videoVariants": []
+              }
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Fastest Man Alive",
+              "overview": "",
+              "airDate": "2014-10-14",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/tM61prhWhwHNDYAybsHAgRJbUZk.jpg",
+              "runtimeMinutes": 41,
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e2/video_1786121571218.mp4",
+                "durationSeconds": 2554.514078,
+                "audioLanguages": [
+                  "eng",
+                  "tur"
+                ],
+                "subtitleLanguages": [
+                  "eng",
+                  "fra",
+                  "tur"
+                ],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": [
+                  {
+                    "language": "eng",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e2/subs_eng_1786121571218_1.vtt",
+                    "label": "Ingilizce",
+                    "mimeType": "text/vtt"
+                  },
+                  {
+                    "language": "fra",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e2/subs_fra_1786121571218_2.vtt",
+                    "label": "Fransizca",
+                    "mimeType": "text/vtt"
+                  },
+                  {
+                    "language": "tur",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e2/subs_tur_1786121571218_3.vtt",
+                    "label": "Turkce",
+                    "mimeType": "text/vtt"
+                  }
+                ],
+                "videoVariants": []
+              }
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Things You Can't Outrun",
+              "overview": "",
+              "airDate": "2014-10-21",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/wY1omkKIuqZILjniPssbGlfZ0NY.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "Going Rogue",
+              "overview": "",
+              "airDate": "2014-10-28",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/flWYU25xy3KM5XxihrDV0cGvscp.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "Plastique",
+              "overview": "",
+              "airDate": "2014-11-11",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/qg2A8gcBpuhEU7M3ZPxmRHGs5mX.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "The Flash Is Born",
+              "overview": "",
+              "airDate": "2014-11-18",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/z8AlWWt2cOcZNqonl0U1BSTzZWb.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 7,
+              "title": "Power Outage",
+              "overview": "",
+              "airDate": "2014-11-25",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/aoCwicuOPu9NkdwqsNy4t4JFEs2.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 8,
+              "title": "Flash vs. Arrow",
+              "overview": "",
+              "airDate": "2014-12-02",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/farB7p2uU1SdFHbHLOvOxMFrdrA.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 9,
+              "title": "The Man in the Yellow Suit",
+              "overview": "",
+              "airDate": "2014-12-09",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/AkXPSqGqLl656FJKPANUxeO8rjt.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 10,
+              "title": "Revenge of the Rogues",
+              "overview": "",
+              "airDate": "2015-01-20",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/mhfQB5YB1fLYGpe495MeYQV2wQP.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 11,
+              "title": "The Sound and the Fury",
+              "overview": "",
+              "airDate": "2015-01-27",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/3ekYsmDkO7BSXxas7A4FFe9UP6A.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 12,
+              "title": "Crazy for You",
+              "overview": "",
+              "airDate": "2015-02-03",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/a1r4J8NQaNK24WMJSgCWkPyCvua.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 13,
+              "title": "The Nuclear Man",
+              "overview": "",
+              "airDate": "2015-02-10",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/gEBPOvQSzfTa8IADdDIFNU1Gsc4.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 14,
+              "title": "Fallout",
+              "overview": "",
+              "airDate": "2015-02-17",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/5CuWCPJD2274Oz3RpsYzC0uK7mL.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 15,
+              "title": "Out of Time",
+              "overview": "",
+              "airDate": "2015-03-17",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/3ecwKLunVv2s8KFC9mt8NZe5jS6.jpg",
+              "runtimeMinutes": 40,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 16,
+              "title": "Rogue Time",
+              "overview": "",
+              "airDate": "2015-03-24",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/akLeJQjlE7A4MaPhOU7im8QHSrK.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 17,
+              "title": "Tricksters",
+              "overview": "",
+              "airDate": "2015-03-31",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/a4OayTfzogEzIc72sK4hBcVaFrC.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 18,
+              "title": "All Star Team Up",
+              "overview": "",
+              "airDate": "2015-04-14",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/o26LIdQiujYfKPI4kNEXz4UDr9v.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 19,
+              "title": "Who Is Harrison Wells?",
+              "overview": "",
+              "airDate": "2015-04-21",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/tQLhduqi4vFsCqXW9hZGVsI5D3K.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 20,
+              "title": "The Trap",
+              "overview": "",
+              "airDate": "2015-04-28",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/xaC675vgOGeOtbE43vw7vuYxdUk.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 21,
+              "title": "Grodd Lives",
+              "overview": "",
+              "airDate": "2015-05-05",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/oA4TzwUNdcTwB4JFMICkx5l4rpR.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 22,
+              "title": "Rogue Air",
+              "overview": "",
+              "airDate": "2015-05-12",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/duURv7F1POR2OKh8TgVpSGvvhoN.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 23,
+              "title": "Fast Enough",
+              "overview": "",
+              "airDate": "2015-05-19",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/aepBBreYvTwsaGuqOygBgsYs4n.jpg",
+              "runtimeMinutes": 44,
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 2,
+          "name": "Sezon 2",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/8xWZPVX1cv9V5YD1RPeLj9QZDE9.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Central City Kurtaran Adam",
+              "overview": "",
+              "airDate": "2015-10-06",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/7cEj8I8uM3uM1y22UR5BouRFJ7l.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Flash of Two Worlds",
+              "overview": "",
+              "airDate": "2015-10-13",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/qPZEyRCdtpxT57Hj0zggi2qCaml.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Family of Rogues",
+              "overview": "",
+              "airDate": "2015-10-20",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/cUlJOXLl2NqncKntf7G76rH7iyT.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "The Fury of Firestorm",
+              "overview": "",
+              "airDate": "2015-10-27",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/7mwmxIbx4ZFWbh6LV5wxL9SZwO.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "The Darkness and the Light",
+              "overview": "",
+              "airDate": "2015-11-03",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/cZUss7jKsQ4caGSWQHWyIHNX7vY.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "Enter Zoom",
+              "overview": "",
+              "airDate": "2015-11-10",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/5KV67qcPV3mxMSY8flnTbdCWiWt.jpg",
+              "runtimeMinutes": 40,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 7,
+              "title": "Goril Savaşı",
+              "overview": "",
+              "airDate": "2015-11-17",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/cv2xltOhRaYMhllbE2b8OlWASbl.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 8,
+              "title": "Legends of Today",
+              "overview": "",
+              "airDate": "2015-12-01",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/exN2yJG4BWGCauvkMkIRiwO8lce.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 9,
+              "title": "Running to Stand Still",
+              "overview": "",
+              "airDate": "2015-12-08",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/3u8E7AY5XpfDSXCaB7JHfbCJVwY.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 10,
+              "title": "Potential Energy",
+              "overview": "",
+              "airDate": "2016-01-19",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/u2rCTzwDf6ePfZ0kBIwTmrNl5rK.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 11,
+              "title": "The Reverse-Flash Returns",
+              "overview": "",
+              "airDate": "2016-01-26",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/gpjOWmxlz7PzhrM65TwO9dKswlK.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 12,
+              "title": "Fast Lane",
+              "overview": "",
+              "airDate": "2016-02-02",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/wwmmhrbZ4JEctNeXdN3oarQUpXA.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 13,
+              "title": "Welcome to Earth-2",
+              "overview": "",
+              "airDate": "2016-02-09",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/sdIU4knF5Qk2hxTXlKtE0aeC779.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 14,
+              "title": "Escape From Earth-2",
+              "overview": "",
+              "airDate": "2016-02-16",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/cwgkxe4l2tb8CNCancRZmPRTEaz.jpg",
+              "runtimeMinutes": 39,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 15,
+              "title": "King Shark",
+              "overview": "",
+              "airDate": "2016-02-23",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/pZpBABUF1rJAllxEsUOtAECZMVp.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 16,
+              "title": "Trajectory",
+              "overview": "",
+              "airDate": "2016-03-22",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/8qbMUBHTmhXRMwVgSdikrvRhGjp.jpg",
+              "runtimeMinutes": 40,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 17,
+              "title": "Flash Back",
+              "overview": "",
+              "airDate": "2016-03-29",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/zc8rMSh8EQWy9bHNsyPY6hMWjzx.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 18,
+              "title": "Versus Zoom",
+              "overview": "",
+              "airDate": "2016-04-19",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/dUqj3M2ZszMSf3zDffaArDYfWCK.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 19,
+              "title": "Back to Norma",
+              "overview": "",
+              "airDate": "2016-04-26",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/anRzRx9G51DpwOmuyhIJ3NWiboF.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 20,
+              "title": "Rupture",
+              "overview": "",
+              "airDate": "2016-05-03",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/aNk16H68m0yPCClaFij3TnDCHSm.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 21,
+              "title": "The Runaway Dinosaur",
+              "overview": "",
+              "airDate": "2016-05-10",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/rxuYCLXgZUEsbsUXAdhdsyxO3bn.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 22,
+              "title": "Invincible",
+              "overview": "",
+              "airDate": "2016-05-17",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/8O5wjKXFwFdqFkChXuQL2G5ACkV.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 23,
+              "title": "The Race of His Life",
+              "overview": "",
+              "airDate": "2016-05-24",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/rgqplybppN3GYojkAIElOoEHZcO.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 3,
+          "name": "Sezon 3",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/rN1hgV8Ag3bZmkv33Udm93hIxQp.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Flashpoint",
+              "overview": "",
+              "airDate": "2016-10-04",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/zcHTOaxmFoCKeGR4d5lSH9bYaEn.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Paradox",
+              "overview": "",
+              "airDate": "2016-10-11",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/qV0UGxuSCSPWNmrb4J6bPKlOyBS.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Magenta",
+              "overview": "",
+              "airDate": "2016-10-18",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/iEXg92FFdwoenKir8EYrsOhknos.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "The New Rogues",
+              "overview": "",
+              "airDate": "2016-10-25",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/zn079GEGFGKcRx934r6fgbrAxli.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "Monster",
+              "overview": "",
+              "airDate": "2016-11-01",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/rSW2SnzyuiYCh29dIpxAS3BnnZd.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "Shade",
+              "overview": "",
+              "airDate": "2016-11-15",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/4i8qYcPorWqquskWJL11WH6dyVN.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 7,
+              "title": "Killer Frost",
+              "overview": "",
+              "airDate": "2016-11-22",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/b0fHHUgZVaDDAkbneQ6akHFRjLj.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 8,
+              "title": "Invasion!",
+              "overview": "",
+              "airDate": "2016-11-29",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/j4tw5k3UGNGvPWp844pF4eYhgrh.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 9,
+              "title": "The Present",
+              "overview": "",
+              "airDate": "2016-12-06",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/m3pds85mWkf43hDob6qtn2L9yJd.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 10,
+              "title": "Borrowing Problems From the Future",
+              "overview": "",
+              "airDate": "2017-01-24",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/isfyG1zruErJyw02vUufYDUzLNc.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 11,
+              "title": "Dead or Alive",
+              "overview": "",
+              "airDate": "2017-01-31",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/a60WRRMtZq964FgEefE5upnkjQc.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 12,
+              "title": "Untouchable",
+              "overview": "",
+              "airDate": "2017-02-07",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/wCE5PTcnLGBHGEy5oVVt3t9k59d.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 13,
+              "title": "Attack on Gorilla City",
+              "overview": "",
+              "airDate": "2017-02-21",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/8bHeI3cJwKAPcwQSe6FvmQUWNHx.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 14,
+              "title": "Attack on Central City",
+              "overview": "",
+              "airDate": "2017-02-28",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/9CM5eTIICaWB34ivihok9e9i0wg.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 15,
+              "title": "The Wrath of Savitar",
+              "overview": "",
+              "airDate": "2017-03-07",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/vr3qbJudy6Q4czkuNELVr8lOp9V.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 16,
+              "title": "Into the Speed Force",
+              "overview": "",
+              "airDate": "2017-03-14",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/6oSRljzmtmzL5HcgXMDIEHeUIAh.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 17,
+              "title": "Duet",
+              "overview": "",
+              "airDate": "2017-03-21",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/kHRGJFFr8tn0s11riOnLY3SI4a4.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 18,
+              "title": "Abra Kadabra",
+              "overview": "",
+              "airDate": "2017-03-28",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/usnFTiLMv8bmbENxTwSlBdUySOe.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 19,
+              "title": "The Once and Future Flash",
+              "overview": "",
+              "airDate": "2017-04-25",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/wMbUrpUkw5Ghvf67nAfG3GTywJZ.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 20,
+              "title": "I Know Who You Are",
+              "overview": "",
+              "airDate": "2017-05-02",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/tprBGzPaC8hN0C0WCZoygYannwR.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 21,
+              "title": "Cause and Effect",
+              "overview": "",
+              "airDate": "2017-05-09",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/wsnRrzggQrAhIpvPmJuSwZ27p56.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 22,
+              "title": "Infantino Street",
+              "overview": "",
+              "airDate": "2017-05-16",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/xtOUGmplyLjcflhsE7vWnPsQviW.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 23,
+              "title": "Finish Line",
+              "overview": "",
+              "airDate": "2017-05-23",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/jZVp65TlXJYDvL6wVHGjkulbRgP.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 4,
+          "name": "Sezon 4",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/e6A65vhYFLqgSsMI294ZQi0rQfH.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "The Flash Reborn",
+              "overview": "Barry hız gücünde sıkışıp kalır. Bu sırada güçlü bir yeni kötü karakter ölümcül bir ültimatom vererek Iris ve yanındakileri zor bir durumda bırakır.",
+              "airDate": "2017-10-10",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/QpHXFNFpwknSsL8xGhkBonPLGV.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Mixed Signals",
+              "overview": "Cisco'nun geliştirilmiş kıyafetine uyum sağlamakta zorlanan Barry teknolojiyi kontrol etme gücüne sahip tehlikeli bir meta ile uğraşır.",
+              "airDate": "2017-10-17",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/detx85YNFO94CV5Zeuyzple77WI.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Luck Be a Lady",
+              "overview": "Bir dizi kaza ve sorunla karşılaşan Barry ve yanındakiler, bu talihsizliklerin tek nedeninin kötü şansları olmayabileceğini fark eder.",
+              "airDate": "2017-10-24",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/q2isRo8B9yj2r0rqA2tptHS1Z0U.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "Elongated Journey into Night",
+              "overview": "Cisco, Earth-1'de Gypsy ve babası Breacher'ı görünce şok geçirir. Barry ise eski düşmanı kaypak Ralph Dibny ile mücadele eder.",
+              "airDate": "2017-10-31",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/HFr1zkORvKzYOKEaKdkmF1GKna.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "Girl's Night Out",
+              "overview": "Barry ve diğer erkekler bekârlığa veda partisi için kente giderken Iris kızlarla dışarıda bir gece geçirir. Ancak kutlamalar birkaç engele takılır.",
+              "airDate": "2017-11-07",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/vh50fVATHWnj0jzGyXJumjECnUe.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "When Harry Met Harry...",
+              "overview": "Ralph Dibny, Cisco'nun özelleştirilmiş kıyafetini giyip Elongated Man olarak yaşamayı dener. Biri Amerikan yerlilerine ait eşyaları toplayan koleksiyoncuları hedefler.",
+              "airDate": "2017-11-14",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/afXbQcJNSX8AsKSr1btj2sCnVVt.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 7,
+              "title": "Therefore I Am",
+              "overview": "Barry'nin DeVoe'nun kimliği ve niyeti hakkındaki şüpheleri onun ekibin geri kalanıyla arasını açar. Iris büyük düğüne hazırlanır.",
+              "airDate": "2017-11-21",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/y1no2bERz1sUj0qIXXA0GlNqMY7.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 8,
+              "title": "Crisis on Earth-X, 3. Kısım",
+              "overview": "Barry, Earth-X'in başlattığı sinsi işgale karşı Supergirl, Green Arrow ve Efsaneler ile iş birliği yapar.",
+              "airDate": "2017-11-28",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/gMoFxyQH2owvsXMd9C8fcZf7w2r.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 9,
+              "title": "Don't Run",
+              "overview": "Barry'nin speedster geçirmez bir hapishanede sıkışıp kalması ve Amunet'in Caitlin'i rehin almasıyla ekip kimi kurtaracağı konusunda zorlu bir seçimle karşılaşır.",
+              "airDate": "2017-12-05",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/fY4DaGaz6OcrGe8947JM3tprzh6.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 10,
+              "title": "The Trial of the Flash",
+              "overview": "Üzerine işlemediği bir suç atılan ve mahkemeye çıkartılan Barry, dünyaya ikinci kişiliğini açıklama zamanının gelip gelmediğine karar vermek zorundadır.",
+              "airDate": "2018-01-16",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/jO1WVRSj6nzBvmjEh0zELzRiZ9C.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 11,
+              "title": "The Elongated Knight Rises",
+              "overview": "Central City'ye dönen alçak bir düşman Ralph'ın cesaretini sınar. Barry ise içinde bulunduğu zorlu durumlara rağmen iyimserliğini kaybetmemeye çalışır.",
+              "airDate": "2018-01-23",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/beqkqosYycMChGJCvaouyfpCE26.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 12,
+              "title": "Honey, I Shrunk Team Flash",
+              "overview": "Sylbert Rundine dokunduğu her şeyi küçültebilir. Cisco ve Ralph bu meta insana karşı savaşırken onun bu yeteneğini birinci elden öğrenecek.",
+              "airDate": "2018-01-30",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/upodc5LfdaCvm832M7bW2oLdjQS.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 13,
+              "title": "True Colors",
+              "overview": "Barry, Amunet'in planları hakkında uğursuz haberler aldığında hücre arkadaşlarını kurtarmak için tehlikeli bir seçim yapmak zorunda kalır.",
+              "airDate": "2018-02-06",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/6cT9Q4JMxBDeG7KNCz2WfjxO4rD.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 14,
+              "title": "Subject 9",
+              "overview": "Barry ve ekip müzikal yetenekleriyle insanları yere yapıştıran sıra dışı bir müttefikle tanışır. Ralph ise önceliklerini gözden geçirir.",
+              "airDate": "2018-02-27",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/cTfzqVGaLzqFRFh9Q3Fbf2w1Xa3.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 15,
+              "title": "Enter Flashtime",
+              "overview": "Barry zamanı olabildiğince yavaşlatarak patlayan bir bombanın Central City'yi yok etmesini önlemenin bir yolunu çaresizce arar.",
+              "airDate": "2018-03-06",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/fTVvQKddt1SRuo4E1X5Gea2Tgtk.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 16,
+              "title": "Run Iris, Run",
+              "overview": "Uğursuz bir yeni düşmanla karşılaşmasının ardından Iris, Barry'nin tüm hızına sahip olur ve Central City'yi korumak zorunda olan yeni kahraman rolüne soyunur.",
+              "airDate": "2018-03-13",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/lf6fSsW0xo9vMVFZYDSxBSJ8k2m.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 17,
+              "title": "Null and Annoyed",
+              "overview": "Ralph'in geri kalan bus metalarının izini sürme konusunda takındığı umursamaz tavır Barry'nin sabrını sınar. Cisco, Breacher'ın iyilik isteğini yanıtlar.",
+              "airDate": "2018-04-10",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/dZd5ZOgIR2uBPsRC7DKLzoF7nJo.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 18,
+              "title": "Lose Yourself",
+              "overview": "Flash Ekibi, Thinker'la hesaplaşmaya hazırlanırken Ralph riskli bir adım atıp atmamayı düşünür. Harry'nin davranışı Joe'nun şüphelenmesine yol açar.",
+              "airDate": "2018-04-17",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/oMQXVXn9pTLuyvvKYmoIF94g2xP.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 19,
+              "title": "Fury Rogue",
+              "overview": "Patlayıcı bir metayı güvenli bir şekilde taşımak için biraz desteğe ihtiyaç duyan Barry ve Flash Ekibi, Leo Snart'tan yani namıdiğer Citizen Cold'dan yardım ister.",
+              "airDate": "2018-04-24",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/m8kbPH5w9pPNNDuwtgNUPd9yaWR.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 20,
+              "title": "Therefore She Is",
+              "overview": "Barry ile Flash Ekibi, Thinker'ın planının meyve vermesini önlemek için çaresizce bir hamle yaptığında Gypsy onların yardımına koşar.",
+              "airDate": "2018-05-01",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/7TvLrH6hyhoLRFWKUpmmytBSg6Q.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 21,
+              "title": "Harry and the Harrisons",
+              "overview": "Barry ve Flash Ekibi beklenmedik bir ortakla sakıncalı bir anlaşma yapar. Cisco ise kötü haberler alan Harry'ye yardımcı olur.",
+              "airDate": "2018-05-08",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/bImch9aEquFv3jo0bdKgPSJdKFi.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 22,
+              "title": "Think Fast",
+              "overview": "DeVoe'nun son oyunu yaklaşırken Barry iç parçalayıcı bir karar vermek zorundadır. Ya tek başına savaşacak ya da dostlarından yardım alıp onların hayatını riske atacaktır.",
+              "airDate": "2018-05-15",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/5r6OE4FvkfMll7CPoKlSiH38225.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 23,
+              "title": "We Are the Flash",
+              "overview": "Barry, DeVoe'nun bilincine girmek için cüretkâr bir hamle yapar. Sürpriz bir müttefik Flash Ekibi'ne büyük ihtiyaç duydukları desteği sağlar.",
+              "airDate": "2018-05-22",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/1yGRFdczeYj7LhVNY8KEVQrSuFL.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 5,
+          "name": "Sezon 5",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/z3CqL2vnjgLuefOiR5AYD9Tf91S.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Nora",
+              "overview": "Flash Ekibi uğursuz bir meta ile uğraşırken Barry ve Iris, farklı bir çağdan gelen konuklarının ziyaretine bir anlam vermeye çalışır.",
+              "airDate": "2018-10-09",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/z7VM7EfhPeFVR5sgrdYNN4pgmih.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Blocked",
+              "overview": "Barry, Nora'ya speedster olmanın inceliklerini öğretir. Flash Ekibi'nin üyeleri en yeni düşmanlarının onlarla aynı şeyin peşinde olduğunu fark eder.",
+              "airDate": "2018-10-16",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/7FXMf0eNOAHlsMZunkHuUDFPzpY.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 3,
+              "title": "The Death of Vibe",
+              "overview": "Caitlin gizemli geçmişiyle ilgili yanıtları ararken Flash Ekibi, Cicada'nın vahşetine bir son verme umuduyla kafa kafaya verir.",
+              "airDate": "2018-10-23",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/tW4HSTZfnSFzgm16t0PvEB7daXP.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "News Flash",
+              "overview": "Nora meta teknolojisiyle donanmış, Y kuşağından hırslı ve tehlikeli birinin dikkatini çeker. Ralph motivasyona ihtiyaç duyar.",
+              "airDate": "2018-10-30",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/mWbRwstBeNwjXteNf4lydsCNlRs.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "All Doll'd Up",
+              "overview": "Tehlikeli ve rahatsız edici yeni bir meta, Barry'yi gafil avlar. Iris ise geleceğe dair endişe verici bir gerçeği öğrenir.",
+              "airDate": "2018-11-13",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/6vNKPF7mu0zWMyxrdepy9otYuhp.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "The Icicle Cometh",
+              "overview": "Babasıyla tekrar yakınlaşmak isteyen Caitlin arkadaşlarının endişelerine kulak asmaz. Iris ve Sherloque, Cicada hakkındaki bir ipucunu araştırır.",
+              "airDate": "2018-11-20",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/67sEwyfBySRvoS2TTKxIr3Rj4Z4.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 7,
+              "title": "O Come, All Ye Thankful",
+              "overview": "Flash Ekibi güçlü Weather Witch ile fırtınalı bir karşılaşmaya hazırlanır. Nora ise babasının ortadan kayboluşunu kabullenmekte zorlanır.",
+              "airDate": "2018-11-27",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/d5TRIV6x7p4SMdFfSjAc8LbiI1w.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 8,
+              "title": "What's Past Is Prologue",
+              "overview": "Cicada'yı durdurmak için Barry ve kızının geçmişe yolculuk yapması gerekir. Ama Barry geçmişini Nora ile paylaşmaya hazır mıdır?",
+              "airDate": "2018-12-04",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/pnnLvJd5B7oHVuVDUF2xGn3dzsn.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 9,
+              "title": "Elseworlds (I)",
+              "overview": "Oliver Queen, yani Arrow, gözlerini açtığında kendini Barry Allen'ın bedeninde bulur. Ama Flash Ekibi'ni bunun gerçekliğine inandırmakta zorlanır.",
+              "airDate": "2018-12-09",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/mBKwMTDUUjFLDuvoAL86AiA9Tkl.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 10,
+              "title": "The Flash & the Furious",
+              "overview": "Nora rahatsız edici bir açıklamayı sindirmekte zorlanırken Flash Ekibi göz korkutucu bir ikiliyle uğraşır. Caitlin ve Cisco olası bir meta-insan tedavisini tartışır.",
+              "airDate": "2019-01-15",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/axS2l7oTu0nqx0ldIY14Plwaebr.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 11,
+              "title": "Seeing Red",
+              "overview": "Hızlı iyileşme özelliğini kaybeden Nora büyük bir tehlike yaşar. Barry alışık olmadığı bir öfkeyle doludur. Caitlin'in tedavi çalışması müdahaleye uğrar.",
+              "airDate": "2019-01-22",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/zw8pZeJRMWTMWcmhxZBKWuShc5r.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 12,
+              "title": "Memorabilia",
+              "overview": "Sırlarının ebeveynleri tarafından öğrenilmesini istemeyen Nora, cüretkâr ve belki de ölümcül bir adım atar. Ralph ise Cisco'yu şehirden çıkarır.",
+              "airDate": "2019-01-29",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/jxd6Ox5pfXynjtYlzYKVRPpDAsQ.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 13,
+              "title": "Goldfaced",
+              "overview": "Barry ve Ralph, Cicada'yı bitirme umuduyla kimliklerini gizleyerek suçla dolu yer altı dünyasına girer. Burada ahlaki duruşları bir sınavdan geçer.",
+              "airDate": "2019-02-05",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/hKMaR6sx8XARdMZohf0eeF1GRGY.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 14,
+              "title": "Cause and XS",
+              "overview": "Nora annesini ciddi bir tehlikeden korumak için zamanla yarışırken Barry meta-insan tedavisini kullanıma hazır hâle getirmeye çalışır. Cisco, Kamilla ile şehre gider.",
+              "airDate": "2019-02-12",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/3KSg8HOC6r0sozBHAhM7TBv7PH6.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 15,
+              "title": "King Shark vs. Gorilla Grodd",
+              "overview": "Gorilla Grodd, Central City'ye saldırdığında Barry ve Flash Ekibi'nin beklenmedik bir müttefikle omuz omuza savaşması gerekir.",
+              "airDate": "2019-03-05",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/yNho0PHX59KJZ8lAFhgvjVTAwB0.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 16,
+              "title": "Failure Is an Orphan",
+              "overview": "Barry ve Flash Ekibi, Cicada'yı meta insan ilacını kullanmaya zorlamanın bir yolunu arar. Joe tekrar işbaşı yapar.",
+              "airDate": "2019-03-12",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/CMQUldLchmhldyKXYKW9lG6j1Y.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 17,
+              "title": "Time Bomb",
+              "overview": "Barry ve Flash Ekibi'nin yolları, ailesinden büyük bir sır saklayan bir kadınla kesişir. Nora, Thawne ile yaptığı çalışmaya dair gerçekleri açıklamayı düşünür.",
+              "airDate": "2019-03-19",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/kwVhe5Duvy92CrRH2tSpYNxDgwI.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 18,
+              "title": "Godspeed",
+              "overview": "Barry ve Iris, kızlarının şoke edici iş ortaklığı konusunda ne yapacaklarını tartışır. Flash Ekibi yanıtları Nora'nın günlüğünde arar.",
+              "airDate": "2019-04-16",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/3phKHAtiuq8wXFKbFuHrdqjGlzf.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 19,
+              "title": "Snow Pack",
+              "overview": "Barry onun görüşünü almadan önemli bir ailevi karar verince Iris tek başına hareket etmeyi seçer. Caitlin ve annesi ise soğuk bir düşmana karşı birlik olmak zorundadır.",
+              "airDate": "2019-04-23",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/fKks2tTcU23q9J686S7Aw5znUWQ.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 20,
+              "title": "Gone Rogue",
+              "overview": "Üç kötü kahraman Central City'nin altını üstüne getirirken Barry kızının aldatmacasını kabullenmekte zorlanır.",
+              "airDate": "2019-04-30",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/8MrwZztbuObMuT4xgz3lmdGlK1S.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 21,
+              "title": "The Girl with the Red Lightning",
+              "overview": "Cicada II'nin korkunç bir virüsü salma tehdidini öğrenen Barry ve Flash Ekibi, en kötü ihtimale hazırlanmak zorundadır.",
+              "airDate": "2019-05-07",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/r4F0XQKvqWYshi3Nyy3rzAMetmj.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 22,
+              "title": "Legacy",
+              "overview": "Flash Ekibi, Cicada'nın hançerini kesinkes yok etmek için harekete geçer. Cisco, Kamilla'ya açılır. Nora kendini affetmekte zorlanır.",
+              "airDate": "2019-05-14",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/d6WtWykXSTtuy5HjtFLYBqPS7MS.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 6,
+          "name": "Sezon 6",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/qDntRDRs5XohN4ClcV2SH9WlzpI.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Into The Void",
+              "overview": "Hâlâ yas tutan Barry bir kara delik problemiyle kendini oyalamaya çalışırken Iris cevaplara sahip olabilecek eksantrik bir bilim insanını arar.",
+              "airDate": "2019-10-08",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/tFmldalDnIh0TX5AhnrJ11ECAa4.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 2,
+              "title": "A Flash of The Lightning",
+              "overview": "Barry, Iris'in teşvikiyle kaderine ilişkin ikinci bir görüş almak için geleceğe gider. Flash Ekibi'nin geri kalanı ise bir metaya yardım etmek için harekete geçer.",
+              "airDate": "2019-10-15",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/yyKwVmRNENYLa3Z3anghP04MRrC.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Dead Man Running",
+              "overview": "Görünüşte kaçınılmaz olan kaderine gizlice hazırlanan Barry, Flash Ekibi ile birlikte, karanlık madde toplamak için her yolu deneyen bir meta insanın peşine düşer.",
+              "airDate": "2019-10-22",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/tkTEdvCR61KUvwY1mGHPXOPicWR.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "There Will Be Blood",
+              "overview": "Kriz yaklaşırken Barry, Cisco'yu kaçınılmaz sona hazırlamaya çalışır. Ramsey Rosso hastalığı için kalıcı bir tedavi arar.",
+              "airDate": "2019-10-29",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/xOiX26Pi9ROAPW1UOSY7uFkTKQB.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "Kiss Kiss Breach Breach",
+              "overview": "Cisco'nun liderlik yetenekleri sınanırken Barry ve Iris kısa bir tatile çıkar. Killer Frost ise Ramsey Rosso'nun peşine düşer.",
+              "airDate": "2019-11-05",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/icR9cNcDfApJsYV9EaqPCSJJdH5.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "License To Elongate",
+              "overview": "Barry, Flash sonrası dünyada cesur olmasını öğretme umuduyla Ralph ile takılır. Nash bir ölüm kalım projesi için Allegra'dan yardım ister.",
+              "airDate": "2019-11-19",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/ox6lB9m2YNo1Fp8FuOcPhUMAm27.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 7,
+              "title": "The Last Temptation of Barry Allen: 1. Kısım",
+              "overview": "Ramsey Rosso tarafından kasten virüs bulaştırılan Barry hayatının en büyük sınavından geçer. Iris uğursuz bir komployu araştırır.",
+              "airDate": "2019-11-26",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/qKApNW6c7gAJqI21Dko2gVSsz2f.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 8,
+              "title": "The Last Temptation of Barry Allen: 2. Kısım",
+              "overview": "Iris ve Cisco, Barry'yi Ramsey'in kötücül etkisinden kurtarmak için mücadele ederken Flash Ekibi'nin geri kalanı Central City genelinde Bloodwork’un ordusuyla çatışır.",
+              "airDate": "2019-12-03",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/uc36R3z22fW7SslNHj888CrkJE9.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 9,
+              "title": "Crisis on Infinite Earths: Hour Three",
+              "overview": "Supergirl, Black Lightning ve diğerlerinin katılımıyla Barry ve Flash Ekibi anti madde dalgasının çoklu evreni yok etmesini önlemenin bir yolunu bulmaya çalışır.",
+              "airDate": "2019-12-10",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/18aj6VOd8d7xToR4uCFk5EX1qEB.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 10,
+              "title": "Marathon",
+              "overview": "Önemli bir ipucunu takip eden Iris alçak bir örgütü araştırır. Barry ise maskenin ardındaki gizemi çözmek için harekete geçer.",
+              "airDate": "2020-02-04",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/hBqoaRw10NZa38eMPsi015Miu4i.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 11,
+              "title": "Love is a Battlefield",
+              "overview": "Barry ve Iris'in Sevgililer Günü yemeği belalı bir baş düşman tarafından kabaca yarıda kesilir. Allegra, Frost'tan talep etmediği bir yardım alır.",
+              "airDate": "2020-02-11",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/aRqczuW7lvqNh8sf3eX90PysgLk.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 12,
+              "title": "A Girl Named Sue",
+              "overview": "Arayışının başarısız olmasından aylar sonra Ralph sonunda Sue Dearbon'a ilişkin bir ipucu bulur. Iris aynalarla oynar. Barry kapanmış bir dosyayı yeniden açar.",
+              "airDate": "2020-02-18",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/gKwjHB8BCV6GxjfqegIMpXsGnyG.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 13,
+              "title": "Grodd Friended Me",
+              "overview": "Krizin yol açtığı değişiklikler karşısında hüsrana uğrayan ve bunlarla başa çıkmakta zorlanan Barry, giriştiği deneyde sürpriz sonuçlar elde eder.",
+              "airDate": "2020-02-25",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/mBYqRU2MeiA7rdaSiDvoWQnRlZ8.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 14,
+              "title": "Death of the Speed Force",
+              "overview": "Çocuk Flash, Barry'ye hız gücüne ilişkin korkunç bir uyarıda bulunur. Cisco tehlikeli bir metaya karşı verilen mücadeleye yardım etmek için döner.",
+              "airDate": "2020-03-10",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/l6Zk6Gd8upZHrGcnzq2i7oO5vhQ.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 15,
+              "title": "The Exorcism of Nash Wells",
+              "overview": "Eva bir görev için Iris ve Kamilla'nın ikiz versiyonlarından yardım alır. Flash Ekibi Nash'i incelerken Barry tehlikeli bir yeni düşmanla karşılaşır.",
+              "airDate": "2020-03-17",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/theU0p73PguZckx4sFNbPW9shSr.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 16,
+              "title": "So Long and Goodnight",
+              "overview": "Ciddi bir tehlikeyle karşı karşıya olmasına rağmen Joe tedbir almayı reddeder. Barry hızını korumakta zorlanır. Iris, Eva ile bir sırrını paylaşır.",
+              "airDate": "2020-04-21",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/aAmTUY9uRKp3x2YIuQXNgTYXvzv.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 17,
+              "title": "Liberation",
+              "overview": "Eşinin değişen kişiliği karşısında giderek daha fazla endişelenen Barry bir açıklama bulmaya çalışır. Eva yeni bir dünyaya adım atmaya hazırlanır.",
+              "airDate": "2020-04-28",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/mIfue9clionNj3VjILUrrHCuH0T.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 18,
+              "title": "Pay the Piper",
+              "overview": "Godspeed'in geri dönüşü Barry'ye Hartley Rathaway'den yardım istemesi için ilham verir. Gerilim ve şüphe, Flash Ekibi'ni parçalamak üzeredir.",
+              "airDate": "2020-05-05",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/aUuqJio16bVanRd4n9L3o0sOhAA.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 19,
+              "title": "Success is Assured",
+              "overview": "Barry ve Ralph sonunda Eva'ya ilişkin bir ipucu bulma umuduyla şüpheli bir depoyu araştırır. Barry daha sonra Carver'a önemli bir uyarıda bulunur.",
+              "airDate": "2020-05-12",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/qFFjQHeHl1Yn5C4mV5tZuceDFGH.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 7,
+          "name": "Sezon 7",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/lJA2RCMfsWoskqlQhXPSLFQGXEJ.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "All's Wells That Ends Wells",
+              "overview": "Barry'nin hızının tehlikeli seviyelere düşmesi, Flash Ekibi'ni bir çözüm arayışına iter. Ancak buldukları çözüm korkunç bir fedakârlık gerektirebilecek niteliktedir.",
+              "airDate": "2021-03-02",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/48iZ3tFn7rzQkzsVhkrymgpKBEC.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 2,
+              "title": "The Speed of Thought",
+              "overview": "Barry hızlı düşünme gücü kazanır ama yeni yeteneği bazı olumsuzlukları da beraberinde getirir. Bu sırada Eva sarsıcı bir gerçekle yüzleşir.",
+              "airDate": "2021-03-09",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/eoITNIDlpHoZA5UTP2Eyj3dy0XD.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Mother",
+              "overview": "Eva'nın güçlerinin korkutucu bir seviyeye gelmesi, Flash Ekibi'ni çaresizliğe iter. Birden ortaya çıkan tanıdık bir yüz, yardım elini uzatır.",
+              "airDate": "2021-03-16",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/jaN7eMGizXp64zlzprigxZP95EA.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "Central City Strong",
+              "overview": "Flash Ekibi, Central City'nin yeniden inşa edilmesine yardım ederken başka bir kötü kahraman intikam için geri döner. Barry ve Iris ise normale dönmekte zorlanır.",
+              "airDate": "2021-03-23",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/2ty6Y8JwLkcSgIhtI1hGy4wOdYH.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "Fear Me",
+              "overview": "Yeni bir düşman, ekibin en karanlık korkularını korkunç halüsinasyonlara dönüştürür. Killer Frost ve Caitlin Snow, tekrar birleşme konusunda fikir ayrılığı yaşar.",
+              "airDate": "2021-03-30",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/lIN1VLNEAwdLpGEmUuqHAZG0WSC.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "The One with the Nineties",
+              "overview": "1998'de sıkışıp kalan Chester ve Cisco, Chester'ın hayatının en kötü günlerinden birini tekrar tekrar yaşar. Barry toparlanırken Iris ve Hız Gücü yakınlaşır.",
+              "airDate": "2021-04-06",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/hfCarUHnQIQkNs8npZsopdK0l6f.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 7,
+              "title": "Growing Pains",
+              "overview": "Frost haksız yere acımasız bir saldırıyla suçlanır. Chester suç mahallerinde çalışmaya başlar. Barry ve Iris ise evlerindeki bir misafirle uğraşır.",
+              "airDate": "2021-04-13",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/fvAxal5HfwOAppNhZ7NWUop3sNQ.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 8,
+              "title": "The People vs. Killer Frost",
+              "overview": "Hayatının mücadelesiyle karşı karşıya olan Frost bildiğini okumaya kararlıdır. Bu sırada Barry ve Nora, meta-insan olduğundan şüphelendikleri yeni birini araştırır.",
+              "airDate": "2021-05-04",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/nHKU8SY2X1mbuopApTZy7XRZW6L.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 9,
+              "title": "Timeless",
+              "overview": "Barry, uğradığı acı verici ihanetin ardından zamanla ilgili bir görev için eski bir dostundan yardım ister. Bu sırada Iris, Allegra ve Kamilla bir ipucunun peşine düşer.",
+              "airDate": "2021-05-11",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/91x7rLL9AvZPtYGHm5ENzNZcoxB.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 10,
+              "title": "Family Matters: 1. Kısım",
+              "overview": "Iris, Psych'ın gerçek niyetinin ne olduğunu anlamaya çalışır. Barry yaklaşan bir tehdidi önlemek için Alexa'yı eğitmeyi teklif eder. Cisco yapacağı hamle üzerine düşünür.",
+              "airDate": "2021-05-18",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/y3wIRpTNYVqeO1yZW0Um4jtXmKK.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 11,
+              "title": "Family Matters: 2. Kısım",
+              "overview": "Barry ve Iris, Bashir ve Alexa'yı intikam peşindeki Nora'dan saklamaya karar verir. Bu sırada büyük bir fırtına Central City'yi yok olmanın eşiğine getirir.",
+              "airDate": "2021-05-25",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/2wvZGOncbpBQhcaR13zvlL7Fwzp.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 12,
+              "title": "Good-Bye Vibrations",
+              "overview": "Cisco ve Kamilla, ekiple büyük bir haber paylaşır. Ama kimse bu haberi umursamıyor gibi görünür. Bu arada yeni bir meta, kurbanlarda geçici bir neşe sarhoşluğu yaratır.",
+              "airDate": "2021-06-08",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/fXAcF9JfeNk4ngRJIbki4wIZVe.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 13,
+              "title": "Masquerade",
+              "overview": "Cecile psişik bir hapishaneden kaçmaya çalışır. Chester, Cisco'nun işini devralsa da geçiş süreci kolay olmayacaktır. Ayrıca Flash Ekibi bir soygun planlar.",
+              "airDate": "2021-06-15",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/luj3XHjyg88RcvA60cWwDBAezy8.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 14,
+              "title": "Rayo De Luz",
+              "overview": "Allegra tehlikeli kuzeninin fikrini değiştirmeye çalışırken Barry ve Iris kısa bir tatile çıkar. Bu sırada Joe, Kristen Kramer'ın geçmişini araştırır.",
+              "airDate": "2021-06-22",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/rImyzS06IyoOaKk7zPAtomZOEBc.jpg",
+              "runtimeMinutes": 41,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 15,
+              "title": "Enemy at the Gates",
+              "overview": "Barry tam da güzel bir haberi kutlamayı düşünürken Godspeed'ler saldırır. Frost, Chillblaine'e güvenme konusunda tereddüt yaşar. Caitlin ise Ultraviolet'ı muayene eder.",
+              "airDate": "2021-06-29",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/gTGgOoj8BhGD8f0S64Xvt1PjKJu.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 16,
+              "title": "P.O.W.",
+              "overview": "Barry, Godspeed iç savaşının ailesine zarar verebileceğinden endişe ederken sürpriz bir isim Flash Ekibi'ne yardım eli uzatır. Joe ve Kramer, Creyke ile yüzleşir.",
+              "airDate": "2021-07-06",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/wInHr9XhSRuon0bLGPr6IfsNX9y.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 17,
+              "title": "Heart of the Matter: 1. Kısım",
+              "overview": "Barry ile Iris'in gelecekteki çocukları XS ve Bart ortaya çıkar. Bu sırada Godspeed savaşı giderek daha ölümcül bir hâl alır ve Allegra bir sorunu kendisine saklar.",
+              "airDate": "2021-07-13",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/pVNqbB8TcvoJfcLPNx0iEfbZ6YD.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 18,
+              "title": "Heart of the Matter: 2. Kısım",
+              "overview": "Godspeed'i yenip speedster savaşına son vermek için var gücüyle uğraşan Barry, arkadaşlarını ve ailesini mücadeleye katılmaya çağırır.",
+              "airDate": "2021-07-20",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/Adt18WHSpYkGo2PXxPEWUtn063K.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 8,
+          "name": "Sezon 8",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/9Oayqj8PXBZIjl4K5UZeM3t9VVJ.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Armageddon, Part 1",
+              "overview": "Gizemli durumlar altında güçlü bir uzaylı tehdit Dünya'ya vardığında Barry, Iris ve diğerleri dünyayı kurtarmak için umutsuz bir savaşta sınırlarını zorlarlar.",
+              "airDate": "2021-11-16",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/btxoq1RGpcnEBmqAra5yFU63VCS.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Armageddon, Part 2",
+              "overview": "Gizemli durumlar altında güçlü bir uzaylı tehdit Dünya'ya vardığında Barry, Iris ve diğerleri dünyayı kurtarmak için umutsuz bir savaşta sınırlarını zorlarlar.",
+              "airDate": "2021-11-23",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/pKUydXjSMVLklcwFtvbyZbgxF64.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Armageddon, Part 3",
+              "overview": "Despero'yla işler kötü bir hâl alınca Barry, Adalet Salonunda Kara Şimşek'le buluşur; İris, Desper'nun geleceği görüşünden bir tuhaflık olduğundan şüphelenir ve bu yüzden güçlü bir müttefikten yardım ister.",
+              "airDate": "2021-11-30",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/xrgK4eftY5k2k3whdWkUYh9Fg5s.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "Armageddon, Part 4",
+              "overview": "Eobard Thawne'ın en beklenmedik şekilde geri dönmesi Barry'i şaşırtır. Damien Darhk, Barry'e bir öneride bulunur ama işin içinde bir bit yeniği vardır. Reverse-Flash'la Flash ve Flash ekibine karşı destansı bir savaş başlar.",
+              "airDate": "2021-12-07",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/rPQtmrYMAT3bSp9RO2CnkMbFEIu.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "Armageddon, Part 5",
+              "overview": "Barry en büyük düşmanını kurtarıp kurtarmamaya karar vermek zorundadır.",
+              "airDate": "2021-12-14",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/a60PsRobF9Upa7sM5RV2iUys54j.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "Impulsive Excessive Disorder",
+              "overview": "Bart ve Mona geçmişten kendi zamanlarına döner ancak hiçbir şey bekledikleri gibi değildir",
+              "airDate": "2022-03-09",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/xxab511nKBfN1BtpDD3iZZ27QFW.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 7,
+              "title": "Lockdown",
+              "overview": "Bart ve Mona geçmişten kendi zamanlarına döner ancak hiçbir şey bekledikleri gibi değildir",
+              "airDate": "2022-03-16",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/ont9wd9IjHy3JZ0MjMNPMo8Jw2G.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 8,
+              "title": "The Fire Next Time",
+              "overview": "Barry geçmişinin yaralarını bugünde sarmaya çalışır.",
+              "airDate": "2022-03-23",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/zyzcQCyCV7BV3c6da31drRfROf8.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 9,
+              "title": "Phantoms",
+              "overview": "Yangın kurbanları artarken Flash ekibi yeni bir aydınlanma yaşar.",
+              "airDate": "2022-03-30",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/vMu2sjYygrwmPclxXXeeIxV3mXC.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 10,
+              "title": "Reckless",
+              "overview": "Kara ateşi durdurma çabaları devam ederken Iris başka bir şehirde kapana kısılır",
+              "airDate": "2022-04-06",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/uqI4JlIgHCN358WR7aOId9wzJaL.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 11,
+              "title": "Resurrection",
+              "overview": "Ateşi söndürme görevi bambaşka bir şeye dönüşürken Iris yaptıklarının cezasını çeker.",
+              "airDate": "2022-04-13",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/vQ42N5vAYopQ48w7dnYGdEl1Bvp.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 12,
+              "title": "Death Rises",
+              "overview": "Yeni Meta şehre korku salarken Joe yerel yetkililere yardım eder; Barry, kitle katilinin izini süren Cecile'den yardım alır.",
+              "airDate": "2022-04-27",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/poSGsqYyzVz6YA5z4Foe57bVoIa.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 13,
+              "title": "Death Falls",
+              "overview": "Deathstorm, yalnızlığına son vermek için herkesi kedere boğuyor ve Frost, Caitlin'i kurtarabilmek adına, en derinlere gömdüğü duyguları ile yüzleşiyor.",
+              "airDate": "2022-05-04",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/nv6gPuL7AfCLpcHpB8afeiAJqMK.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 14,
+              "title": "Funeral for a Friend",
+              "overview": "Flash takımı bir yandan düşmanla baş ederken öte yandan Frost'un ölümünün üstesinden gelmeye çalışır.",
+              "airDate": "2022-05-11",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/jYkzNBYRvYHvzI7vyE9opO9XYP6.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 15,
+              "title": "Into the Still Force",
+              "overview": "Flash Still Force'un içinde bir yolculuğa çıkıyor. CCPD, gizemli bir cihazın sırlarını çözmesi için Chester'ın yardımını istiyor.",
+              "airDate": "2022-05-18",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/pk6zP0geB2A7irzn8tIP0kv0Z0s.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 16,
+              "title": "The Curious Case of Bartholomew Allen",
+              "overview": "Flash erken yaşlanmasına neden olan bir şok dalgasına maruz kalır.",
+              "airDate": "2022-05-25",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/oK3kg8CPl85VWZXjvx6NWg74VNi.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 17,
+              "title": "Keep It Dark",
+              "overview": "Flash gizlice şehirdeki yeni meta hakkındaki gerçekleri öğrenmeye çalışıyor. Allegra CC Citizen Media'daki arkadaşını korumaya çalışır.",
+              "airDate": "2022-06-08",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/d6EWpNtaOMnVbxOnWiRiEpC1kft.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 18,
+              "title": "The Man in the Yellow Tie",
+              "overview": "Şehirdeki yeni bir hızcı, Flash'ı beklediğinden fazla zorlar. Cecile'in güçleri gelişir ve Flash Takımı'na apayrı bir seviyede yardım etmesini sağlar.",
+              "airDate": "2022-06-15",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/ofdfY6TLybNbJwzeoG8umbuXXpw.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 19,
+              "title": "Negative, Part 1",
+              "overview": "Flash ve takımın karşısına bir zorluk çıkar. Iris zaman tutmasının sebebini öğrenir.",
+              "airDate": "2022-06-22",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/cYkfi3ucqScDbKH1CDIIf8PBEby.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 20,
+              "title": "Negative, Part Two",
+              "overview": "Flash hâlâ olanları idrak etmeye çalışırken, takımın geri kalanı en çok ihtiyacı olan zamanda ona yardım etmeye koşar",
+              "airDate": "2022-06-29",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/pWU8oL1KyioOGwMqw9ny8pQ9l1t.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            }
+          ]
+        },
+        {
+          "seasonNumber": 9,
+          "name": "Sezon 9",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/lSIraXr6r1v5CvkjE7CjMcJZld0.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Wednesday Ever After",
+              "overview": "Barry ve İris aynı günü yaşayıp dururlar; Joe Cecile'e içini döker; dostlar ve düşmanlar, yeniler ve eskiler Central City'e akın etmeye başlar.",
+              "airDate": "2023-02-08",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/4S4XAyU71fOqHnL97cB4KueHutf.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Hear No Evil",
+              "overview": "Barry Caitlin'in başına gelenlerden suçluluk duyar; Mark herkesi şüpheye düşürecek bir plan bulur; Red Death Central City'de dolanır ve başarısızlığın seçenek olmadığını duyurur.",
+              "airDate": "2023-02-15",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/4lbqQk2IapF38Z8YYtbPSgQq7RJ.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Rogues of War",
+              "overview": "Barry yeni Haydutlar Ekibi çalmadan önce ekipmanın önemli bir parçasını çalmak için beklenmedik bir ekip kurar.",
+              "airDate": "2023-02-22",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/jUlIctIEbsg92BJLgtkgLphJsJM.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 4,
+              "title": "The Mask of the Red Death, Part 1",
+              "overview": "Flash zor seçimler yapmaya zorlanır; şehirdeki elektrik kesintisinden ötürü Flash Ekibi Haydut Takım'dan yardım ister; İris'i eski bir dost ziyaret eder.",
+              "airDate": "2023-03-01",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/3nz3u5sOrTxWGWQ1m5ojmJzDQZf.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "The Mask of the Red Death, Part 2",
+              "overview": "Red Death şehir merkezine korku salarken Barry ve Iris bir plan yapıp Cecile'den yardım isterler.",
+              "airDate": "2023-03-08",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/qeUVFYGswpWUqnluvQmCVVwSTOm.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "The Good, the Bad and the Lucky",
+              "overview": "İris'le Barry bebekayı yaparken Cecile şans küpü olan bir metanın şanssız davasını alır.",
+              "airDate": "2023-03-15",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/g0xY1gF9fQtquuRGQeiBlGAIVaI.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 7,
+              "title": "Wildest Dreams",
+              "overview": "Khione ve Mark arasındaki ilişki tehlikeli bir yola girerken Nia ve Iris kendilerini kâbusun içinde bulur.",
+              "airDate": "2023-03-29",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/7rsAFeWUft4q3eq9gqXaZYzbeVs.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 8,
+              "title": "Partners in Time",
+              "overview": "Flash'ın güçlerini yine sadece Iris'e yemek getirmek için kullandığı bu bölümde Star Labs'ta yapılan belediye denetimi müfettişlerin ve Flash'ın hayatını tehlikeye atar.",
+              "airDate": "2023-04-05",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/tCJutF1brVERN77ORR3VQNsev0h.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 9,
+              "title": "It's My Party and I'll Die if I Want To",
+              "overview": "Flash'ın yeniden 30 yaşına girmesi şerefine düzenlenen sürpriz partiye beklenmedik bir misafir katılır.",
+              "airDate": "2023-04-26",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/zDPCrqKSSGpFBZUpuv4CV8bW6wa.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 10,
+              "title": "A New World, Part One",
+              "overview": "Flash'ın uzun bir aradan sonra güçlerini kullandığına tanık olacağımız bu bölümde geçmişin hayaletleri hamlesini yapar.",
+              "airDate": "2023-05-03",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/nhJLhz0JxXMzP1enozw7XR3nW0J.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 11,
+              "title": "A New World, Part Two",
+              "overview": "Yine tüm dünyanın Iris'in etrafında döndüğü bu bölümde Negatif Speed Force'un planları ekibi harekete geçirir ve uzun zamandır bilinmesine karşın hevesle beklenen bir gelişme herkesi bir araya getirir.",
+              "airDate": "2023-05-10",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/lPZFOBpvvvqi47JBAfrb6XYpiyN.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 12,
+              "title": "A New World, Part Three",
+              "overview": "Barry, Negatif Speed Force tarafından zamandan zamana gönderilirken Eddie'nin neden ölümden döndüğüne dair gizem çözülür. Iris'in doğum sancıları, bir bölümün daha Iris'in etrafında dönmesini engeller.",
+              "airDate": "2023-05-17",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/jEqKyagrsoPhjhzze7ckBbwTBAV.jpg",
+              "runtimeMinutes": 42,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 13,
+              "title": "A New World, Part Four",
+              "overview": "Flash efsanesi minimum Iris ve maksimum Flash'la son bulur. Flash, herkes için daha iyi bir dünya yaratmaya karar verin. Sorunların havalı süper kahraman güçleri ve dövüşleriyle değil, konuşarak çözüldüğü bir dünya...",
+              "airDate": "2023-05-24",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/tFhCJhJu6JV93WT9Ew8YdnrbTOR.jpg",
+              "runtimeMinutes": 43,
+              "status": "pending"
+            }
+          ]
+        }
+      ],
+      "trailerUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/trailer_1786137728274.mp4"
+    },
+    {
+      "id": "demir-adam-0371",
+      "type": "movie",
+      "imdbId": "tt0371746",
+      "tmdbId": 1726,
+      "title": "Demir Adam",
+      "originalTitle": "Iron Man",
+      "overview": "Milyarder bir sanayici ve dâhi bir mucit olan Tony Stark kaçırılır ve yıkıcı bir silah inşa etmeye zorlanır. Zekâsını ve yaratıcılığını kullanarak bunun yerine ileri teknoloji bir zırh inşa eder ve esaretten kaçar. Küresel sonuçları olacak alçak bir plan olduğunu keşfettiğinde güçlü zırhını kuşanır ve Demir Adam olarak dünyayı korumaya yemin eder.",
+      "releaseYear": 2008,
+      "genres": [
+        "Aksiyon",
+        "Bilim-Kurgu",
+        "Macera"
+      ],
+      "runtimeMinutes": 127,
+      "posterUrl": "https://image.tmdb.org/t/p/w780/9qjZeIZ52CWgmZuEuVuBPaypChy.jpg",
+      "posterUrls": [],
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/cKvDv2LpwVEqbdXWoQl4XgGN6le.jpg",
+      "backdropUrls": [],
+      "trailerUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/demir-adam-0371/trailer.mp4",
+      "cast": [
+        {
+          "name": "Robert Downey Jr.",
+          "character": "Tony Stark",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/5qHNjhtjMD4YWH3UP0rm4tKwxCL.jpg"
+        },
+        {
+          "name": "Terrence Howard",
+          "character": "Rhodey",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/wXWt2NSY23v7DHe2yZQ1C8TikBp.jpg"
+        },
+        {
+          "name": "Jeff Bridges",
+          "character": "Obadiah Stane",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/xms1RAY6q7Lzp7wNeRCB0kzhucn.jpg"
+        },
+        {
+          "name": "Gwyneth Paltrow",
+          "character": "Pepper Potts",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/x040uB0CDrHjVAUSONw8bbWMvDC.jpg"
+        },
+        {
+          "name": "Leslie Bibb",
+          "character": "Christine Everhart",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/g3a1O9lOTZvrwQupUtg4Fc3CdTd.jpg"
+        },
+        {
+          "name": "Shaun Toub",
+          "character": "Yinsen",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/6fuJ9D50bYuMAhrlEgVqzgqF0LU.jpg"
+        },
+        {
+          "name": "Faran Tahir",
+          "character": "Raza",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/dMsD7h6KiZ5dM0f9MegXUOKnqb0.jpg"
+        },
+        {
+          "name": "Clark Gregg",
+          "character": "Agent Coulson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/mq686D91XoZpqkzELn0888NOiZW.jpg"
+        },
+        {
+          "name": "Bill Smitrovich",
+          "character": "General Gabriel",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/dtLvDK5Z4PHzRj8ngtGake8YDsU.jpg"
+        },
+        {
+          "name": "Sayed Badreya",
+          "character": "Abu Bakaar",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/sVvwmMsjXd5YqyZEfWcWQEkBScu.jpg"
+        },
+        {
+          "name": "Paul Bettany",
+          "character": "Jarvis (voice)",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vcAVrAOZrpqmi37qjFdztRAv1u9.jpg"
+        },
+        {
+          "name": "Jon Favreau",
+          "character": "Hogan",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8MtRRnEHaBSw8Ztdl8saXiw1egP.jpg"
+        },
+        {
+          "name": "Peter Billingsley",
+          "character": "William Ginter Riva",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/mgGquIo2diWHkRVbjRVULnMA46x.jpg"
+        },
+        {
+          "name": "Tim Guinee",
+          "character": "Major Allen",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/bl2kh12pzVORh6oavx0zYeuefl1.jpg"
+        },
+        {
+          "name": "Will Lyman",
+          "character": "Award Ceremony Narrator (voice)",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ymifKdrtMFEZVYTvOmYoshPg7HR.jpg"
+        },
+        {
+          "name": "Tom Morello",
+          "character": "Guard",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/gTN2tWZkatEvbVmBeurA5LQYlR6.jpg"
+        },
+        {
+          "name": "Marco Khan",
+          "character": "Guard",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/mZhRtwJinLGh7a6R0qcwK7sBeEs.jpg"
+        },
+        {
+          "name": "Daston Kalili",
+          "character": "Guard",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/kPcyffHZuJ3whGGwDjWmVz7JNNg.jpg"
+        },
+        {
+          "name": "Ido Mor",
+          "character": "Guard",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/xu4fYwGjbQjSkGcE5XpIiPdzofX.jpg"
+        },
+        {
+          "name": "Kevin Foster",
+          "character": "Jimmy",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/x2HRAzaFtIPUnuuX4GjOukyg0O5.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Louis D'Esposito",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ewtzT2ZMIX2DNyGUUkHLn36fjgF.jpg"
+        },
+        {
+          "name": "Peter Billingsley",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/mgGquIo2diWHkRVbjRVULnMA46x.jpg"
+        },
+        {
+          "name": "Jon Favreau",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8MtRRnEHaBSw8Ztdl8saXiw1egP.jpg"
+        },
+        {
+          "name": "David Maisel",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Ari Arad",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Stan Lee",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
+        },
+        {
+          "name": "Avi Arad",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
+        },
+        {
+          "name": "Kevin Feige",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
+        },
+        {
+          "name": "Jon Favreau",
+          "job": "Director",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8MtRRnEHaBSw8Ztdl8saXiw1egP.jpg"
+        }
+      ],
+      "status": "ready",
+      "manualEntry": false,
+      "createdAt": "2026-08-07T18:25:39.650811Z",
+      "updatedAt": "2026-08-07T18:33:44.640683Z",
+      "shardId": "mfilms12/film2-media-01",
+      "asset": {
+        "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/demir-adam-0371/video_1786127292102.mp4",
+        "durationSeconds": 7561.757,
+        "audioLanguages": [
+          "eng",
+          "tur"
+        ],
+        "subtitleLanguages": [
+          "eng",
+          "tur"
+        ],
+        "externalAudioTracks": [],
+        "externalSubtitleTracks": [
+          {
+            "language": "eng",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/demir-adam-0371/subs_eng_1786127292102_1.vtt",
+            "label": "Ingilizce",
+            "mimeType": "text/vtt"
+          },
+          {
+            "language": "tur",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/demir-adam-0371/subs_tur_1786127292102_2.vtt",
+            "label": "Turkce",
+            "mimeType": "text/vtt"
+          }
+        ],
+        "videoVariants": []
+      }
+    },
+    {
+      "id": "saplant-3728",
+      "type": "movie",
+      "imdbId": "tt37287335",
+      "tmdbId": 1339713,
+      "title": "Saplantı",
+      "originalTitle": "Obsession",
+      "overview": "​Hoşlandığı kızın kalbini kazanmak için gizemli \"Tek Dilek Söğüdü\"nü (One Wish Willow) kıran umutsuz bir romantik, tam da dilediği şeye kavuşur; ancak çok geçmeden bazı arzuların karanlık ve tekinsiz bir bedeli olduğunu keşfeder.",
+      "releaseYear": 2026,
+      "genres": [
+        "Korku",
+        "Gerilim"
+      ],
+      "runtimeMinutes": 109,
+      "posterUrl": "https://image.tmdb.org/t/p/w780/nriiXc6VbD6qWBj7INOElJbX8mp.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/rZfmzpixLKLR3Hg2u0WgC7XLFl8.jpg",
+      "trailerUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/trailer.mp4",
+      "cast": [
+        {
+          "name": "Michael Johnston",
+          "character": "Bear",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/fbpcCkBzu43kMdlXxEAMuLhseL8.jpg"
+        },
+        {
+          "name": "Inde Navarrette",
+          "character": "Nikki",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8mYBaOximzwBgXOYRzbS6eUnoMX.jpg"
+        },
+        {
+          "name": "Cooper Tomlinson",
+          "character": "Ian",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vBMQbYT1DyWPCUp11dIiqZR9zhd.jpg"
+        },
+        {
+          "name": "Megan Lawless",
+          "character": "Sarah",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/6qW63YEgB1qro01sM7T2HvhtFkh.jpg"
+        },
+        {
+          "name": "Andy Richter",
+          "character": "Carter",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/5Qr7N6TzC8cI0ULxDm6EC5GpZ4C.jpg"
+        },
+        {
+          "name": "Haley Fitzgerald",
+          "character": "Viola",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/xbKqZ5Epz0IaSCPLXDnByDACw2X.jpg"
+        },
+        {
+          "name": "Darin Toonder",
+          "character": "Harry",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/bD7Y9T7Y6XwDXjGJ8Suabyt1ZGo.jpg"
+        },
+        {
+          "name": "Anthony Pavone",
+          "character": "Reggie",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/hxiqY9gHgwXGYnXSD11Wacm5Nmi.jpg"
+        },
+        {
+          "name": "Justice",
+          "character": "Joe",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/YFxKf2HHJvyavQf54NO5wXFOJX.jpg"
+        },
+        {
+          "name": "Anthony Casabianca",
+          "character": "Chris",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/xNJUKqKQhMeyZ74erQvETr3AqV0.jpg"
+        },
+        {
+          "name": "Chloe Breen",
+          "character": "Ruthie",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/oKBTQeGcQBM5aHNHwAqVWPjDVfz.jpg"
+        },
+        {
+          "name": "Malcolm Kelner",
+          "character": "Bartender",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/xlojlX1dlu1OY0Vf2owDWv5PV3l.jpg"
+        },
+        {
+          "name": "Charles Santa Cruz",
+          "character": "Background"
+        },
+        {
+          "name": "Alex Maystrik",
+          "character": "Background"
+        },
+        {
+          "name": "Mariana Silva",
+          "character": "Background"
+        },
+        {
+          "name": "Kyle Blumenthal",
+          "character": "Background"
+        },
+        {
+          "name": "Jorge Luquin",
+          "character": "Background"
+        },
+        {
+          "name": "Jose Herrera",
+          "character": "Background"
+        },
+        {
+          "name": "Emilio Flores",
+          "character": "Background",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/j5HG24bZUjr7Nw8NtB4dGENelWx.jpg"
+        },
+        {
+          "name": "Manny Liotta",
+          "character": "Background",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/sMOebSAJzglALejW2rNuPI0ii5r.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Curry Barker",
+          "job": "Director",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/A16CxGKlkQYryoxGpxzKj4Wxk83.jpg"
+        },
+        {
+          "name": "Curry Barker",
+          "job": "Writer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/A16CxGKlkQYryoxGpxzKj4Wxk83.jpg"
+        },
+        {
+          "name": "James Harris",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/saC2CiD6PUazSJEeKJODHoI5VWE.jpg"
+        },
+        {
+          "name": "Ruzanna Kegeyan",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "David Haring",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Leonora Darby",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Christian Mercuri",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vISkC384cFXhjKxPbdAhtSyoBDY.jpg"
+        },
+        {
+          "name": "Haley Nicole Johnson",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/9TnLydfFTIXNZQWt3wvFCRsr8WK.jpg"
+        },
+        {
+          "name": "Jason Blum",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/oOsdVzSXyj1L1mKN3d2QcF01hkc.jpg"
+        },
+        {
+          "name": "Mark Lane",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Roman Viaris-de-Lesegno",
+          "job": "Producer"
+        }
+      ],
+      "status": "ready",
+      "manualEntry": false,
+      "createdAt": "2026-08-07T10:00:45.970165Z",
+      "updatedAt": "2026-08-07T14:28:49.726148Z",
+      "shardId": "mfilms12/film2-media-01",
+      "asset": {
+        "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/video.mp4",
+        "audioLanguages": [
+          "eng",
+          "tur"
+        ],
+        "subtitleLanguages": [
+          "eng",
+          "tur"
+        ],
+        "externalAudioTracks": [],
+        "externalSubtitleTracks": [
+          {
+            "language": "eng",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/subs_ingilizce_4.vtt",
+            "label": "İngilizce",
+            "mimeType": "text/vtt"
+          },
+          {
+            "language": "tur",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/subs_trke_5.vtt",
+            "label": "Türkçe",
+            "mimeType": "text/vtt"
+          }
+        ],
+        "videoVariants": []
+      }
+    },
+    {
+      "id": "tolgshow-7827",
+      "type": "series",
+      "imdbId": "tt7827112",
+      "tmdbId": 76579,
+      "title": "TOLGSHOW",
+      "originalTitle": "TOLGSHOW",
+      "overview": "Tolga Çevik’in merakla beklenen yeni programı TOLGSHOW yayına hazır! Doğaçlama sahnelediği ‘Arkadaşım’ karakteriyle 10 yıldır milyonları güldüren Tolga Çevik yeni programında sürpriz konuklar da ağırlayacak. ‘Gizemli Yönetmen’ Fırat Parlak ve ‘Minik Müzisyen’ Özer Atik’in de yer aldığı TOLGSHOW yine yanlış anlamalar, bilinmezlikler, didişmeler ve kahkahalar arasında geçecek.",
+      "releaseYear": 2018,
+      "genres": [
+        "Komedi",
+        "Talk"
+      ],
+      "posterUrl": "https://image.tmdb.org/t/p/w780/cpIuEqufA0efZ6mbB5GDMbifSzM.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/1vxXE7ZfKuXBP7FoPlDVJGKdegc.jpg",
+      "cast": [
+        {
+          "name": "Tolga Çevik",
+          "character": "Arkadaşım",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/btsEAsTYeMk5YSFy0br0u4y4GcL.jpg"
+        },
+        {
+          "name": "Özer Atik",
+          "character": "Minik",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/fXnAJxR7uZTHgVNeANsXpnyc00f.jpg"
+        },
+        {
+          "name": "Fırat Parlak",
+          "character": "Yönetmen",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ebGjbXwfvgt08D5viQjG6B7iIhq.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Fırat Parlak",
+          "job": "Writer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ebGjbXwfvgt08D5viQjG6B7iIhq.jpg"
+        },
+        {
+          "name": "Tolga Çevik",
+          "job": "Writer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/btsEAsTYeMk5YSFy0br0u4y4GcL.jpg"
+        }
+      ],
+      "status": "ready",
+      "manualEntry": false,
+      "createdAt": "2026-08-06T23:40:13.637Z",
+      "updatedAt": "2026-08-07T09:52:12.898114Z",
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Sezon 1",
+          "overview": "",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/mEd39AicKW5VotPTe4wM1jRvjJx.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "1. Bölüm",
+              "overview": "",
+              "airDate": "2018-01-01",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/ghVv9M63MqO1jNRebVWSKxWCfDf.jpg",
+              "runtimeMinutes": 92,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 2,
+              "title": "2. Bölüm",
+              "overview": "",
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "masterPlaylistUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/tolgshow-7827/s1e2/master.m3u8",
+                "audioLanguages": [],
+                "subtitleLanguages": [],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": []
+              }
+            },
+            {
+              "episodeNumber": 4,
+              "title": "4. Bolum",
+              "overview": "",
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "masterPlaylistUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/tolgshow-7827/s1e4/master.m3u8",
+                "audioLanguages": [
+                  "tur"
+                ],
+                "subtitleLanguages": [],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": []
+              }
+            },
+            {
+              "episodeNumber": 10,
+              "title": "10. Bolum",
+              "overview": "",
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/tolgshow-7827/s1e10/video.mp4",
+                "audioLanguages": [],
+                "subtitleLanguages": [],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": []
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
