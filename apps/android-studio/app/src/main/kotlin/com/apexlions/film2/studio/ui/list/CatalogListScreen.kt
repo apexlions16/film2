@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,6 +47,7 @@ import com.apexlions.film2.studio.catalog.Title
 fun CatalogListScreen(
     onAddNew: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenEditorial: () -> Unit,
     onAttachMedia: (titleId: String, titleType: com.apexlions.film2.studio.catalog.TitleType) -> Unit,
     onGenerateQualities: (titleId: String, titleType: com.apexlions.film2.studio.catalog.TitleType) -> Unit,
     onManageTrailer: (titleId: String) -> Unit,
@@ -65,6 +67,9 @@ fun CatalogListScreen(
                 actions = {
                     IconButton(onClick = viewModel::refresh) {
                         Icon(Icons.Filled.Refresh, contentDescription = "Yenile")
+                    }
+                    IconButton(onClick = onOpenEditorial) {
+                        Icon(Icons.Filled.AutoAwesome, contentDescription = "Ana sayfa ve editoryal")
                     }
                     IconButton(onClick = onOpenSettings) {
                         Icon(imageVector = Icons.Filled.Settings, contentDescription = "Ayarlar")
