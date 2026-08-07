@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: agent/tizen-tv-player
 
       - name: Validate JavaScript syntax
         run: |
@@ -54,22 +56,23 @@ jobs:
 
       - name: Build unsigned WGT
         run: |
-          mkdir -p dist
+          rm -rf dist/tizen
+          mkdir -p dist/tizen
           cd apps/tizen-tv-player
-          zip -q -r ../../dist/Film2TV-development-unsigned.wgt . \
+          zip -q -r ../../dist/tizen/Film2TV-development-unsigned.wgt . \
             -x '*.DS_Store' '*.git*' 'README.md'
           cd ../..
-          sha256sum dist/Film2TV-development-unsigned.wgt | tee dist/SHA256SUMS.txt
+          sha256sum dist/tizen/Film2TV-development-unsigned.wgt | tee dist/tizen/SHA256SUMS.txt
 
       - name: Explain signing requirement
         run: |
-          cat > dist/SIGNING_REQUIRED.txt <<'EOF'
+          cat > dist/tizen/SIGNING_REQUIRED.txt <<'EOF'
           This WGT contains the complete Film2 Samsung Tizen TV player application but is unsigned.
 
           Samsung TVs require every application to be signed with a valid Samsung/Tizen certificate profile before installation.
           A physical TV distributor certificate is bound to the target TV DUID, so it cannot be generated safely in GitHub Actions without the owner's Samsung certificate material and target TV DUID.
 
-          Sign this exact project/package with Tizen Studio or the Samsung Tizen TV VS Code extension using your Samsung author + distributor certificate profile. Do not edit the WGT after signing.
+          Sign the source project at apps/tizen-tv-player with Tizen Studio or the Samsung Tizen TV VS Code extension using your Samsung author + distributor certificate profile. Do not edit a WGT after signing.
           EOF
 
       - name: Upload Tizen package artifact
@@ -77,8 +80,20 @@ jobs:
         with:
           name: Film2TV-Tizen-development
           path: |
-            dist/Film2TV-development-unsigned.wgt
-            dist/SHA256SUMS.txt
-            dist/SIGNING_REQUIRED.txt
+            dist/tizen/Film2TV-development-unsigned.wgt
+            dist/tizen/SHA256SUMS.txt
+            dist/tizen/SIGNING_REQUIRED.txt
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish build output to Tizen branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f dist/tizen/Film2TV-development-unsigned.wgt dist/tizen/SHA256SUMS.txt dist/tizen/SIGNING_REQUIRED.txt
+          if git diff --cached --quiet; then
+            echo "Build output unchanged"
+          else
+            git commit -m "build(tizen): publish development WGT"
+            git push origin HEAD:agent/tizen-tv-player
+          fi
