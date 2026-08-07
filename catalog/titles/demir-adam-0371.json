@@ -1,0 +1,171 @@
+{
+  "id": "demir-adam-0371",
+  "type": "movie",
+  "imdbId": "tt0371746",
+  "tmdbId": 1726,
+  "title": "Demir Adam",
+  "originalTitle": "Iron Man",
+  "overview": "Milyarder bir sanayici ve dâhi bir mucit olan Tony Stark kaçırılır ve yıkıcı bir silah inşa etmeye zorlanır. Zekâsını ve yaratıcılığını kullanarak bunun yerine ileri teknoloji bir zırh inşa eder ve esaretten kaçar. Küresel sonuçları olacak alçak bir plan olduğunu keşfettiğinde güçlü zırhını kuşanır ve Demir Adam olarak dünyayı korumaya yemin eder.",
+  "releaseYear": 2008,
+  "genres": [
+    "Aksiyon",
+    "Bilim-Kurgu",
+    "Macera"
+  ],
+  "runtimeMinutes": 127,
+  "posterUrl": "https://image.tmdb.org/t/p/w780/9qjZeIZ52CWgmZuEuVuBPaypChy.jpg",
+  "posterUrls": [],
+  "backdropUrl": "https://image.tmdb.org/t/p/w1280/cKvDv2LpwVEqbdXWoQl4XgGN6le.jpg",
+  "backdropUrls": [],
+  "cast": [
+    {
+      "name": "Robert Downey Jr.",
+      "character": "Tony Stark",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/5qHNjhtjMD4YWH3UP0rm4tKwxCL.jpg"
+    },
+    {
+      "name": "Terrence Howard",
+      "character": "Rhodey",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/wXWt2NSY23v7DHe2yZQ1C8TikBp.jpg"
+    },
+    {
+      "name": "Jeff Bridges",
+      "character": "Obadiah Stane",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/xms1RAY6q7Lzp7wNeRCB0kzhucn.jpg"
+    },
+    {
+      "name": "Gwyneth Paltrow",
+      "character": "Pepper Potts",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/x040uB0CDrHjVAUSONw8bbWMvDC.jpg"
+    },
+    {
+      "name": "Leslie Bibb",
+      "character": "Christine Everhart",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/g3a1O9lOTZvrwQupUtg4Fc3CdTd.jpg"
+    },
+    {
+      "name": "Shaun Toub",
+      "character": "Yinsen",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/6fuJ9D50bYuMAhrlEgVqzgqF0LU.jpg"
+    },
+    {
+      "name": "Faran Tahir",
+      "character": "Raza",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/dMsD7h6KiZ5dM0f9MegXUOKnqb0.jpg"
+    },
+    {
+      "name": "Clark Gregg",
+      "character": "Agent Coulson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/mq686D91XoZpqkzELn0888NOiZW.jpg"
+    },
+    {
+      "name": "Bill Smitrovich",
+      "character": "General Gabriel",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/dtLvDK5Z4PHzRj8ngtGake8YDsU.jpg"
+    },
+    {
+      "name": "Sayed Badreya",
+      "character": "Abu Bakaar",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/sVvwmMsjXd5YqyZEfWcWQEkBScu.jpg"
+    },
+    {
+      "name": "Paul Bettany",
+      "character": "Jarvis (voice)",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/vcAVrAOZrpqmi37qjFdztRAv1u9.jpg"
+    },
+    {
+      "name": "Jon Favreau",
+      "character": "Hogan",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/8MtRRnEHaBSw8Ztdl8saXiw1egP.jpg"
+    },
+    {
+      "name": "Peter Billingsley",
+      "character": "William Ginter Riva",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/mgGquIo2diWHkRVbjRVULnMA46x.jpg"
+    },
+    {
+      "name": "Tim Guinee",
+      "character": "Major Allen",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/bl2kh12pzVORh6oavx0zYeuefl1.jpg"
+    },
+    {
+      "name": "Will Lyman",
+      "character": "Award Ceremony Narrator (voice)",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ymifKdrtMFEZVYTvOmYoshPg7HR.jpg"
+    },
+    {
+      "name": "Tom Morello",
+      "character": "Guard",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/gTN2tWZkatEvbVmBeurA5LQYlR6.jpg"
+    },
+    {
+      "name": "Marco Khan",
+      "character": "Guard",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/mZhRtwJinLGh7a6R0qcwK7sBeEs.jpg"
+    },
+    {
+      "name": "Daston Kalili",
+      "character": "Guard",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/kPcyffHZuJ3whGGwDjWmVz7JNNg.jpg"
+    },
+    {
+      "name": "Ido Mor",
+      "character": "Guard",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/xu4fYwGjbQjSkGcE5XpIiPdzofX.jpg"
+    },
+    {
+      "name": "Kevin Foster",
+      "character": "Jimmy",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/x2HRAzaFtIPUnuuX4GjOukyg0O5.jpg"
+    }
+  ],
+  "crew": [
+    {
+      "name": "Louis D'Esposito",
+      "job": "Executive Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ewtzT2ZMIX2DNyGUUkHLn36fjgF.jpg"
+    },
+    {
+      "name": "Peter Billingsley",
+      "job": "Executive Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/mgGquIo2diWHkRVbjRVULnMA46x.jpg"
+    },
+    {
+      "name": "Jon Favreau",
+      "job": "Executive Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/8MtRRnEHaBSw8Ztdl8saXiw1egP.jpg"
+    },
+    {
+      "name": "David Maisel",
+      "job": "Executive Producer"
+    },
+    {
+      "name": "Ari Arad",
+      "job": "Executive Producer"
+    },
+    {
+      "name": "Stan Lee",
+      "job": "Executive Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
+    },
+    {
+      "name": "Avi Arad",
+      "job": "Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
+    },
+    {
+      "name": "Kevin Feige",
+      "job": "Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
+    },
+    {
+      "name": "Jon Favreau",
+      "job": "Director",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/8MtRRnEHaBSw8Ztdl8saXiw1egP.jpg"
+    }
+  ],
+  "status": "pending",
+  "manualEntry": false,
+  "createdAt": "2026-08-07T18:25:39.650811Z",
+  "updatedAt": "2026-08-07T18:25:43.278681Z"
+}
