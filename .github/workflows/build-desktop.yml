@@ -67,3 +67,21 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: apps/${{ matrix.app }}/release/*.exe
+
+      - name: Branch build durumunu kaydet
+        if: always() && github.ref == 'refs/heads/agent/windows-ux-v2'
+        shell: bash
+        run: |
+          git config user.name "film2-bot"
+          git config user.email "actions@users.noreply.github.com"
+          FILE=".github/${{ matrix.app }}-build-status.txt"
+          {
+            echo "status=${{ job.status }}"
+            echo "run_id=${{ github.run_id }}"
+            echo "sha=${{ github.sha }}"
+            echo "time=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > "$FILE"
+          git add "$FILE"
+          git diff --cached --quiet || git commit -m "chore(ci): ${{ matrix.app }} Windows build durumu"
+          git pull --rebase origin agent/windows-ux-v2 || true
+          git push origin HEAD:agent/windows-ux-v2 || true
