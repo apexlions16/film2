@@ -4,7 +4,7 @@
   "manualEntry": false,
   "status": "ready",
   "createdAt": "2026-08-07T19:51:10.235Z",
-  "updatedAt": "2026-08-07T21:17:19.632Z",
+  "updatedAt": "2026-08-07T21:35:25.060Z",
   "type": "series",
   "tmdbId": 92749,
   "title": "Ay Şövalyesi",
@@ -153,7 +153,7 @@
           "airDate": "2022-04-06",
           "stillUrl": "https://image.tmdb.org/t/p/w500/oLmV6R7PoEMLJJ62bE4idOoG9WX.jpg",
           "runtimeMinutes": 53,
-          "status": "pending"
+          "status": "processing"
         },
         {
           "episodeNumber": 3,
