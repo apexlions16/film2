@@ -1,14 +1,13 @@
 {
   "namespace": "mfilms12",
   "prefix": "film2-media",
-  "_comment": "sizeThresholdBytes asilir asilmaz hf-storage paketi otomatik olarak {prefix}-02, -03 ... adinda yeni bir Hugging Face dataset repo acar ve yeni yuklemeleri oraya yonlendirir. Eski shard'lardaki icerik shardId alaniyla okunmaya devam eder, hicbir sey tasinmaz. namespace = Hugging Face kullanici adi (mfilms12), GitHub kullanici adindan (apexlions16) farkli.",
   "sizeThresholdBytes": 300000000000,
   "shards": [
     {
       "id": "mfilms12/film2-media-01",
       "repoType": "dataset",
       "active": true,
-      "usedBytesApprox": 4495082225,
+      "usedBytesApprox": 4495082226,
       "createdAt": "2026-08-06T00:00:00.000Z"
     }
   ]
