@@ -1,0 +1,4 @@
+status=failure
+run_id=31172138391
+sha=ba04b2e5595d5c4aee2796a9fabe845b5917f78e
+time=2026-08-07T10:58:02Z
