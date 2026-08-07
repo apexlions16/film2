@@ -7,39 +7,31 @@
   isolation: isolate;
 }
 
-.backdrop {
+.backdrop,
+.trailer {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center 22%;
-  z-index: -3;
 }
+
+.backdrop { z-index: -4; }
+.trailer { z-index: -3; background: #080809; }
 
 .backdropFallback {
   position: absolute;
   inset: 0;
-  z-index: -3;
-  background:
-    radial-gradient(120% 90% at 82% 20%, rgba(201, 138, 76, 0.16), transparent 60%),
-    linear-gradient(150deg, var(--bg-elevated) 0%, var(--bg) 75%);
+  z-index: -4;
+  background: radial-gradient(120% 90% at 82% 20%, rgba(201, 138, 76, 0.16), transparent 60%), linear-gradient(150deg, var(--bg-elevated) 0%, var(--bg) 75%);
 }
 
-/* Left-heavy scrim so the text column sits on solid ground while the image
-   stays legible on the right — asymmetric, not a centered dark-veil hero. */
 .scrimH {
   position: absolute;
   inset: 0;
   z-index: -2;
-  background: linear-gradient(
-    90deg,
-    var(--bg) 0%,
-    rgba(10, 10, 11, 0.92) 24%,
-    rgba(10, 10, 11, 0.55) 48%,
-    rgba(10, 10, 11, 0.08) 72%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, var(--bg) 0%, rgba(10, 10, 11, 0.92) 24%, rgba(10, 10, 11, 0.55) 48%, rgba(10, 10, 11, 0.08) 72%, transparent 100%);
 }
 
 .scrimB {
@@ -49,29 +41,35 @@
   background: linear-gradient(180deg, transparent 42%, rgba(9, 9, 10, 0.5) 76%, var(--bg) 100%);
 }
 
-/* Local keyframes — see Row.module.css for why these must be declared per
-   module file rather than shared from global.css. */
+.muteButton {
+  position: absolute;
+  z-index: 4;
+  right: 44px;
+  bottom: 80px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.24);
+  background: rgba(0,0,0,.48);
+  color: white;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-app-region: no-drag;
+}
+
 @keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .content {
   position: relative;
   height: 100%;
   max-width: 620px;
-  padding: 0 56px;
-  padding-top: 64px;
+  padding: 64px 56px 76px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding-bottom: 76px;
   gap: 16px;
   animation: fade-up 0.6s var(--ease-out) both;
 }
@@ -98,11 +96,7 @@
   letter-spacing: 0.02em;
 }
 
-.eyebrow span + span::before {
-  content: '·';
-  margin-right: 10px;
-  color: var(--text-faint);
-}
+.eyebrow span + span::before { content: '·'; margin-right: 10px; color: var(--text-faint); }
 
 .title {
   margin: 0;
@@ -133,11 +127,7 @@
   overflow: hidden;
 }
 
-.actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 6px;
-}
+.actions { display: flex; gap: 12px; margin-top: 6px; }
 
 .playButton {
   appearance: none;
@@ -145,36 +135,22 @@
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  background: var(--accent);
-  color: #171008;
+  background: #fff;
+  color: #080809;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 750;
   padding: 12px 24px;
   border-radius: var(--radius-md);
   cursor: pointer;
   -webkit-app-region: no-drag;
-  transition:
-    transform 0.18s var(--ease-spring),
-    background 0.2s var(--ease-out),
-    box-shadow 0.2s var(--ease-out);
+  transition: transform 0.18s var(--ease-spring), background 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
 }
 
-.playButton:hover {
-  background: var(--accent-strong);
-  box-shadow: 0 12px 24px -10px rgba(201, 138, 76, 0.45);
-}
-
-.playButton:active {
-  transform: scale(0.97) translateY(1px);
-}
+.playButton:hover { background: rgba(255,255,255,.84); box-shadow: 0 12px 24px -10px rgba(0,0,0,.55); }
+.playButton:active { transform: scale(0.97) translateY(1px); }
 
 @media (max-width: 900px) {
-  .content {
-    max-width: 100%;
-    padding: 0 20px 56px;
-  }
-
-  .overview {
-    max-width: none;
-  }
+  .content { max-width: 100%; padding: 0 20px 56px; }
+  .overview { max-width: none; }
+  .muteButton { right: 20px; bottom: 58px; }
 }
