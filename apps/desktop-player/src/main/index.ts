@@ -8,6 +8,12 @@ import {
   removeOfflineDownload,
   type OfflineEnqueueRequest
 } from './offline'
+import { readOfflineText } from './offline-text'
+
+// Chromium exposes HTMLMediaElement.audioTracks/videoTracks behind this web-platform
+// feature on builds where it is not enabled by default. Film2's single-MP4 multi-audio
+// player uses it to switch embedded Turkish/English tracks without remuxing in the Player.
+app.commandLine.appendSwitch('enable-experimental-web-platform-features')
 
 const isWindows = process.platform === 'win32'
 let ipcRegistered = false
@@ -19,6 +25,7 @@ function registerIpc(): void {
   ipcMain.handle('offline:enqueue', (_event, request: OfflineEnqueueRequest) => enqueueOfflineDownload(request))
   ipcMain.handle('offline:remove', (_event, key: string) => removeOfflineDownload(key))
   ipcMain.handle('offline:localPlayback', (_event, key: string) => localPlaybackFor(key))
+  ipcMain.handle('offline:readText', (_event, fileUrl: string) => readOfflineText(fileUrl))
 }
 
 function createMainWindow(): BrowserWindow {
@@ -48,21 +55,15 @@ function createMainWindow(): BrowserWindow {
     }
   })
 
-  win.on('ready-to-show', () => {
-    win.show()
-  })
-
+  win.on('ready-to-show', () => win.show())
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
   })
 
   const devServerUrl = process.env['ELECTRON_RENDERER_URL']
-  if (devServerUrl) {
-    win.loadURL(devServerUrl)
-  } else {
-    win.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+  if (devServerUrl) win.loadURL(devServerUrl)
+  else win.loadFile(join(__dirname, '../renderer/index.html'))
 
   void initializeOfflineDownloads(win)
   return win
@@ -71,16 +72,11 @@ function createMainWindow(): BrowserWindow {
 app.whenReady().then(() => {
   registerIpc()
   createMainWindow()
-
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createMainWindow()
-    }
+    if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
   })
 })
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  if (process.platform !== 'darwin') app.quit()
 })
