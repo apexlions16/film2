@@ -58,6 +58,7 @@ fun PlayerScreen(
 
     val uiState by viewModel.uiState.collectAsState()
     val tracks by viewModel.currentTracks.collectAsState()
+    val selectedExternalAudioIndex by viewModel.selectedExternalAudioIndex.collectAsState()
     var trackSheetVisible by remember { mutableStateOf(false) }
 
     Box(
@@ -100,9 +101,13 @@ fun PlayerScreen(
                 if (trackSheetVisible) {
                     TrackSelectionSheet(
                         tracks = tracks,
-                        audioFallbackLabels = state.asset.externalAudioTracks.map { it.label ?: it.language },
+                        externalAudioTracks = state.asset.externalAudioTracks,
+                        selectedExternalAudioIndex = selectedExternalAudioIndex,
                         onSelectAudio = { group, index ->
                             viewModel.selectAudioTrack(group, index)
+                        },
+                        onSelectExternalAudio = { index ->
+                            viewModel.selectExternalAudio(index)
                         },
                         onSelectSubtitle = { group, index ->
                             viewModel.selectSubtitleTrack(group, index)
