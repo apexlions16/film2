@@ -1,4 +1,4 @@
-status=cancelled
-run_id=31210017733
-sha=5e1391c4e9babd6e785d58ba119eb0e74d99e58a
-time=2026-08-07T19:07:22Z
+status=failure
+run_id=31210289068
+sha=ce25325b9c40f7c3d0ad713a72dcc6bd1befdc9a
+time=2026-08-07T19:11:15Z
