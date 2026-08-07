@@ -14,6 +14,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
 import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
@@ -99,8 +100,10 @@ class CommitRepairingHfUploader(
         localUri: Uri,
         onProgress: (HfUploadProgress) -> Unit,
     ) {
-        val size = querySize(localUri)
-        require(size >= 0L) { "Dosya boyutu commit onarımı için alınamadı" }
+        val size = resolveSize(localUri)
+        if (size < 0L) {
+            throw HfUploadException("Dosya boyutu commit onarımı için belirlenemedi")
+        }
 
         // Ask the Hub which commit operation it expects. This is cheap and prevents us
         // from guessing whether a file is regular or LFS.
@@ -187,14 +190,66 @@ class CommitRepairingHfUploader(
         }
     }
 
-    private fun querySize(uri: Uri): Long {
-        context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { cursor ->
-            val index = cursor.getColumnIndex(OpenableColumns.SIZE)
-            if (index >= 0 && cursor.moveToFirst() && !cursor.isNull(index)) {
-                return cursor.getLong(index).coerceAtLeast(0L)
+    /**
+     * SAF providers are inconsistent about OpenableColumns.SIZE, and the fast local mux
+     * path intentionally uses a file:// Uri. Resolve the size through several cheap
+     * metadata paths first; only as a last resort count the stream bytes. The last path
+     * is slower, but it runs only after the media object was already uploaded and the
+     * Hub commit endpoint needs repair, so it is preferable to failing a completed upload.
+     */
+    private fun resolveSize(uri: Uri): Long {
+        try {
+            context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { cursor ->
+                val index = cursor.getColumnIndex(OpenableColumns.SIZE)
+                if (index >= 0 && cursor.moveToFirst() && !cursor.isNull(index)) {
+                    val value = cursor.getLong(index)
+                    if (value >= 0L) return value
+                }
+            }
+        } catch (_: Throwable) {
+            // Some providers reject metadata queries; continue with the next strategy.
+        }
+
+        if (uri.scheme.equals("file", ignoreCase = true)) {
+            val path = uri.path
+            if (!path.isNullOrBlank()) {
+                val file = File(path)
+                if (file.exists() && file.isFile) return file.length()
             }
         }
-        return -1L
+
+        try {
+            context.contentResolver.openFileDescriptor(uri, "r")?.use { descriptor ->
+                if (descriptor.statSize >= 0L) return descriptor.statSize
+            }
+        } catch (_: Throwable) {
+            // Continue.
+        }
+
+        try {
+            context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { descriptor ->
+                if (descriptor.length >= 0L) return descriptor.length
+            }
+        } catch (_: Throwable) {
+            // Continue.
+        }
+
+        return try {
+            val input = context.contentResolver.openInputStream(uri) ?: return -1L
+            input.use { source ->
+                val buffer = ByteArray(1024 * 1024)
+                var total = 0L
+                while (true) {
+                    val read = source.read(buffer)
+                    if (read < 0) break
+                    if (read == 0) continue
+                    total += read
+                }
+                total
+            }
+        } catch (_: Throwable) {
+            -1L
+        }
     }
 
     private fun readSample(uri: Uri): ByteArray {
@@ -238,7 +293,7 @@ class CommitRepairingHfUploader(
 
     companion object {
         private const val HF_ENDPOINT = "https://huggingface.co"
-        private const val USER_AGENT = "film2-android-studio/1.1.1"
+        private const val USER_AGENT = "film2-android-studio/1.4.1"
         private val JSON_MEDIA_TYPE = "application/json".toMediaType()
         private val NDJSON_MEDIA_TYPE = "application/x-ndjson".toMediaType()
     }
