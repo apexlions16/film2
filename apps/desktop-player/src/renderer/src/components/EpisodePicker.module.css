@@ -1,217 +1,38 @@
-/* Local keyframes — see Row.module.css for why these must be declared per
-   module file rather than shared from global.css. */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.root {
-  min-height: 100dvh;
-  padding: 24px 56px 60px;
-  animation: fade-in 0.35s var(--ease-out) both;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 28px;
-}
-
-.back {
-  appearance: none;
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  color: var(--text);
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition:
-    background 0.2s var(--ease-out),
-    transform 0.15s var(--ease-out);
-}
-
-.back:hover {
-  background: var(--bg-elevated-2);
-}
-
-.back:active {
-  transform: scale(0.94);
-}
-
-.title {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.subtitle {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: var(--text-faint);
-}
-
-.seasonTabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 26px;
-  overflow-x: auto;
-}
-
-.seasonTab {
-  appearance: none;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-dim);
-  font-size: 13px;
-  font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 999px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s var(--ease-out);
-}
-
-.seasonTab:hover {
-  color: var(--text);
-  border-color: var(--border);
-  background: var(--bg-elevated);
-}
-
-.seasonTabActive,
-.seasonTabActive:hover {
-  color: #171008;
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-.card {
-  appearance: none;
-  border: 1px solid var(--border-soft);
-  background: var(--bg-elevated);
-  border-radius: var(--radius-lg);
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    transform 0.25s var(--ease-spring),
-    border-color 0.25s var(--ease-out),
-    background 0.25s var(--ease-out);
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  border-color: var(--accent-dim);
-  background: var(--bg-elevated-2);
-}
-
-.card:active {
-  transform: translateY(-1px) scale(0.99);
-}
-
-.cardLocked {
-  cursor: default;
-  opacity: 0.55;
-}
-
-.cardLocked:hover {
-  transform: none;
-  border-color: var(--border-soft);
-  background: var(--bg-elevated);
-}
-
-.stillWrap {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--bg-elevated-2);
-}
-
-.stillWrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.stillFallback {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-faint);
-}
-
-.stillBadge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-}
-
-.epNumber {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text);
-  background: rgba(10, 10, 11, 0.72);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2px 7px;
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 0 4px 4px;
-}
-
-.epTitle {
-  font-size: 14.5px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.epRuntime {
-  font-size: 12px;
-  color: var(--text-faint);
-}
-
-.epOverview {
-  margin-top: 4px;
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--text-dim);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-@media (max-width: 900px) {
-  .root {
-    padding: 56px 20px 48px;
-  }
-}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.root { min-height: 100dvh; padding: 24px 56px 60px; animation: fade-in .3s ease both; }
+.header { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }
+.headerCopy { min-width: 0; }
+.back { border: 1px solid var(--border); background: var(--bg-elevated); color: var(--text); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; }
+.title { margin: 0; font-size: 28px; font-weight: 750; letter-spacing: -.02em; }
+.subtitle { margin: 2px 0 0; font-size: 13px; color: var(--text-faint); }
+.seasonDownload { margin-left: auto; border: 1px solid rgba(255,255,255,.13); border-radius: 9px; padding: 10px 14px; background: rgba(255,255,255,.08); color: #fff; font-weight: 650; cursor: pointer; }
+.seasonDownload:hover { background: rgba(255,255,255,.13); }
+.seasonTabs { display: flex; gap: 8px; margin-bottom: 18px; overflow-x: auto; }
+.seasonTab { border: 1px solid var(--border); background: transparent; color: var(--text-dim); font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+.seasonTabActive { color: #fff; background: #e50914; border-color: #e50914; }
+.seasonProgress { height: 4px; margin: -4px 0 24px; background: rgba(255,255,255,.1); border-radius: 999px; overflow: hidden; }
+.seasonProgress span { display: block; height: 100%; background: #63c7be; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.card { border: 1px solid var(--border-soft); background: var(--bg-elevated); border-radius: var(--radius-lg); padding: 10px; display: flex; flex-direction: column; gap: 8px; transition: transform .24s ease, border-color .24s ease; }
+.card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,.16); }
+.cardLocked { opacity: .56; }
+.episodeMain { border: 0; padding: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 10px; }
+.cardLocked .episodeMain { cursor: default; }
+.stillWrap { position: relative; display: block; aspect-ratio: 16/9; border-radius: var(--radius-md); overflow: hidden; background: var(--bg-elevated-2); }
+.stillWrap img { width: 100%; height: 100%; object-fit: cover; }
+.stillFallback { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-faint); font-size: 28px; }
+.stillBadge { position: absolute; top: 8px; left: 8px; }
+.epNumber { position: absolute; right: 8px; bottom: 9px; font-size: 12px; font-weight: 750; color: #fff; background: rgba(0,0,0,.66); border-radius: 5px; padding: 3px 7px; }
+.watchProgress { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: rgba(0,0,0,.75); }
+.watchProgress span { display: block; height: 100%; background: #e50914; }
+.info { display: flex; flex-direction: column; gap: 4px; padding: 0 4px 4px; }
+.epTitle { color: var(--text); font-size: 15px; font-weight: 650; }
+.epRuntime { color: var(--text-faint); font-size: 12px; }
+.resume { color: rgba(255,255,255,.8); font-size: 11px; }
+.epOverview { margin-top: 4px; color: var(--text-dim); font-size: 12.5px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.downloadZone { padding: 0 4px 4px; }
+.downloadButton { width: 100%; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.06); color: rgba(255,255,255,.82); border-radius: 7px; padding: 7px 10px; cursor: pointer; font-size: 12px; font-weight: 650; }
+.downloadButton:hover { background: rgba(255,255,255,.12); }
+.downloadProgress { height: 3px; background: rgba(255,255,255,.09); margin-top: 6px; overflow: hidden; border-radius: 999px; }
+.downloadProgress span { display: block; height: 100%; background: #63c7be; }
+@media (max-width: 900px) { .root { padding: 56px 20px 48px; } .header { flex-wrap: wrap; } .seasonDownload { margin-left: 0; } }
