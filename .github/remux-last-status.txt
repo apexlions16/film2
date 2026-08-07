@@ -1,4 +1,38 @@
-status=failure
-run_id=31172138391
-sha=ba04b2e5595d5c4aee2796a9fabe845b5917f78e
-time=2026-08-07T10:58:02Z
+status=success
+run_id=31172283520
+sha=74c96d8cb8f74ceabd97745cf6b72467557bd93a
+time=2026-08-07T11:03:01Z
+--- error ---
+--- result ---
+{
+  "titleId": "saplant-3728",
+  "kind": "movie",
+  "shardId": "mfilms12/film2-media-01",
+  "asset": {
+    "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/video.mp4",
+    "masterPlaylistUrl": null,
+    "audioLanguages": [
+      "eng",
+      "tur"
+    ],
+    "subtitleLanguages": [
+      "eng",
+      "tur"
+    ],
+    "externalAudioTracks": [],
+    "externalSubtitleTracks": [
+      {
+        "language": "eng",
+        "label": "İngilizce",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/subs_ingilizce_4.vtt",
+        "mimeType": "text/vtt"
+      },
+      {
+        "language": "tur",
+        "label": "Türkçe",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/subs_trke_5.vtt",
+        "mimeType": "text/vtt"
+      }
+    ]
+  }
+}
