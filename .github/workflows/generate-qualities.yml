@@ -91,6 +91,7 @@ jobs:
           git config user.name "film2-bot"
           git config user.email "actions@users.noreply.github.com"
           TITLE_ID=$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/quality-payload.json','utf8')).titleId)")
+          node -e "require('fs').writeFileSync('catalog/version.json', JSON.stringify({revision:new Date().toISOString()}, null, 2) + '\n')"
           git add catalog/
           git diff --cached --quiet || git commit -m "chore(quality): MP4 kalite varyantlari hazir ($TITLE_ID)"
           git pull --rebase origin main
