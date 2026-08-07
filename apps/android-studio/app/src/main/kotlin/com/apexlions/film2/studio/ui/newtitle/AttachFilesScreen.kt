@@ -155,6 +155,11 @@ fun AttachFilesScreen(
             }
 
             if (mode == AttachMode.COMBINED) {
+                Text(
+                    "Dosya uzantisi onemli degil. MP4, MPEG-TS veya .mkv diye adlandirilmis MPEG-TS secilebilir; gercek track'ler cihazda analiz edilir.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 FilePickRow(
                     label = "Birlesik dosya (video + coklu ses/altyazi track'leri)",
                     fileName = combinedUri?.let { displayName(context, it) },
@@ -162,17 +167,22 @@ fun AttachFilesScreen(
                     onPick = { pickCombined.launch(arrayOf("*/*")) },
                 )
             } else {
+                Text(
+                    "Uzantiya bakilmiyor. video.mkv / tr.mkv / en.mkv gercekte MPEG-TS ise MediaExtractor track'leri icerikten tanir ve hizli MP4 yolu kullanilir.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 FilePickRow(
                     label = "Video dosyasi",
                     fileName = videoUri?.let { displayName(context, it) },
                     enabled = !uploadRunning,
-                    onPick = { pickVideo.launch(arrayOf("video/*")) },
+                    onPick = { pickVideo.launch(arrayOf("*/*")) },
                 )
                 LanguageFileList(
                     label = "Ses dosyalari (dil kodu girin: tr, en, ...)",
                     files = audioFiles,
                     enabled = !uploadRunning,
-                    onAdd = { pickAudio.launch(arrayOf("audio/*")) },
+                    onAdd = { pickAudio.launch(arrayOf("*/*")) },
                     onLanguageChange = { index, lang -> audioFiles[index] = audioFiles[index].first to lang },
                     context = context,
                 )
@@ -245,7 +255,7 @@ fun AttachFilesScreen(
                         kind = if (titleType == TitleType.SERIES) "episode" else "movie",
                         seasonNumber = seasonNumber.toIntOrNull(),
                         episodeNumber = episodeNumber.toIntOrNull(),
-                        mode = if (mode == AttachMode.COMBINED) "combined" else "separate",
+                        mode = if (mode == AttachMode.SEPARATE) "separate" else "combined",
                         files = files,
                     )
                     val specJson = Json.encodeToString(UploadJobSpec.serializer(), spec)
