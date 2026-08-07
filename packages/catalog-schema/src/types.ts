@@ -24,6 +24,15 @@ export interface ExternalMediaTrack {
   mimeType?: string;
 }
 
+/** Aynı içeriğin farklı çözünürlükteki tek-MP4 varyantı. */
+export interface VideoVariant {
+  label: string;
+  height: number;
+  width?: number | null;
+  url: string;
+  source?: boolean;
+}
+
 export interface PlayableAsset {
   /** Yeni varsayılan: doğrudan MP4/MKV/progressive medya URL'i. */
   videoUrl?: string;
@@ -36,6 +45,8 @@ export interface PlayableAsset {
   externalAudioTracks?: ExternalMediaTrack[];
   /** WebVTT/SRT gibi sidecar altyazılar. */
   externalSubtitleTracks?: ExternalMediaTrack[];
+  /** 1080p/720p/480p gibi her biri tek MP4 olan kalite seçenekleri. */
+  videoVariants?: VideoVariant[];
 }
 
 export interface Episode {
