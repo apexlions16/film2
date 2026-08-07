@@ -1,11 +1,7 @@
 {
   "id": "tolgshow-7827",
-  "imdbId": "tt7827112",
-  "manualEntry": false,
-  "status": "ready",
-  "createdAt": "2026-08-06T23:40:13.637Z",
-  "updatedAt": "2026-08-07T09:19:37.477Z",
   "type": "series",
+  "imdbId": "tt7827112",
   "tmdbId": 76579,
   "title": "TOLGSHOW",
   "originalTitle": "TOLGSHOW",
@@ -46,6 +42,10 @@
       "profileUrl": "https://image.tmdb.org/t/p/w300/btsEAsTYeMk5YSFy0br0u4y4GcL.jpg"
     }
   ],
+  "status": "ready",
+  "manualEntry": false,
+  "createdAt": "2026-08-06T23:40:13.637Z",
+  "updatedAt": "2026-08-07T09:52:12.898114Z",
   "seasons": [
     {
       "seasonNumber": 1,
@@ -71,7 +71,9 @@
           "asset": {
             "masterPlaylistUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/tolgshow-7827/s1e2/master.m3u8",
             "audioLanguages": [],
-            "subtitleLanguages": []
+            "subtitleLanguages": [],
+            "externalAudioTracks": [],
+            "externalSubtitleTracks": []
           }
         },
         {
@@ -85,7 +87,23 @@
             "audioLanguages": [
               "tur"
             ],
-            "subtitleLanguages": []
+            "subtitleLanguages": [],
+            "externalAudioTracks": [],
+            "externalSubtitleTracks": []
+          }
+        },
+        {
+          "episodeNumber": 10,
+          "title": "10. Bolum",
+          "overview": "",
+          "status": "ready",
+          "shardId": "mfilms12/film2-media-01",
+          "asset": {
+            "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/tolgshow-7827/s1e10/video.mp4",
+            "audioLanguages": [],
+            "subtitleLanguages": [],
+            "externalAudioTracks": [],
+            "externalSubtitleTracks": []
           }
         }
       ]
