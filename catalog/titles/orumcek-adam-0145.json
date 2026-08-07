@@ -1,0 +1,152 @@
+{
+  "id": "orumcek-adam-0145",
+  "type": "movie",
+  "imdbId": "tt0145487",
+  "tmdbId": 557,
+  "title": "Örümcek Adam",
+  "originalTitle": "Spider-Man",
+  "overview": "Sıradan bir lise öğrencisi olan Peter Parker'ın hayatı bir gün bir örümcek tarafından ısırılmasıyla tamamen değişir. Çünkü bu örümcek sıradan bir örümcek değildir, genetik olarak özelikle geliştirilmiş, bilimsel amaçlarla kullanılan bir denektir. Öte yandan olan olmuştur ve Parker'da tuhaf değişiklikler başgöstermektedir.",
+  "releaseYear": 2002,
+  "genres": [
+    "Aksiyon",
+    "Bilim-Kurgu"
+  ],
+  "runtimeMinutes": 189,
+  "posterUrl": "https://image.tmdb.org/t/p/w780/5FyIHcUTLFNSk4D5rfsGRTkSwie.jpg",
+  "posterUrls": [],
+  "backdropUrl": "https://image.tmdb.org/t/p/w1280/zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg",
+  "backdropUrls": [],
+  "cast": [
+    {
+      "name": "Tobey Maguire",
+      "character": "Spider-Man / Peter Parker",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/s6PwSvq6gC7PGEjIku69tPbvR8M.jpg"
+    },
+    {
+      "name": "Willem Dafoe",
+      "character": "Green Goblin / Norman Osborn",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg"
+    },
+    {
+      "name": "Kirsten Dunst",
+      "character": "Mary Jane Watson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/yhLKGjuiMMdbGnFrR8AREkCZcVF.jpg"
+    },
+    {
+      "name": "James Franco",
+      "character": "Harry Osborn",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/bjmAntHGiibLZixH8nTNVBzaFQn.jpg"
+    },
+    {
+      "name": "Cliff Robertson",
+      "character": "Ben Parker",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/8pH2RWCPtXKzT9P33MbzgnzPlF0.jpg"
+    },
+    {
+      "name": "Rosemary Harris",
+      "character": "May Parker",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/3Mu02enwaF8dFuT195f7esILXns.jpg"
+    },
+    {
+      "name": "J.K. Simmons",
+      "character": "J. Jonah Jameson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ScmKoJ9eiSUOthAt1PDNLi8Fkw.jpg"
+    },
+    {
+      "name": "Joe Manganiello",
+      "character": "Flash Thompson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/mTdACmitdrwor0Nrv5sr0u123vZ.jpg"
+    },
+    {
+      "name": "Gerry Becker",
+      "character": "Maximilian Fargas",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/il1r1Iym5WFJyo8SQon60aqu4nC.jpg"
+    },
+    {
+      "name": "Bill Nunn",
+      "character": "Joseph 'Robbie' Robertson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/trxNvS6g5yvwbXzx2LK6JqutE5z.jpg"
+    },
+    {
+      "name": "Jack Betts",
+      "character": "Henry Balkan",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/aC8uOwxVW2NJ5sYUvQImFZuVKQ7.jpg"
+    },
+    {
+      "name": "Stanley Anderson",
+      "character": "General Slocum",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/6kHp1SlLRw0NobVdY8X6DbBAPt8.jpg"
+    },
+    {
+      "name": "Ron Perkins",
+      "character": "Dr. Mendel Stromm",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ld3OJ0WpMv0Rcml59WuVzKoQWaB.jpg"
+    },
+    {
+      "name": "Michael Papajohn",
+      "character": "Carjacker",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/hdTJBfIXfvRdlD1p8y6rra207UP.jpg"
+    },
+    {
+      "name": "K.K. Dodds",
+      "character": "Simkins",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/nGou7wXgXAKr5oJEyUIuX9RCgFl.jpg"
+    },
+    {
+      "name": "Ted Raimi",
+      "character": "Hoffman",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/juhz6ajCjjHlLPzYBxPtDxwX6em.jpg"
+    },
+    {
+      "name": "Bruce Campbell",
+      "character": "Ring Announcer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/p9335ljr7luOWsfwZSOlsIzFJKE.jpg"
+    },
+    {
+      "name": "Elizabeth Banks",
+      "character": "Miss Brant",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg"
+    },
+    {
+      "name": "John Paxton",
+      "character": "Houseman",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ndSd4nnukk03loB6RKx3iuP5xfx.jpg"
+    },
+    {
+      "name": "Tim DeZarn",
+      "character": "Philip Watson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/tduRqomAU3LARfuDa2OMKFAd1rR.jpg"
+    }
+  ],
+  "crew": [
+    {
+      "name": "Ian Bryce",
+      "job": "Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/y45uZM4RTXmC02XwsMseFMObUAF.jpg"
+    },
+    {
+      "name": "Laura Ziskin",
+      "job": "Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/nw6ZfMnDdoeWJCMiM4mQp8arZD1.jpg"
+    },
+    {
+      "name": "Avi Arad",
+      "job": "Executive Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
+    },
+    {
+      "name": "Sam Raimi",
+      "job": "Director",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
+    },
+    {
+      "name": "Stan Lee",
+      "job": "Executive Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
+    }
+  ],
+  "status": "pending",
+  "manualEntry": false,
+  "createdAt": "2026-08-07T23:32:02.657572Z",
+  "updatedAt": "2026-08-07T23:32:05.392117Z"
+}
