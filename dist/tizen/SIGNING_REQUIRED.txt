@@ -1,0 +1,6 @@
+This WGT contains the complete Film2 Samsung Tizen TV player application but is unsigned.
+
+Samsung TVs require every application to be signed with a valid Samsung/Tizen certificate profile before installation.
+A physical TV distributor certificate is bound to the target TV DUID, so it cannot be generated safely in GitHub Actions without the owner's Samsung certificate material and target TV DUID.
+
+Sign the source project at apps/tizen-tv-player with Tizen Studio or the Samsung Tizen TV VS Code extension using your Samsung author + distributor certificate profile. Do not edit a WGT after signing.
