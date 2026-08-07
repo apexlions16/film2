@@ -3,8 +3,6 @@
 package com.apexlions.film2.studio.catalog
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -31,9 +29,6 @@ class GitHubContentsClient(
     }
 
     @Serializable
-    private data class ContentsEntry(val name: String, val type: String, val sha: String? = null)
-
-    @Serializable
     private data class ContentsFile(val sha: String? = null, val content: String? = null, val encoding: String? = null)
 
     @Serializable
@@ -46,6 +41,12 @@ class GitHubContentsClient(
 
     @Serializable
     private data class CatalogRevision(val revision: String)
+
+    @Serializable
+    private data class CatalogSnapshot(
+        val revision: String = "",
+        val titles: List<Title> = emptyList(),
+    )
 
     private suspend fun normalizedToken(): String? {
         var value = tokenProvider()?.trim()?.takeIf { it.isNotBlank() } ?: return null
@@ -79,17 +80,17 @@ class GitHubContentsClient(
         }
     }
 
-    suspend fun listTitleIds(): List<String> = withContext(Dispatchers.IO) {
-        val url = "https://api.github.com/repos/$repo/contents/catalog/titles?ref=$branch"
-        val request = authHeader(Request.Builder().url(url)).build()
+    private suspend fun getCatalogSnapshot(): CatalogSnapshot = withContext(Dispatchers.IO) {
+        val nonce = System.currentTimeMillis()
+        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/index.json?v=$nonce"
+        val request = Request.Builder().url(url).header("Cache-Control", "no-cache").build()
         httpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw GitHubApiException("Katalog listelenemedi: ${response.code}")
-            val entries = json.decodeFromString<List<ContentsEntry>>(response.body?.string().orEmpty())
-            entries
-                .filter { it.type == "file" && it.name.endsWith(".json") && !it.name.startsWith("_") }
-                .map { it.name.removeSuffix(".json") }
+            if (!response.isSuccessful) throw GitHubApiException("Katalog snapshot alinamadi: ${response.code}")
+            json.decodeFromString(CatalogSnapshot.serializer(), response.body?.string().orEmpty())
         }
     }
+
+    suspend fun listTitleIds(): List<String> = getCatalogSnapshot().titles.map { it.id }
 
     suspend fun getTitle(id: String): Title? = withContext(Dispatchers.IO) {
         val nonce = System.currentTimeMillis()
@@ -101,10 +102,7 @@ class GitHubContentsClient(
         }
     }
 
-    suspend fun listTitles(): List<Title> = withContext(Dispatchers.IO) {
-        val ids = listTitleIds()
-        ids.map { id -> async { getTitle(id) } }.awaitAll().filterNotNull()
-    }
+    suspend fun listTitles(): List<Title> = getCatalogSnapshot().titles
 
     suspend fun getHomeConfig(): HomeConfig = withContext(Dispatchers.IO) {
         val nonce = System.currentTimeMillis()
