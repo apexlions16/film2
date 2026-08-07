@@ -18,8 +18,6 @@ import com.apexlions.film2.studio.hf.HfUploadProgress
 import com.apexlions.film2.studio.hf.HfUploadStage
 import com.apexlions.film2.studio.hf.uploadFileWithFailover
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.nio.ByteBuffer
 import java.time.Instant
@@ -31,14 +29,12 @@ data class FastPublishResult(
 )
 
 /**
- * Fast path for the common Film2 upload case.
+ * Fast path for Film2 media uploads.
  *
- * Separate MP4 video + AAC/M4A tracks are muxed on-device with Android's MediaExtractor /
- * MediaMuxer. Samples stay encoded: no video or audio transcoding happens. The resulting
- * single MP4 is uploaded to Hugging Face exactly once and the catalog is made ready directly.
- *
- * If the device/container/codec cannot use this path, null is returned BEFORE source files
- * are uploaded and UploadWorker falls back to the existing GitHub Actions workflow.
+ * File extensions are not trusted. Android MediaExtractor sniffs the actual container and
+ * stream types, so a file named .mkv that is really MPEG-TS can use the same local fast path
+ * as MP4. Compatible encoded samples are copied with MediaMuxer; no video/audio encoder is
+ * invoked. Only genuinely unsupported container/codec/device combinations fall back.
  */
 class FastPublishCoordinator(private val context: Context) {
 
@@ -114,7 +110,7 @@ class FastPublishCoordinator(private val context: Context) {
         onProgress: (percent: Int, message: String, bytes: Long, total: Long) -> Unit,
     ): FastPublishResult? = when (spec.mode) {
         "separate" -> tryPublishSeparate(app, spec, accounts, onProgress)
-        "combined" -> tryPublishCombinedMp4(app, spec, accounts, onProgress)
+        "combined" -> tryPublishCombined(app, spec, accounts, onProgress)
         else -> null
     }
 
@@ -129,34 +125,21 @@ class FastPublishCoordinator(private val context: Context) {
         if (audios.isEmpty()) return null
 
         val cacheRoot = context.externalCacheDir ?: context.cacheDir
-        val estimatedOutput = (querySize(Uri.parse(video.uri)).coerceAtLeast(0L) +
-            audios.sumOf { querySize(Uri.parse(it.uri)).coerceAtLeast(0L) })
-        if (estimatedOutput > 0L) {
-            // Current HF uploader prepares a seekable copy. Leave space for mux output +
-            // that upload preparation copy. This guard makes fallback safe on low storage.
-            val required = estimatedOutput * 2L + FAST_PATH_SAFETY_BYTES
-            if (cacheRoot.usableSpace < required) {
-                onProgress(
-                    4,
-                    "Hizli yerel mux icin gecici alan yetersiz; sunucu yolu kullanilacak",
-                    0,
-                    required,
-                )
-                return null
-            }
-        }
+        val estimatedOutput = querySize(Uri.parse(video.uri)).coerceAtLeast(0L) +
+            audios.sumOf { querySize(Uri.parse(it.uri)).coerceAtLeast(0L) }
+        if (!hasFastPathSpace(cacheRoot, estimatedOutput, onProgress)) return null
 
         val outputDir = File(cacheRoot, "film2_fast_mux").apply { mkdirs() }
         val output = File(outputDir, "${safeName(spec.titleId)}_${System.currentTimeMillis()}.mp4")
         val muxResult = try {
-            FastLocalMuxer(context).mux(
+            FastLocalMuxer(context).muxSeparate(
                 videoUri = Uri.parse(video.uri),
                 audioInputs = audios.map { Uri.parse(it.uri) to normalizedLanguage(it.language) },
                 output = output,
                 onProgress = { fraction ->
                     onProgress(
                         5 + (fraction.coerceIn(0f, 1f) * 23f).toInt(),
-                        "Video ve sesler cihazda hizli MP4'e birlestiriliyor (encode yok)",
+                        "Gercek container analiz edildi; video ve sesler hizli MP4'e birlestiriliyor (encode yok)",
                         (fraction * estimatedOutput.coerceAtLeast(1L)).toLong(),
                         estimatedOutput,
                     )
@@ -165,7 +148,7 @@ class FastPublishCoordinator(private val context: Context) {
         } catch (t: Throwable) {
             output.delete()
             if (t is CancellationException) throw t
-            onProgress(5, "Yerel hizli mux uygun degil; GitHub fallback kullanilacak", 0, 0)
+            onProgress(5, "Yerel stream-copy uyumlu degil; guvenli fallback kullanilacak", 0, 0)
             return null
         }
 
@@ -186,35 +169,89 @@ class FastPublishCoordinator(private val context: Context) {
         }
     }
 
-    private suspend fun tryPublishCombinedMp4(
+    private suspend fun tryPublishCombined(
         app: Film2StudioApplication,
         spec: UploadJobSpec,
         accounts: List<HfAccountEntry>,
         onProgress: (Int, String, Long, Long) -> Unit,
     ): FastPublishResult? {
         val combined = spec.files.firstOrNull { it.role == "combined" } ?: return null
+        val sourceUri = Uri.parse(combined.uri)
         val ext = combined.fileName.substringAfterLast('.', "").lowercase(Locale.ROOT)
-        if (ext !in setOf("mp4", "m4v")) return null
 
-        val info = try {
-            FastLocalMuxer(context).inspectMp4(Uri.parse(combined.uri))
+        if (ext in setOf("mp4", "m4v")) {
+            val info = try {
+                FastLocalMuxer(context).inspectPlayable(sourceUri)
+            } catch (t: Throwable) {
+                if (t is CancellationException) throw t
+                return null
+            }
+            onProgress(8, "Birlesik MP4 zaten hazir; sunucu remux'u atlaniyor", 0, 0)
+            return publishPreparedVideo(
+                app = app,
+                spec = spec,
+                accounts = accounts,
+                videoUri = sourceUri,
+                audioLanguages = info.audioLanguages,
+                durationSeconds = info.durationUs.takeIf { it > 0L }?.div(1_000_000.0),
+                subtitles = emptyList(),
+                uploadStartPercent = 10,
+                onProgress = onProgress,
+            )
+        }
+
+        val cacheRoot = context.externalCacheDir ?: context.cacheDir
+        val estimatedOutput = querySize(sourceUri).coerceAtLeast(0L)
+        if (!hasFastPathSpace(cacheRoot, estimatedOutput, onProgress)) return null
+        val outputDir = File(cacheRoot, "film2_fast_mux").apply { mkdirs() }
+        val output = File(outputDir, "${safeName(spec.titleId)}_${System.currentTimeMillis()}.mp4")
+        val muxResult = try {
+            FastLocalMuxer(context).muxCombined(
+                inputUri = sourceUri,
+                output = output,
+                onProgress = { fraction ->
+                    onProgress(
+                        5 + (fraction.coerceIn(0f, 1f) * 23f).toInt(),
+                        "Dosya uzantisi yok sayildi; gercek MPEG-TS/MKV streamleri MP4'e tasiniyor (encode yok)",
+                        (fraction * estimatedOutput.coerceAtLeast(1L)).toLong(),
+                        estimatedOutput,
+                    )
+                },
+            )
         } catch (t: Throwable) {
+            output.delete()
             if (t is CancellationException) throw t
+            onProgress(5, "Yerel stream-copy uyumlu degil; guvenli fallback kullanilacak", 0, 0)
             return null
         }
 
-        onProgress(8, "Birlesik MP4 zaten hazir; sunucu remux'u atlaniyor", 0, 0)
-        return publishPreparedVideo(
-            app = app,
-            spec = spec,
-            accounts = accounts,
-            videoUri = Uri.parse(combined.uri),
-            audioLanguages = info.audioLanguages,
-            durationSeconds = info.durationUs.takeIf { it > 0L }?.div(1_000_000.0),
-            subtitles = emptyList(),
-            uploadStartPercent = 10,
-            onProgress = onProgress,
-        )
+        try {
+            return publishPreparedVideo(
+                app = app,
+                spec = spec,
+                accounts = accounts,
+                videoUri = Uri.fromFile(output),
+                audioLanguages = muxResult.audioLanguages,
+                durationSeconds = muxResult.durationUs.takeIf { it > 0L }?.div(1_000_000.0),
+                subtitles = emptyList(),
+                uploadStartPercent = 29,
+                onProgress = onProgress,
+            )
+        } finally {
+            output.delete()
+        }
+    }
+
+    private fun hasFastPathSpace(
+        cacheRoot: File,
+        estimatedOutput: Long,
+        onProgress: (Int, String, Long, Long) -> Unit,
+    ): Boolean {
+        if (estimatedOutput <= 0L) return true
+        val required = estimatedOutput * 2L + FAST_PATH_SAFETY_BYTES
+        if (cacheRoot.usableSpace >= required) return true
+        onProgress(4, "Hizli yerel mux icin gecici alan yetersiz; sunucu yolu kullanilacak", 0, required)
+        return false
     }
 
     private suspend fun publishPreparedVideo(
@@ -447,6 +484,7 @@ class FastPublishCoordinator(private val context: Context) {
                 return cursor.getLong(index).coerceAtLeast(0L)
             }
         }
+        if (uri.scheme == "file") return uri.path?.let(::File)?.takeIf { it.exists() }?.length() ?: -1L
         return -1L
     }
 
@@ -462,7 +500,7 @@ private data class FastMuxResult(
     val durationUs: Long,
 )
 
-private data class Mp4Inspection(
+private data class MediaInspection(
     val audioLanguages: List<String>,
     val durationUs: Long,
 )
@@ -476,7 +514,7 @@ private class FastLocalMuxer(private val context: Context) {
         val outputTrack: Int,
     )
 
-    fun inspectMp4(uri: Uri): Mp4Inspection {
+    fun inspectPlayable(uri: Uri): MediaInspection {
         val extractor = MediaExtractor()
         return try {
             extractor.setDataSource(context, uri, null)
@@ -494,14 +532,14 @@ private class FastLocalMuxer(private val context: Context) {
                     durationUs = maxOf(durationUs, format.durationUsOrZero())
                 }
             }
-            if (!hasVideo) throw IllegalArgumentException("MP4 icinde video track'i bulunamadi")
-            Mp4Inspection(languages.distinct(), durationUs)
+            if (!hasVideo) throw IllegalArgumentException("Medya icinde video track'i bulunamadi")
+            MediaInspection(languages.distinct(), durationUs)
         } finally {
             extractor.release()
         }
     }
 
-    fun mux(
+    fun muxSeparate(
         videoUri: Uri,
         audioInputs: List<Pair<Uri, String>>,
         output: File,
@@ -555,6 +593,13 @@ private class FastLocalMuxer(private val context: Context) {
                 languages += lang
             }
 
+            val baseTimeUs = sources
+                .map { it.extractor.sampleTime }
+                .filter { it >= 0L }
+                .minOrNull()
+                ?.coerceAtLeast(0L)
+                ?: 0L
+
             muxer.start()
             muxerStarted = true
             val capacity = maxInputSize
@@ -583,13 +628,8 @@ private class FastLocalMuxer(private val context: Context) {
                 if (sampleTrack != source.inputTrack) {
                     throw IllegalStateException("Beklenmeyen track sirasi: $sampleTrack")
                 }
-                val sampleTime = source.extractor.sampleTime.coerceAtLeast(0L)
-                info.set(
-                    0,
-                    sampleSize,
-                    sampleTime,
-                    source.extractor.sampleFlags,
-                )
+                val sampleTime = (source.extractor.sampleTime - baseTimeUs).coerceAtLeast(0L)
+                info.set(0, sampleSize, sampleTime, source.extractor.sampleFlags)
                 buffer.position(0)
                 buffer.limit(sampleSize)
                 muxer.writeSampleData(source.outputTrack, buffer, info)
@@ -612,6 +652,110 @@ private class FastLocalMuxer(private val context: Context) {
             FastMuxResult(languages.distinct(), durationUs)
         } finally {
             extractors.forEach { runCatching { it.release() } }
+            if (muxerStarted) runCatching { muxer?.stop() }
+            runCatching { muxer?.release() }
+        }
+    }.getOrElse { t ->
+        output.delete()
+        throw t
+    }
+
+    fun muxCombined(
+        inputUri: Uri,
+        output: File,
+        onProgress: (Float) -> Unit,
+    ): FastMuxResult = runCatching {
+        output.parentFile?.mkdirs()
+        output.delete()
+        val extractor = MediaExtractor()
+        var muxer: MediaMuxer? = null
+        var muxerStarted = false
+        try {
+            extractor.setDataSource(context, inputUri, null)
+            muxer = MediaMuxer(output.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            val trackMap = mutableMapOf<Int, Int>()
+            val languages = mutableListOf<String>()
+            var hasVideo = false
+            var durationUs = 0L
+            var maxInputSize = DEFAULT_SAMPLE_BUFFER_BYTES
+
+            for (i in 0 until extractor.trackCount) {
+                val format = extractor.getTrackFormat(i)
+                val mime = format.getString(MediaFormat.KEY_MIME).orEmpty()
+                val keep = when {
+                    mime.startsWith("video/") && !hasVideo -> {
+                        hasVideo = true
+                        if (format.containsKey(MediaFormat.KEY_ROTATION)) {
+                            val rotation = format.getInteger(MediaFormat.KEY_ROTATION)
+                            if (rotation in setOf(90, 180, 270)) muxer.setOrientationHint(rotation)
+                        }
+                        true
+                    }
+                    mime.startsWith("audio/") -> true
+                    else -> false
+                }
+                if (!keep) continue
+
+                durationUs = maxOf(durationUs, format.durationUsOrZero())
+                maxInputSize = maxOf(maxInputSize, format.maxInputSizeOrZero())
+                if (mime.startsWith("audio/")) {
+                    languages += normalizeEmbeddedLanguage(format.getString(MediaFormat.KEY_LANGUAGE))
+                }
+                val outputTrack = muxer.addTrack(format)
+                trackMap[i] = outputTrack
+                extractor.selectTrack(i)
+            }
+            if (!hasVideo) throw IllegalArgumentException("Medya icinde video track'i bulunamadi")
+            if (trackMap.isEmpty()) throw IllegalArgumentException("MP4'e tasinabilecek track bulunamadi")
+
+            muxer.start()
+            muxerStarted = true
+            val baseTimeUs = extractor.sampleTime.coerceAtLeast(0L)
+            val capacity = maxInputSize
+                .coerceAtLeast(DEFAULT_SAMPLE_BUFFER_BYTES)
+                .coerceAtMost(MAX_SAMPLE_BUFFER_BYTES)
+            val buffer = ByteBuffer.allocateDirect(capacity)
+            val info = MediaCodec.BufferInfo()
+            var lastReported = -1
+
+            while (true) {
+                val inputTrack = extractor.sampleTrackIndex
+                if (inputTrack < 0) break
+                val outputTrack = trackMap[inputTrack]
+                if (outputTrack == null) {
+                    extractor.advance()
+                    continue
+                }
+                buffer.clear()
+                val sampleSize = extractor.readSampleData(buffer, 0)
+                if (sampleSize < 0) break
+                if (sampleSize > buffer.capacity()) {
+                    throw IllegalArgumentException("Medya ornegi cihaz buffer sinirini asti: $sampleSize bayt")
+                }
+                val sampleTime = (extractor.sampleTime - baseTimeUs).coerceAtLeast(0L)
+                info.set(0, sampleSize, sampleTime, extractor.sampleFlags)
+                buffer.position(0)
+                buffer.limit(sampleSize)
+                muxer.writeSampleData(outputTrack, buffer, info)
+                extractor.advance()
+
+                if (durationUs > 0L) {
+                    val percent = ((sampleTime.toDouble() / durationUs.toDouble()) * 100.0)
+                        .toInt()
+                        .coerceIn(0, 100)
+                    if (percent != lastReported) {
+                        lastReported = percent
+                        onProgress(percent / 100f)
+                    }
+                }
+            }
+
+            muxer.stop()
+            muxerStarted = false
+            onProgress(1f)
+            FastMuxResult(languages.distinct(), durationUs)
+        } finally {
+            runCatching { extractor.release() }
             if (muxerStarted) runCatching { muxer?.stop() }
             runCatching { muxer?.release() }
         }
