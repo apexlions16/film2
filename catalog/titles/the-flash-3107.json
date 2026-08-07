@@ -101,7 +101,7 @@
   "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T14:39:40.441735Z",
-  "updatedAt": "2026-08-07T16:52:07.885977Z",
+  "updatedAt": "2026-08-07T16:53:21.347120Z",
   "seasons": [
     {
       "seasonNumber": 1,
@@ -154,7 +154,43 @@
           "airDate": "2014-10-14",
           "stillUrl": "https://image.tmdb.org/t/p/w500/tM61prhWhwHNDYAybsHAgRJbUZk.jpg",
           "runtimeMinutes": 41,
-          "status": "processing"
+          "status": "ready",
+          "shardId": "mfilms12/film2-media-01",
+          "asset": {
+            "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e2/video_1786121571218.mp4",
+            "durationSeconds": 2554.514078,
+            "audioLanguages": [
+              "eng",
+              "tur"
+            ],
+            "subtitleLanguages": [
+              "eng",
+              "fra",
+              "tur"
+            ],
+            "externalAudioTracks": [],
+            "externalSubtitleTracks": [
+              {
+                "language": "eng",
+                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e2/subs_eng_1786121571218_1.vtt",
+                "label": "Ingilizce",
+                "mimeType": "text/vtt"
+              },
+              {
+                "language": "fra",
+                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e2/subs_fra_1786121571218_2.vtt",
+                "label": "Fransizca",
+                "mimeType": "text/vtt"
+              },
+              {
+                "language": "tur",
+                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e2/subs_tur_1786121571218_3.vtt",
+                "label": "Turkce",
+                "mimeType": "text/vtt"
+              }
+            ],
+            "videoVariants": []
+          }
         },
         {
           "episodeNumber": 3,
