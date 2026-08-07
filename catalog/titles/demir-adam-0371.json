@@ -164,8 +164,8 @@
       "profileUrl": "https://image.tmdb.org/t/p/w300/8MtRRnEHaBSw8Ztdl8saXiw1egP.jpg"
     }
   ],
-  "status": "pending",
+  "status": "processing",
   "manualEntry": false,
   "createdAt": "2026-08-07T18:25:39.650811Z",
-  "updatedAt": "2026-08-07T18:25:43.278681Z"
+  "updatedAt": "2026-08-07T18:26:36.657438Z"
 }
