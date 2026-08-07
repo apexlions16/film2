@@ -40,6 +40,15 @@ data class ExternalMediaTrack(
 )
 
 @Serializable
+data class VideoVariant(
+    val label: String,
+    val height: Int,
+    val width: Int? = null,
+    val url: String,
+    val source: Boolean = false,
+)
+
+@Serializable
 data class PlayableAsset(
     /** Yeni varsayilan: dogrudan MP4/MKV/progressive medya. */
     val videoUrl: String? = null,
@@ -50,6 +59,7 @@ data class PlayableAsset(
     val subtitleLanguages: List<String> = emptyList(),
     val externalAudioTracks: List<ExternalMediaTrack> = emptyList(),
     val externalSubtitleTracks: List<ExternalMediaTrack> = emptyList(),
+    val videoVariants: List<VideoVariant> = emptyList(),
 )
 
 @Serializable
