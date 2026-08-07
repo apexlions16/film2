@@ -7,6 +7,10 @@ export type {
   Season,
   Episode,
   PlayableAsset,
+  ExternalMediaTrack,
+  VideoVariant,
   CastMember,
-  CrewMember
+  CrewMember,
+  HomeShelf,
+  HomeConfig
 } from '../../../../../../packages/catalog-schema/src/types'
