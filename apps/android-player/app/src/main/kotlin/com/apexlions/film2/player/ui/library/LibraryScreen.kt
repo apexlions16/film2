@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.apexlions.film2.player.Film2PlayerApplication
 import com.apexlions.film2.player.catalog.CatalogResult
 import com.apexlions.film2.player.catalog.Title
+import com.apexlions.film2.player.offline.OfflineDownloadStatus
 import com.apexlions.film2.player.ui.browse.GenreRow
 import com.apexlions.film2.player.ui.common.BottomTab
 import com.apexlions.film2.player.ui.common.CatalogErrorState
@@ -52,6 +53,7 @@ fun LibraryScreen(
 ) {
     val application = LocalContext.current.applicationContext as Film2PlayerApplication
     val library by application.userLibraryRepository.state.collectAsState()
+    val offline by application.offlineDownloadRepository.state.collectAsState()
     val catalogResult by produceState<CatalogResult>(CatalogResult.Loading) {
         value = application.catalogRepository.fetchTitles()
     }
@@ -68,14 +70,22 @@ fun LibraryScreen(
             is CatalogResult.Error -> CatalogErrorState(message = catalog.message, onRetry = onHome)
             is CatalogResult.Success -> {
                 val titles = catalog.titles
+                val byId = titles.associateBy { it.id }
                 val progress = titles.associate { title ->
                     title.id to (library.latestForTitle(title.id)?.progressFraction ?: 0f)
                 }
-                val myList = library.myListTitleIds.mapNotNull { id -> titles.firstOrNull { it.id == id } }
+                val myList = library.myListTitleIds.mapNotNull(byId::get)
+                val offlineTitleIds = offline.records.values
+                    .filter {
+                        it.status == OfflineDownloadStatus.COMPLETE ||
+                            it.status == OfflineDownloadStatus.DOWNLOADING ||
+                            it.status == OfflineDownloadStatus.QUEUED
+                    }
+                    .map { it.titleId }
+                    .distinct()
+                val offlineTitles = offlineTitleIds.mapNotNull(byId::get)
 
-                androidx.compose.foundation.lazy.LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                ) {
+                androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.fillMaxSize()) {
                     item {
                         Row(
                             modifier = Modifier
@@ -86,13 +96,13 @@ fun LibraryScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    "Listelerim",
+                                    "Benim Film2'm",
                                     style = MaterialTheme.typography.headlineMedium,
                                     color = MaterialTheme.colorScheme.onBackground,
                                     fontWeight = FontWeight.Bold,
                                 )
                                 Text(
-                                    "Kaydettiklerin ve kendi koleksiyonlarin",
+                                    "İndirdiklerin, kaydettiklerin ve kendi koleksiyonların",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -103,11 +113,33 @@ fun LibraryScreen(
                         }
                     }
 
+                    if (offlineTitles.isNotEmpty()) {
+                        item(key = "offline") {
+                            GenreRow(
+                                genre = "İndirilenler",
+                                titles = offlineTitles,
+                                onSelect = onTitleSelected,
+                                progressByTitle = progress,
+                            )
+                            val active = offline.records.values.filter {
+                                it.status == OfflineDownloadStatus.DOWNLOADING || it.status == OfflineDownloadStatus.QUEUED
+                            }
+                            if (active.isNotEmpty()) {
+                                Text(
+                                    "${active.size} indirme devam ediyor • ayrıntılı ilerleme için içeriği aç",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(start = 16.dp, bottom = 18.dp),
+                                )
+                            }
+                        }
+                    }
+
                     item(key = "default-my-list") {
                         if (myList.isEmpty()) {
                             EmptyListBlock(
                                 title = "Listem",
-                                text = "Bir icerigin detay sayfasindaki + Listem dugmesiyle buraya ekleyebilirsin.",
+                                text = "Bir içeriğin detay sayfasındaki + Listem düğmesiyle buraya ekleyebilirsin.",
                             )
                         } else {
                             GenreRow(
@@ -123,9 +155,7 @@ fun LibraryScreen(
                         item(key = "custom-${collection.id}") {
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 16.dp, end = 8.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Text(
@@ -143,10 +173,10 @@ fun LibraryScreen(
                                         )
                                     }
                                 }
-                                val listTitles = collection.titleIds.mapNotNull { id -> titles.firstOrNull { it.id == id } }
+                                val listTitles = collection.titleIds.mapNotNull(byId::get)
                                 if (listTitles.isEmpty()) {
                                     Text(
-                                        "Bu liste henuz bos.",
+                                        "Bu liste henüz boş.",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(start = 16.dp, bottom = 24.dp),
@@ -188,7 +218,7 @@ fun LibraryScreen(
                 OutlinedTextField(
                     value = newListName,
                     onValueChange = { newListName = it },
-                    label = { Text("Liste adi") },
+                    label = { Text("Liste adı") },
                     singleLine = true,
                 )
             },
@@ -200,11 +230,9 @@ fun LibraryScreen(
                         createDialog = false
                     },
                     enabled = newListName.isNotBlank(),
-                ) { Text("Olustur") }
+                ) { Text("Oluştur") }
             },
-            dismissButton = {
-                OutlinedButton(onClick = { createDialog = false }) { Text("Vazgec") }
-            },
+            dismissButton = { OutlinedButton(onClick = { createDialog = false }) { Text("Vazgeç") } },
         )
     }
 }
@@ -212,21 +240,10 @@ fun LibraryScreen(
 @Composable
 private fun EmptyListBlock(title: String, text: String) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Text(
-            title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontWeight = FontWeight.SemiBold,
-        )
-        Text(
-            text,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.SemiBold)
+        Text(text, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
