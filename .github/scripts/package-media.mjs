@@ -1,26 +1,16 @@
 #!/usr/bin/env node
-// package-media.yml workflow'unun calistirdigi script.
-// Studio uygulamasinin repository_dispatch ile gonderdigi ham dosyalari Hugging Face'ten
-// indirir, ffmpeg ile coklu ses track + WebVTT altyazi destekli HLS'e paketler, sonucu
-// ayni (ya da gerekirse yeni) shard'a yukler ve catalog/titles/{id}.json'u gunceller.
-//
-// Beklenen ortam degiskenleri:
-//   HF_TOKEN — tek hesaplik kurulum (varsayilan, bu proje simdilik boyle)
-//   HF_ACCOUNTS_JSON — coklu Hugging Face hesabi: '[{"namespace":"...","token":"hf_..."}, ...]'
-//     Herhangi bir hesabin depolama kotasi dolarsa pipeline otomatik olarak listedeki
-//     siradaki hesaba gecer (bkz. packages/hf-storage/src/failover.js). HF_TOKEN'in
-//     ait oldugu hesap bu listede yoksa otomatik olarak listeye eklenir.
-// Beklenen girdi: process.argv[2] = repository_dispatch client_payload'un JSON string'i
-// (workflow bunu `github.event.client_payload` uzerinden gecirir)
+// Studio'nun Hugging Face'e yukledigi video + harici sesleri TEK MP4 icine remux eder.
+// HLS / m3u8 / ts segmenti URETMEZ. Video ve ses yeniden encode edilmez (-c copy),
+// dolayisiyla kalite kaybi yoktur. VTT/SRT altyazilar sidecar olarak kalir.
 
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { createWriteStream } from "node:fs";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -33,7 +23,6 @@ import {
 } from "../../packages/hf-storage/src/index.js";
 
 const execFileAsync = promisify(execFile);
-
 const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const SHARDS_JSON = join(REPO_ROOT, "catalog", "shards.json");
 const HF_TOKEN = process.env.HF_TOKEN;
@@ -44,41 +33,43 @@ if (!HF_TOKEN && !HF_ACCOUNTS_JSON) {
   process.exit(1);
 }
 
-/** @returns {Promise<{ namespace: string, token: string }[]>} */
 async function resolveAccounts() {
   const accounts = HF_ACCOUNTS_JSON ? JSON.parse(HF_ACCOUNTS_JSON) : [];
   if (HF_TOKEN && !accounts.some((a) => a.token === HF_TOKEN)) {
     const { namespace } = await resolveHfAccount(HF_TOKEN);
     accounts.push({ namespace, token: HF_TOKEN });
   }
-  if (accounts.length === 0) {
-    throw new Error("Kullanilabilir hicbir Hugging Face hesabi cozumlenemedi.");
-  }
+  if (accounts.length === 0) throw new Error("Kullanilabilir Hugging Face hesabi yok.");
   return accounts;
 }
 
 const payload = JSON.parse(process.argv[2] ?? "{}");
-const { titleId, kind, seasonNumber, episodeNumber, shardId, mode, incomingPrefix, combinedFile, videoFile, audioFiles = {}, subtitleFiles = {} } = payload;
+const {
+  titleId,
+  kind,
+  seasonNumber,
+  episodeNumber,
+  shardId,
+  mode,
+  incomingPrefix,
+  combinedFile,
+  videoFile,
+  audioFiles = {},
+  subtitleFiles = {},
+} = payload;
 
 if (!titleId || !shardId || !incomingPrefix || !mode) {
-  console.error("Eksik payload alanlari:", payload);
-  process.exit(1);
+  throw new Error(`Eksik payload: ${JSON.stringify(payload)}`);
 }
 
-/** @type {{ namespace: string, token: string }[]} */
 let accounts = [];
 
 function tokenForNamespace(namespace) {
   const account = accounts.find((a) => a.namespace === namespace);
-  if (!account) {
-    throw new Error(`"${namespace}" hesabi icin bir Hugging Face token'i bulunamadi (HF_ACCOUNTS_JSON'a eklenmemis).`);
-  }
+  if (!account) throw new Error(`${namespace} icin HF token bulunamadi.`);
   return account.token;
 }
 
-// NOT: buyuk film dosyalarini (birkac GB) res.arrayBuffer() ile tek seferde bellege
-// almak Actions runner'inda hafiza tasmasina yol acabilir — bunun yerine yanit govdesi
-// dogrudan diske akitiliyor (stream), bellek kullanimi dosya boyutundan bagimsiz kaliyor.
 async function downloadFromShard(repoPath, destPath) {
   const url = resolveUrl(shardId, repoPath);
   const token = tokenForNamespace(namespaceOf(shardId));
@@ -91,177 +82,159 @@ async function downloadFromShard(repoPath, destPath) {
 async function ffprobeStreams(filePath) {
   const { stdout } = await execFileAsync("ffprobe", [
     "-v", "error",
-    "-show_entries", "stream=index,codec_type:stream_tags=language",
+    "-show_entries", "stream=index,codec_type:stream_tags=language,title",
     "-of", "json",
     filePath,
   ]);
-  const parsed = JSON.parse(stdout);
-  return parsed.streams ?? [];
+  return JSON.parse(stdout).streams ?? [];
 }
 
-// NOT: ilk versiyon "v:0,a:N,agroup:aud" (video her ses icin TEKRARLANIYOR) pattern'i
-// kullaniyordu. Bu YANLIS: ffmpeg ayni video stream'i birden fazla variant'ta gorunce
-// "Same elementary stream found more than once" hatasiyla direkt REDDEDIYOR — coklu
-// sesli gercek bir dosyayla yerelde denenip dogrulandi. Dogru HLS "alternate audio"
-// yapisi: TEK video-only variant + her dil icin AYRI, audio-only bir "agroup" uyesi.
-// hls.js/ExoPlayer'in track-secici API'leri (audioTracks/audioTrack) sadece bu yapiyi
-// (EXT-X-MEDIA:TYPE=AUDIO satirlari) tanir — onceki yapi bunlari ayri "kalite seviyesi"
-// sanardi, ses degistirme hic calismazdi. Yerelde sentetik 2 dilli bir dosyayla
-// (Turkce/Ingilizce) uretilen master.m3u8 dogru EXT-X-MEDIA satirlarini urettigi
-// dogrulandi.
-function buildVarStreamMap(audioInputs) {
-  const parts = audioInputs.map((audio, i) => {
-    const nameTag = (audio.lang || `trk${i}`).replace(/[^a-zA-Z0-9]/g, "").slice(0, 12) || `trk${i}`;
-    const defaultFlag = i === 0 ? ",default:yes" : "";
-    return `a:${i},agroup:aud,name:${nameTag},language:${audio.lang || "und"}${defaultFlag}`;
-  });
-  parts.push("v:0,agroup:aud");
-  return parts.join(" ");
-}
+function languageInfo(raw, index = 0) {
+  const original = String(raw ?? "").trim();
+  const key = original
+    .toLocaleLowerCase("tr-TR")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ı/g, "i")
+    .replace(/[^a-z0-9]/g, "");
 
-async function muxToHls({ workDir, videoInput, audioInputs, outDir }) {
-  await mkdir(outDir, { recursive: true });
-  const args = ["-y"];
-
-  // Girdi dosyalarini tekillestir: "combined" modda tum ses track'leri AYNI dosyadan
-  // (videoInput) farkli stream index'leriyle gelir — o dosyayi ffmpeg'e birden fazla
-  // kez ayri -i olarak vermek (eskiden oldugu gibi) her seferinde stream a:0'i (ilk ses
-  // track'ini) seciyordu, yani tum diller yanlislikla AYNI sesi alıyordu. "separate"
-  // modda ise her ses ayri bir dosyadir.
-  const inputPaths = [videoInput];
-  const audioInputIndex = audioInputs.map((audio) => {
-    let idx = inputPaths.indexOf(audio.path);
-    if (idx === -1) {
-      inputPaths.push(audio.path);
-      idx = inputPaths.length - 1;
-    }
-    return idx;
-  });
-  for (const p of inputPaths) args.push("-i", p);
-
-  args.push("-map", "0:v:0");
-  audioInputs.forEach((audio, i) => {
-    const inputIdx = audioInputIndex[i];
-    // combined modda audio.streamIndex o dosyadaki KESIN stream numarasidir (orn. 0:2);
-    // separate modda her ses kendi ayri dosyasinin ilk (ve tek) ses stream'idir (N:a:0).
-    const selector = audio.streamIndex !== undefined ? `${inputIdx}:${audio.streamIndex}` : `${inputIdx}:a:0`;
-    args.push("-map", selector);
-  });
-
-  args.push(
-    "-c:v", "copy",
-    "-c:a", "copy",
-    "-f", "hls",
-    "-hls_time", "6",
-    "-hls_playlist_type", "vod",
-    "-hls_flags", "independent_segments",
-    "-hls_segment_type", "mpegts",
-    "-master_pl_name", "master.m3u8",
-    "-var_stream_map", buildVarStreamMap(audioInputs),
-    join(outDir, "variant_%v", "stream.m3u8"),
-  );
-
-  await execFileAsync("ffmpeg", args, { cwd: workDir });
+  if (["en", "eng", "english", "ingilizce"].includes(key)) return { code: "eng", label: "İngilizce" };
+  if (["tr", "tur", "turkish", "turkce", "trke"].includes(key)) return { code: "tur", label: "Türkçe" };
+  if (["de", "deu", "ger", "german", "almanca"].includes(key)) return { code: "deu", label: "Almanca" };
+  if (["fr", "fra", "fre", "french", "fransizca"].includes(key)) return { code: "fra", label: "Fransızca" };
+  if (["es", "spa", "spanish", "ispanyolca"].includes(key)) return { code: "spa", label: "İspanyolca" };
+  return { code: /^[a-z]{3}$/.test(key) ? key : "und", label: original || `Ses ${index + 1}` };
 }
 
 async function extractSubtitleAsVtt(inputPath, outPath, streamIndex) {
   const args = ["-y", "-i", inputPath];
   if (streamIndex !== undefined) args.push("-map", `0:${streamIndex}`);
-  args.push(outPath);
+  args.push("-c:s", "webvtt", outPath);
   await execFileAsync("ffmpeg", args);
 }
 
-/** ffmpeg'in urettigi master.m3u8'e altyazi EXT-X-MEDIA satirlarini ve SUBTITLES grubunu ekler. */
-async function patchMasterWithSubtitles(masterPath, subtitleLangs) {
-  if (subtitleLangs.length === 0) return;
-  let content = await readFile(masterPath, "utf-8");
+async function remuxSeparate(videoInput, audioInputs, outputPath) {
+  const args = ["-y", "-fflags", "+genpts", "-i", videoInput];
+  for (const audio of audioInputs) args.push("-i", audio.path);
 
-  const mediaLines = subtitleLangs
-    .map(
-      (lang, i) =>
-        `#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="${lang}",LANGUAGE="${lang}",AUTOSELECT=${i === 0 ? "YES" : "NO"},DEFAULT=${i === 0 ? "YES" : "NO"},URI="subs_${lang}.vtt"`,
-    )
-    .join("\n");
+  args.push("-map", "0:v:0");
+  audioInputs.forEach((_, i) => args.push("-map", `${i + 1}:a:0`));
+  args.push("-c:v", "copy", "-c:a", "copy");
 
-  content = content.replace(
-    /(#EXT-X-STREAM-INF:[^\n]*)/g,
-    (line) => (line.includes("SUBTITLES=") ? line : `${line},SUBTITLES="subs"`),
-  );
+  audioInputs.forEach((audio, i) => {
+    args.push(`-metadata:s:a:${i}`, `language=${audio.info.code}`);
+    args.push(`-metadata:s:a:${i}`, `title=${audio.info.label}`);
+    args.push(`-disposition:a:${i}`, i === 0 ? "default" : "0");
+  });
 
-  content = content.replace("#EXT-X-VERSION:", `${mediaLines}\n#EXT-X-VERSION:`);
-  await writeFile(masterPath, content, "utf-8");
+  args.push("-movflags", "+faststart", "-avoid_negative_ts", "make_zero", outputPath);
+  await execFileAsync("ffmpeg", args, { maxBuffer: 16 * 1024 * 1024 });
+}
+
+async function remuxCombined(inputPath, streams, outputPath) {
+  const audioStreams = streams.filter((s) => s.codec_type === "audio");
+  if (audioStreams.length === 0) throw new Error("Birlesik dosyada ses track'i bulunamadi.");
+
+  const args = ["-y", "-i", inputPath, "-map", "0:v:0"];
+  audioStreams.forEach((s) => args.push("-map", `0:${s.index}`));
+  args.push("-c:v", "copy", "-c:a", "copy");
+
+  audioStreams.forEach((s, i) => {
+    const info = languageInfo(s.tags?.language ?? s.tags?.title, i);
+    args.push(`-metadata:s:a:${i}`, `language=${info.code}`);
+    args.push(`-metadata:s:a:${i}`, `title=${s.tags?.title || info.label}`);
+    args.push(`-disposition:a:${i}`, i === 0 ? "default" : "0");
+  });
+
+  args.push("-movflags", "+faststart", "-avoid_negative_ts", "make_zero", outputPath);
+  await execFileAsync("ffmpeg", args, { maxBuffer: 16 * 1024 * 1024 });
 }
 
 async function main() {
   accounts = await resolveAccounts();
-
-  const workDir = await mkdtemp(join(tmpdir(), "film2-package-"));
+  const workDir = await mkdtemp(join(tmpdir(), "film2-remux-"));
   const outDir = join(workDir, "out");
   await mkdir(outDir, { recursive: true });
 
-  let videoLocal;
-  const audioInputs = [];
-  const subtitleLangs = [];
+  const outputVideo = join(outDir, "video.mp4");
+  let audioLanguages = [];
+  let subtitleLanguages = [];
+  let externalSubtitleTracks = [];
 
   if (mode === "combined") {
-    videoLocal = await downloadFromShard(`${incomingPrefix}/${combinedFile}`, join(workDir, combinedFile));
-    const streams = await ffprobeStreams(videoLocal);
+    if (!combinedFile) throw new Error("combinedFile eksik.");
+    const local = await downloadFromShard(`${incomingPrefix}/${combinedFile}`, join(workDir, combinedFile));
+    const streams = await ffprobeStreams(local);
     const audioStreams = streams.filter((s) => s.codec_type === "audio");
-    audioStreams.forEach((s, i) => audioInputs.push({ path: videoLocal, lang: s.tags?.language ?? `trk${i}`, streamIndex: s.index }));
-    const subStreams = streams.filter((s) => s.codec_type === "subtitle");
-    for (const [i, s] of subStreams.entries()) {
-      const lang = s.tags?.language ?? `sub${i}`;
-      await extractSubtitleAsVtt(videoLocal, join(outDir, `subs_${lang}.vtt`), s.index);
-      subtitleLangs.push(lang);
+    audioLanguages = audioStreams.map((s, i) => languageInfo(s.tags?.language ?? s.tags?.title, i).code);
+    await remuxCombined(local, streams, outputVideo);
+
+    const subtitleStreams = streams.filter((s) => s.codec_type === "subtitle");
+    for (const [i, s] of subtitleStreams.entries()) {
+      const info = languageInfo(s.tags?.language ?? s.tags?.title ?? `sub${i}`, i);
+      const name = `subs_${info.code}_${i + 1}.vtt`;
+      await extractSubtitleAsVtt(local, join(outDir, name), s.index);
+      subtitleLanguages.push(info.code);
+      externalSubtitleTracks.push({ language: info.code, label: info.label, __outName: name, mimeType: "text/vtt" });
     }
   } else {
-    videoLocal = await downloadFromShard(`${incomingPrefix}/${videoFile}`, join(workDir, videoFile));
+    if (!videoFile) throw new Error("videoFile eksik.");
+    const videoLocal = await downloadFromShard(`${incomingPrefix}/${videoFile}`, join(workDir, videoFile));
+    const audioInputs = [];
+
+    let index = 0;
     for (const [lang, relPath] of Object.entries(audioFiles)) {
-      const local = await downloadFromShard(`${incomingPrefix}/${relPath}`, join(workDir, `audio_${lang}${relPath.slice(relPath.lastIndexOf("."))}`));
-      audioInputs.push({ path: local, lang });
+      const info = languageInfo(lang, index);
+      const ext = extname(relPath) || ".aac";
+      const local = await downloadFromShard(`${incomingPrefix}/${relPath}`, join(workDir, `audio_${index}${ext}`));
+      audioInputs.push({ path: local, info });
+      index++;
     }
+    if (audioInputs.length === 0) throw new Error("Separate modda en az bir ses dosyasi gerekli.");
+    audioLanguages = audioInputs.map((a) => a.info.code);
+    await remuxSeparate(videoLocal, audioInputs, outputVideo);
+
+    index = 0;
     for (const [lang, relPath] of Object.entries(subtitleFiles)) {
-      const local = await downloadFromShard(`${incomingPrefix}/${relPath}`, join(workDir, `subs_${lang}${relPath.slice(relPath.lastIndexOf("."))}`));
-      await extractSubtitleAsVtt(local, join(outDir, `subs_${lang}.vtt`));
-      subtitleLangs.push(lang);
+      const info = languageInfo(lang, index);
+      subtitleLanguages.push(info.code);
+      externalSubtitleTracks.push({
+        language: info.code,
+        label: info.label,
+        url: resolveUrl(shardId, `${incomingPrefix}/${relPath}`),
+        mimeType: relPath.toLowerCase().endsWith(".srt") ? "application/x-subrip" : "text/vtt",
+      });
+      index++;
     }
   }
 
-  if (audioInputs.length === 0) {
-    throw new Error("En az bir ses track'i gerekli (combined dosyada bulunamadi ya da separate modda audioFiles bos).");
-  }
-
-  await muxToHls({ workDir, videoInput: videoLocal, audioInputs, outDir });
-  await patchMasterWithSubtitles(join(outDir, "master.m3u8"), subtitleLangs);
-
-  // Aktif shard'a yukler; shard doluysa (ya da HF gercek bir kota hatasi verirse)
-  // otomatik olarak siradaki kayitli Hugging Face hesabina/shard'ina geçer.
   const registry = await loadShardRegistry(SHARDS_JSON);
   const repoPrefix = kind === "episode" ? `media/${titleId}/s${seasonNumber}e${episodeNumber}` : `media/${titleId}`;
-  const { shard: targetShard, registry: updatedRegistry, rotatedAccount } = await uploadDirectoryWithFailover({
+  const { shard: targetShard, registry: updatedRegistry } = await uploadDirectoryWithFailover({
     localDir: outDir,
     repoPrefix,
     registry,
     accounts,
   });
-  if (rotatedAccount) {
-    console.log(`Hesap dolu, yeni Hugging Face hesabina gecildi: ${targetShard.id}`);
-  }
   await saveShardRegistry(SHARDS_JSON, updatedRegistry);
 
-  const masterPlaylistUrl = resolveUrl(targetShard.id, `${repoPrefix}/master.m3u8`);
-  const audioLanguages = audioInputs.map((a) => a.lang);
+  externalSubtitleTracks = externalSubtitleTracks.map((track) => {
+    if (!track.__outName) return track;
+    const { __outName, ...rest } = track;
+    return { ...rest, url: resolveUrl(targetShard.id, `${repoPrefix}/${__outName}`) };
+  });
 
-  const result = {
-    titleId,
-    kind,
-    seasonNumber,
-    episodeNumber,
-    shardId: targetShard.id,
-    asset: { masterPlaylistUrl, audioLanguages, subtitleLanguages: subtitleLangs },
+  const asset = {
+    videoUrl: resolveUrl(targetShard.id, `${repoPrefix}/video.mp4`),
+    masterPlaylistUrl: null,
+    audioLanguages,
+    subtitleLanguages,
+    externalAudioTracks: [],
+    externalSubtitleTracks,
   };
-  console.log(JSON.stringify(result, null, 2));
 
+  const result = { titleId, kind, seasonNumber, episodeNumber, shardId: targetShard.id, asset };
+  console.log(JSON.stringify(result, null, 2));
   if (process.env.GITHUB_OUTPUT) {
     await writeFile(process.env.GITHUB_OUTPUT, `result=${JSON.stringify(result)}\n`, { flag: "a" });
   }
