@@ -39,6 +39,7 @@ interface Window {
       enqueue: (request: unknown) => Promise<Film2OfflineRecord>
       remove: (key: string) => Promise<void>
       localPlayback: (key: string) => Promise<Film2OfflineRecord | null>
+      readText: (fileUrl: string) => Promise<string>
       onProgress: (callback: (record: Film2OfflineRecord) => void) => () => void
     }
   }
