@@ -154,7 +154,9 @@ class OfflineDownloadRepository(private val context: Context) {
                     .setDescription("Film2 altyazı")
                     .setAllowedOverMetered(true)
                     .setAllowedOverRoaming(false)
-                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
+                    // VISIBILITY_HIDDEN needs a privileged permission on some OEM builds.
+                    // VISIBLE is safe for normal apps and disappears when the tiny subtitle finishes.
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
                     .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_MOVIES, relative)
                     .addRequestHeader("User-Agent", USER_AGENT),
             )
