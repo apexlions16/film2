@@ -4,8 +4,6 @@ package com.apexlions.film2.player.ui.player
 
 import android.app.Application
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -42,11 +40,14 @@ sealed interface PlaybackUiState {
 /**
  * Direct progressive player.
  *
- * Video tek ana ExoPlayer'da oynar. Harici ses dosyalari artik MergingMediaSource ile
- * ana timeline'a eklenmez; bu yontem farkli MP4/AAC seek noktalarinda
- * "Unexpected child seekToUs result" hatasi uretiyordu. Bunun yerine secilen sidecar
- * ses ikinci bir audio-only ExoPlayer'da calisir ve ana player'in play/pause/seek/hiz
- * durumuna senkron tutulur. Depolama yapisi degismez: tek video + istege bagli ses/VTT.
+ * Ana video tek ExoPlayer'da kalir. Sidecar ses ikinci, audio-only ExoPlayer'da oynar.
+ * Iki kaynak MergingMediaSource ile birlestirilmez; dolayisiyla progressive MP4/AAC seek
+ * noktalarinin farkli olmasi ana oynaticiyi cokertmez.
+ *
+ * Onemli: sidecar audio'yu periyodik olarak seek etmek SESI BOZAR. Onceki surum 500 ms'de
+ * bir 180 ms'den buyuk drift gordugunde hard seek yapiyordu ve kullanicinin duydugu
+ * "dit/klik/glitch" bunun sonucuydu. Bu surum yalnizca gercek bir seek, ilk hazirlanma
+ * veya buffer'dan donus aninda konum esler. Normal oynatmada iki ExoPlayer serbest akar.
  */
 class PlayerViewModel(
     application: Application,
@@ -57,11 +58,13 @@ class PlayerViewModel(
 ) : AndroidViewModel(application) {
 
     private val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-        .setUserAgent("film2-android-player/1.1.1-direct")
+        .setUserAgent("film2-android-player/1.1.2-direct")
         .setAllowCrossProtocolRedirects(true)
 
     val player: ExoPlayer = ExoPlayer.Builder(application).build()
-    private val externalAudioPlayer: ExoPlayer = ExoPlayer.Builder(application).build()
+    private val externalAudioPlayer: ExoPlayer = ExoPlayer.Builder(application).build().apply {
+        volume = 1f
+    }
 
     private val _uiState = MutableStateFlow<PlaybackUiState>(PlaybackUiState.Loading)
     val uiState: StateFlow<PlaybackUiState> = _uiState.asStateFlow()
@@ -75,14 +78,7 @@ class PlayerViewModel(
     private var activeAsset: PlayableAsset? = null
     private var directPlayback = false
     private var autoExternalSelectionDone = false
-
-    private val syncHandler = Handler(Looper.getMainLooper())
-    private val syncRunnable = object : Runnable {
-        override fun run() {
-            syncExternalAudioPosition(force = false)
-            syncHandler.postDelayed(this, SYNC_INTERVAL_MS)
-        }
-    }
+    private var externalAudioWasBuffering = false
 
     init {
         player.addListener(object : Player.Listener {
@@ -98,7 +94,6 @@ class PlayerViewModel(
                 when (playbackState) {
                     Player.STATE_READY -> {
                         maybeAutoSelectExternalAudio()
-                        syncExternalAudioPosition(force = true)
                         syncExternalAudioPlayback()
                     }
                     Player.STATE_ENDED -> externalAudioPlayer.pause()
@@ -110,7 +105,11 @@ class PlayerViewModel(
                 newPosition: Player.PositionInfo,
                 reason: Int,
             ) {
-                syncExternalAudioPosition(force = true)
+                // Kullanici timeline'da ileri/geri sardiginda sidecar sesi BIR KEZ ayni
+                // konuma cek. Normal oynatmada surekli seek yoktur.
+                if (_selectedExternalAudioIndex.value != null) {
+                    seekExternalToMain()
+                }
             }
 
             override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
@@ -128,14 +127,25 @@ class PlayerViewModel(
             }
 
             override fun onPlaybackStateChanged(playbackState: Int) {
-                if (playbackState == Player.STATE_READY) {
-                    syncExternalAudioPosition(force = true)
-                    syncExternalAudioPlayback()
+                when (playbackState) {
+                    Player.STATE_BUFFERING -> externalAudioWasBuffering = true
+                    Player.STATE_READY -> {
+                        // Ilk acilista ya da ag buffer'indan donuste ana video bu arada
+                        // ilerlemis olabilir. Tek seferlik konum eslemesi yap.
+                        if (externalAudioWasBuffering || externalAudioPlayer.currentPosition <= 0L) {
+                            seekExternalToMain()
+                        } else if (abs(externalAudioPlayer.currentPosition - player.currentPosition) > BUFFER_RECOVERY_DRIFT_MS) {
+                            seekExternalToMain()
+                        }
+                        externalAudioWasBuffering = false
+                        player.volume = 0f
+                        externalAudioPlayer.volume = 1f
+                        syncExternalAudioPlayback()
+                    }
                 }
             }
         })
 
-        syncHandler.post(syncRunnable)
         resolveAndLoad()
     }
 
@@ -223,7 +233,6 @@ class PlayerViewModel(
             .setSubtitleConfigurations(subtitleConfigurations)
             .build()
 
-        // Yalnizca video + altyazi ana player'da. Harici sesler burada merge EDILMEZ.
         val baseSource = DefaultMediaSourceFactory(httpDataSourceFactory)
             .createMediaSource(videoItem)
         startMain(baseSource)
@@ -238,22 +247,17 @@ class PlayerViewModel(
         player.playWhenReady = true
     }
 
-    /**
-     * Ana dosyanin icindeki bir audio track'i secer. Daha once harici ses aktifse onu
-     * kapatir ve ana player'in sesini geri acar.
-     */
+    /** Ana MP4/MKV'nin icindeki audio track'i secer. */
     fun selectAudioTrack(group: Tracks.Group, trackIndex: Int) {
         deactivateExternalAudio(restoreMainAudio = true)
         val override = TrackSelectionOverride(group.mediaTrackGroup, trackIndex)
         player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+            .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
             .setOverrideForType(override)
             .build()
     }
 
-    /**
-     * Katalogdaki ayri audio dosyasini secip audio-only player'da baslatir. Ana videonun
-     * sesi volume=0 ile susturulur; goruntu ve zaman cizelgesi ana player'da kalir.
-     */
+    /** Katalogdaki ayri ses dosyasini secip audio-only player'da baslatir. */
     fun selectExternalAudio(index: Int) {
         val asset = activeAsset ?: return
         val track = asset.externalAudioTracks.getOrNull(index) ?: return
@@ -264,24 +268,36 @@ class PlayerViewModel(
         if (!directPlayback) return
 
         _selectedExternalAudioIndex.value = index
-        player.volume = 0f
+        externalAudioWasBuffering = true
 
-        val itemBuilder = MediaItem.Builder().setUri(track.url)
-        track.mimeType?.takeIf { it.isNotBlank() }?.let(itemBuilder::setMimeType)
-        val item = itemBuilder.build()
+        // Katalogda eski surumlerden kalma yanlis MIME olabilir (ornegin ham .aac dosyasi
+        // audio/mp4 diye yazilmis). MIME'i zorlamiyoruz; Media3 URL uzantisindan/container
+        // imzasindan extractor'i kendisi secsin. Bu mevcut yuklemeleri yeniden yuklemeden
+        // duzeltir.
+        val item = MediaItem.Builder()
+            .setUri(track.url)
+            .build()
 
+        externalAudioPlayer.playWhenReady = false
         externalAudioPlayer.stop()
         externalAudioPlayer.clearMediaItems()
         externalAudioPlayer.setMediaItem(item)
         externalAudioPlayer.playbackParameters = player.playbackParameters
-        externalAudioPlayer.prepare()
+        externalAudioPlayer.volume = 1f
         externalAudioPlayer.seekTo(player.currentPosition.coerceAtLeast(0L))
-        externalAudioPlayer.playWhenReady = player.playWhenReady
-        syncExternalAudioPlayback()
+        externalAudioPlayer.prepare()
+
+        // Yeni sidecar ses hazir olana kadar ana ses aniden kesilmesin. STATE_READY'de
+        // ana player mute edilir ve sidecar baslatilir.
+        if (player.currentTracks.groups.none { it.type == C.TRACK_TYPE_AUDIO && it.length > 0 }) {
+            player.volume = 0f
+        }
     }
 
     private fun deactivateExternalAudio(restoreMainAudio: Boolean) {
         _selectedExternalAudioIndex.value = null
+        externalAudioWasBuffering = false
+        externalAudioPlayer.playWhenReady = false
         externalAudioPlayer.pause()
         externalAudioPlayer.stop()
         externalAudioPlayer.clearMediaItems()
@@ -305,6 +321,8 @@ class PlayerViewModel(
 
     private fun syncExternalAudioPlayback() {
         if (_selectedExternalAudioIndex.value == null) return
+        if (externalAudioPlayer.mediaItemCount == 0) return
+
         if (player.isPlaying) {
             if (externalAudioPlayer.playbackState == Player.STATE_READY) {
                 externalAudioPlayer.play()
@@ -316,15 +334,10 @@ class PlayerViewModel(
         }
     }
 
-    private fun syncExternalAudioPosition(force: Boolean) {
+    private fun seekExternalToMain() {
         if (_selectedExternalAudioIndex.value == null) return
         if (externalAudioPlayer.mediaItemCount == 0) return
-
-        val mainPosition = player.currentPosition.coerceAtLeast(0L)
-        val audioPosition = externalAudioPlayer.currentPosition.coerceAtLeast(0L)
-        if (force || abs(mainPosition - audioPosition) > MAX_ALLOWED_DRIFT_MS) {
-            externalAudioPlayer.seekTo(mainPosition)
-        }
+        externalAudioPlayer.seekTo(player.currentPosition.coerceAtLeast(0L))
     }
 
     fun selectSubtitleTrack(group: Tracks.Group, trackIndex: Int) {
@@ -346,11 +359,11 @@ class PlayerViewModel(
         deactivateExternalAudio(restoreMainAudio = true)
         player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
             .clearOverridesOfType(C.TRACK_TYPE_AUDIO)
+            .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
             .build()
     }
 
     override fun onCleared() {
-        syncHandler.removeCallbacks(syncRunnable)
         externalAudioPlayer.release()
         player.release()
         super.onCleared()
@@ -371,7 +384,8 @@ class PlayerViewModel(
     }
 
     companion object {
-        private const val SYNC_INTERVAL_MS = 500L
-        private const val MAX_ALLOWED_DRIFT_MS = 180L
+        // Yalnizca buffer'dan donuste cok buyuk kayma varsa hard seek yapilir. Normal
+        // oynatma boyunca periyodik seek YOKTUR.
+        private const val BUFFER_RECOVERY_DRIFT_MS = 1_500L
     }
 }
