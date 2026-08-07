@@ -32,25 +32,24 @@ export function parseSubtitleFile(raw: string): SubtitleCue[] {
   for (const block of blocks) {
     const lines = block.split('\n').map((line) => line.trimEnd()).filter(Boolean)
     if (lines.length < 2) continue
-
-    let timingIndex = lines.findIndex((line) => line.includes('-->'))
+    const timingIndex = lines.findIndex((line) => line.includes('-->'))
     if (timingIndex < 0) continue
     const timing = lines[timingIndex].split('-->')
     if (timing.length < 2) continue
-
     const start = parseTime(timing[0].trim().split(/\s+/)[0])
     const end = parseTime(timing[1].trim().split(/\s+/)[0])
     if (!(end > start)) continue
-
     const cueText = cleanText(lines.slice(timingIndex + 1).join('\n'))
     if (!cueText) continue
     cues.push({ start, end, text: cueText })
   }
-
   return cues.sort((a, b) => a.start - b.start)
 }
 
 export async function fetchSubtitleCues(url: string): Promise<SubtitleCue[]> {
+  if (url.startsWith('file:') && window.film2?.offline.readText) {
+    return parseSubtitleFile(await window.film2.offline.readText(url))
+  }
   const response = await fetch(url, { cache: 'no-store' })
   if (!response.ok) throw new Error(`Altyazi indirilemedi (${response.status})`)
   return parseSubtitleFile(await response.text())
