@@ -13,6 +13,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.time.Instant
 import java.util.Base64
 
 /**
@@ -58,6 +59,9 @@ class GitHubContentsClient(
         val sha: String? = null,
     )
 
+    @Serializable
+    private data class CatalogRevision(val revision: String)
+
     /**
      * Accepts a raw PAT as well as an accidentally pasted `Bearer ...` / `token ...`
      * value. Quotes/newlines copied from a backup file are removed too.
@@ -93,8 +97,7 @@ class GitHubContentsClient(
 
     /**
      * Performs a real authenticated request before a long HF upload starts. This lets the
-     * UI fail immediately if the saved PAT disappeared/expired instead of uploading the
-     * trailer first and failing at catalog/shards.json afterwards.
+     * UI fail immediately if the saved PAT disappeared/expired instead of uploading first.
      */
     suspend fun verifyAuthentication() = withContext(Dispatchers.IO) {
         val request = authHeader(
@@ -127,8 +130,9 @@ class GitHubContentsClient(
     }
 
     suspend fun getTitle(id: String): Title? = withContext(Dispatchers.IO) {
-        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/titles/$id.json"
-        val request = Request.Builder().url(url).build()
+        val nonce = System.currentTimeMillis()
+        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/titles/$id.json?v=$nonce"
+        val request = Request.Builder().url(url).header("Cache-Control", "no-cache").build()
         httpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) return@use null
             json.decodeFromString(Title.serializer(), response.body?.string().orEmpty())
@@ -141,8 +145,9 @@ class GitHubContentsClient(
     }
 
     suspend fun getShardRegistry(): ShardRegistry = withContext(Dispatchers.IO) {
-        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/shards.json"
-        val request = Request.Builder().url(url).build()
+        val nonce = System.currentTimeMillis()
+        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/shards.json?v=$nonce"
+        val request = Request.Builder().url(url).header("Cache-Control", "no-cache").build()
         httpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw GitHubApiException("shards.json okunamadi: ${response.code}")
             json.decodeFromString(ShardRegistry.serializer(), response.body?.string().orEmpty())
@@ -195,6 +200,22 @@ class GitHubContentsClient(
             }
         }
 
+    /**
+     * Player polls only this tiny file. When it changes, the full catalog is refreshed once.
+     * That avoids repeatedly hitting the 60/hour unauthenticated GitHub Contents API limit.
+     */
+    private suspend fun touchCatalogVersion() {
+        val body = json.encodeToString(
+            CatalogRevision.serializer(),
+            CatalogRevision(revision = Instant.now().toString()),
+        ) + "\n"
+        putFile(
+            path = "catalog/version.json",
+            contentBytes = body.toByteArray(Charsets.UTF_8),
+            commitMessage = "chore(catalog): player revision",
+        )
+    }
+
     suspend fun putTitle(title: Title) {
         val body = json.encodeToString(Title.serializer(), title)
         putFile(
@@ -202,6 +223,7 @@ class GitHubContentsClient(
             contentBytes = body.toByteArray(Charsets.UTF_8),
             commitMessage = "chore(catalog): ${title.id} eklendi/guncellendi (android-studio)",
         )
+        touchCatalogVersion()
     }
 
     suspend fun putShardRegistry(registry: ShardRegistry) {
