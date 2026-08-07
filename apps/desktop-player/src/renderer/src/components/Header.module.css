@@ -6,36 +6,80 @@
   z-index: 20;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, rgba(8, 8, 9, 0.75) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(8, 8, 9, 0.82) 0%, transparent 100%);
   transition: background 0.3s var(--ease-out);
 }
 
 .header.scrolled {
-  background: rgba(9, 9, 10, 0.86);
-  backdrop-filter: blur(10px);
+  background: rgba(9, 9, 10, 0.92);
+  backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-soft);
 }
 
 .bar {
   display: flex;
   align-items: center;
+  gap: 24px;
   padding: 10px 56px 14px;
   -webkit-app-region: drag;
 }
 
+.wordmarkButton,
+.action {
+  -webkit-app-region: no-drag;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.wordmarkButton {
+  padding: 0;
+}
+
 .wordmark {
-  font-size: 19px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: var(--text);
 }
 
 .wordmarkAccent {
-  color: var(--accent);
+  color: #e50914;
+}
+
+.actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  -webkit-app-region: no-drag;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(18, 18, 20, 0.42);
+  transition: background 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.action:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 900px) {
   .bar {
     padding: 10px 20px 14px;
+  }
+
+  .action span {
+    display: none;
   }
 }
