@@ -4,7 +4,6 @@ package com.apexlions.film2.player.ui.player
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,7 +35,14 @@ private data class TrackOption(
     val selected: Boolean,
 )
 
-private fun trackLabel(format: Format, fallbackIndex: Int): String {
+private data class RawTrackOption(
+    val group: Tracks.Group,
+    val indexInGroup: Int,
+    val format: Format,
+    val selected: Boolean,
+)
+
+private fun trackLabel(format: Format, fallbackIndex: Int, catalogFallback: String? = null): String {
     val languageTag = format.language
     val displayName = languageTag?.let {
         runCatching { Locale.forLanguageTag(it).displayLanguage }.getOrNull()
@@ -45,34 +51,59 @@ private fun trackLabel(format: Format, fallbackIndex: Int): String {
         !displayName.isNullOrBlank() -> displayName.replaceFirstChar { it.uppercaseChar() }
         !format.label.isNullOrBlank() -> format.label!!
         !languageTag.isNullOrBlank() -> languageTag
+        !catalogFallback.isNullOrBlank() -> catalogFallback.uppercase(Locale.ROOT)
         else -> "Track ${fallbackIndex + 1}"
     }
 }
 
-private fun optionsForType(tracks: Tracks, type: Int): List<TrackOption> =
-    tracks.groups
+private fun optionsForType(
+    tracks: Tracks,
+    type: Int,
+    catalogFallbackLabels: List<String> = emptyList(),
+): List<TrackOption> {
+    val raw = tracks.groups
         .filter { it.type == type }
         .flatMap { group ->
             (0 until group.length).map { i ->
-                TrackOption(
+                RawTrackOption(
                     group = group,
                     indexInGroup = i,
-                    label = trackLabel(group.getTrackFormat(i), i),
+                    format = group.getTrackFormat(i),
                     selected = group.isTrackSelected(i),
                 )
             }
         }
 
+    // MergingMediaSource'ta ana video source ilk, harici audio source'lar sonradan gelir.
+    // Harici dosyada language metadata yoksa katalogdaki tr/en etiketlerini sondaki
+    // track'lere sirayla uygula.
+    val fallbackStart = (raw.size - catalogFallbackLabels.size).coerceAtLeast(0)
+    return raw.mapIndexed { flatIndex, option ->
+        val fallback = if (flatIndex >= fallbackStart) {
+            catalogFallbackLabels.getOrNull(flatIndex - fallbackStart)
+        } else {
+            null
+        }
+        TrackOption(
+            group = option.group,
+            indexInGroup = option.indexInGroup,
+            label = trackLabel(option.format, flatIndex, fallback),
+            selected = option.selected,
+        )
+    }
+}
+
 @Composable
 fun TrackSelectionSheet(
     tracks: Tracks,
+    audioFallbackLabels: List<String> = emptyList(),
     onSelectAudio: (Tracks.Group, Int) -> Unit,
     onSelectSubtitle: (Tracks.Group, Int) -> Unit,
     onDisableSubtitles: () -> Unit,
     onDismiss: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(),
 ) {
-    val audioOptions = optionsForType(tracks, C.TRACK_TYPE_AUDIO)
+    val audioOptions = optionsForType(tracks, C.TRACK_TYPE_AUDIO, audioFallbackLabels)
     val subtitleOptions = optionsForType(tracks, C.TRACK_TYPE_TEXT)
     val subtitlesOff = subtitleOptions.none { it.selected }
 
