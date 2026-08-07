@@ -11,6 +11,9 @@ object Destinations {
     const val QUALITY_ROUTE = "quality/{titleId}/{titleType}"
     fun quality(titleId: String, titleType: String) = "quality/$titleId/$titleType"
 
+    const val TRAILER_ROUTE = "trailer/{titleId}"
+    fun trailer(titleId: String) = "trailer/$titleId"
+
     const val ARG_TITLE_ID = "titleId"
     const val ARG_TITLE_TYPE = "titleType"
 }
