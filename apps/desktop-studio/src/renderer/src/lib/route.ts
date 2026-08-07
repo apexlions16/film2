@@ -1,6 +1,7 @@
 export type Route =
   | { name: "catalog" }
   | { name: "add" }
+  | { name: "editorial" }
   | { name: "settings" }
   | {
       name: "upload";
