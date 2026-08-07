@@ -6,7 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
-import android.graphics.Color as AndroidColor
+import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -15,6 +15,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Forward10
@@ -52,11 +54,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,9 +72,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.CaptionStyleCompat
 import androidx.media3.ui.PlayerView
-import androidx.media3.ui.SubtitleView
 import com.apexlions.film2.player.Film2PlayerApplication
 import com.apexlions.film2.player.ui.common.CatalogErrorState
 import com.apexlions.film2.player.userdata.PlaybackAppearanceState
@@ -106,6 +110,7 @@ fun PlayerScreen(
     val tracks by viewModel.currentTracks.collectAsState()
     val selectedQualityHeight by viewModel.selectedQualityHeight.collectAsState()
     val runtime by viewModel.runtime.collectAsState()
+    val subtitleText by viewModel.subtitleText.collectAsState()
     val appearance by application.playbackAppearanceRepository.state.collectAsState()
     val appearanceRepository = application.playbackAppearanceRepository
 
@@ -202,6 +207,14 @@ fun PlayerScreen(
                     },
                 )
 
+                if (subtitleText.isNotBlank()) {
+                    Film2SubtitleOverlay(
+                        text = subtitleText,
+                        appearance = appearance,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+
                 if (runtime.isBuffering) {
                     CircularProgressIndicator(
                         color = Color.White,
@@ -254,46 +267,70 @@ fun PlayerScreen(
     }
 }
 
+/**
+ * The native SubtitleView is intentionally hidden. Some VTT cues carry their own line/position
+ * metadata, which can override SubtitleView bottom padding. Film2 renders the active Media3 cue
+ * text here so the user's percentage maps directly to the distance from the bottom, exactly like
+ * the Windows player.
+ */
+@Composable
+private fun Film2SubtitleOverlay(
+    text: String,
+    appearance: PlaybackAppearanceState,
+    modifier: Modifier = Modifier,
+) {
+    val textColor = when (appearance.subtitleTextColor) {
+        SubtitleTextColor.WHITE -> Color.White
+        SubtitleTextColor.YELLOW -> Color(0xFFFFEB3B)
+        SubtitleTextColor.CYAN -> Color(0xFF80DEEA)
+    }
+    val backgroundColor = when (appearance.subtitleBackground) {
+        SubtitleBackground.NONE -> Color.Transparent
+        SubtitleBackground.SOFT -> Color.Black.copy(alpha = 0.55f)
+        SubtitleBackground.STRONG -> Color.Black.copy(alpha = 0.86f)
+    }
+    val shadow = when (appearance.subtitleEdge) {
+        SubtitleEdge.OUTLINE -> Shadow(Color.Black, Offset.Zero, 5.5f)
+        SubtitleEdge.SHADOW -> Shadow(Color.Black, Offset(0f, 4f), 7f)
+        SubtitleEdge.NONE -> null
+    }
+    val scale = appearance.subtitleSizeScale.coerceIn(0.65f, 1.75f)
+    val bottomFraction = appearance.subtitleBottomPaddingFraction.coerceIn(0.04f, 0.32f)
+
+    BoxWithConstraints(modifier = modifier) {
+        val bottomPadding = maxHeight * bottomFraction
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 26.dp)
+                .padding(bottom = bottomPadding),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = text,
+                color = textColor,
+                fontSize = (24f * scale).sp,
+                lineHeight = (30f * scale).sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Medium,
+                style = TextStyle(shadow = shadow),
+                modifier = Modifier
+                    .background(backgroundColor, RoundedCornerShape(4.dp))
+                    .padding(horizontal = 8.dp, vertical = 3.dp),
+            )
+        }
+    }
+}
+
 private fun applyPlayerAppearance(view: PlayerView, appearance: PlaybackAppearanceState) {
     view.resizeMode = when (appearance.videoLayoutMode) {
         VideoLayoutMode.SCREEN_CROP -> AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         VideoLayoutMode.STRETCH -> AspectRatioFrameLayout.RESIZE_MODE_FILL
         else -> AspectRatioFrameLayout.RESIZE_MODE_FIT
     }
-
-    val foreground = when (appearance.subtitleTextColor) {
-        SubtitleTextColor.WHITE -> AndroidColor.WHITE
-        SubtitleTextColor.YELLOW -> AndroidColor.rgb(255, 235, 59)
-        SubtitleTextColor.CYAN -> AndroidColor.rgb(128, 222, 234)
-    }
-    val background = when (appearance.subtitleBackground) {
-        SubtitleBackground.NONE -> AndroidColor.TRANSPARENT
-        SubtitleBackground.SOFT -> AndroidColor.argb(145, 0, 0, 0)
-        SubtitleBackground.STRONG -> AndroidColor.argb(225, 0, 0, 0)
-    }
-    val edgeType = when (appearance.subtitleEdge) {
-        SubtitleEdge.OUTLINE -> CaptionStyleCompat.EDGE_TYPE_OUTLINE
-        SubtitleEdge.SHADOW -> CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW
-        SubtitleEdge.NONE -> CaptionStyleCompat.EDGE_TYPE_NONE
-    }
-    view.subtitleView?.apply {
-        setApplyEmbeddedStyles(false)
-        setApplyEmbeddedFontSizes(false)
-        setFractionalTextSize(
-            SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * appearance.subtitleSizeScale.coerceIn(0.65f, 1.75f),
-        )
-        setBottomPaddingFraction(appearance.subtitleBottomPaddingFraction.coerceIn(0.02f, 0.32f))
-        setStyle(
-            CaptionStyleCompat(
-                foreground,
-                background,
-                AndroidColor.TRANSPARENT,
-                edgeType,
-                AndroidColor.BLACK,
-                null,
-            ),
-        )
-    }
+    // Film2SubtitleOverlay owns subtitle layout/styling. Hiding SubtitleView prevents duplicate
+    // rendering and prevents embedded VTT cue positions from fighting the user's chosen height.
+    view.subtitleView?.visibility = View.GONE
 }
 
 @Composable
