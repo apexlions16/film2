@@ -96,10 +96,10 @@
       "profileUrl": "https://image.tmdb.org/t/p/w300/1T24SiIIDMa9gAmq7QaYwZywq4y.jpg"
     }
   ],
-  "status": "pending",
+  "status": "processing",
   "manualEntry": false,
   "createdAt": "2026-08-07T14:39:40.441735Z",
-  "updatedAt": "2026-08-07T14:39:46.626105Z",
+  "updatedAt": "2026-08-07T15:19:14.932265Z",
   "seasons": [
     {
       "seasonNumber": 1,
@@ -114,7 +114,7 @@
           "airDate": "2014-10-07",
           "stillUrl": "https://image.tmdb.org/t/p/w500/piyGyhwbqqyIxcyuZXYmDUWSylb.jpg",
           "runtimeMinutes": 44,
-          "status": "pending"
+          "status": "processing"
         },
         {
           "episodeNumber": 2,
