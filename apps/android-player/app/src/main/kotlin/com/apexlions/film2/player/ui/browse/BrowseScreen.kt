@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.apexlions.film2.player.Film2PlayerApplication
 import com.apexlions.film2.player.catalog.AssetStatus
 import com.apexlions.film2.player.catalog.CatalogResult
+import com.apexlions.film2.player.catalog.HomeConfig
 import com.apexlions.film2.player.catalog.Title
 import com.apexlions.film2.player.ui.common.BottomTab
 import com.apexlions.film2.player.ui.common.BrowseLoadingSkeleton
@@ -46,6 +48,7 @@ import com.apexlions.film2.player.userdata.PlaybackRecord
 import com.apexlions.film2.player.userdata.UserLibraryState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlin.random.Random
 
 @Composable
 fun BrowseScreen(
@@ -60,10 +63,10 @@ fun BrowseScreen(
         factory = BrowseViewModel.Factory(application.catalogRepository),
     )
     val state by viewModel.state.collectAsState()
+    val homeConfig by viewModel.homeConfig.collectAsState()
+    val artworkNonce by viewModel.artworkNonce.collectAsState()
     val library by application.userLibraryRepository.state.collectAsState()
 
-    // Only runs while the home screen is in composition. A 5-second request downloads
-    // catalog/version.json only; full catalog reload happens solely when revision changed.
     LaunchedEffect(viewModel) {
         while (isActive) {
             delay(CATALOG_POLL_MS)
@@ -82,21 +85,16 @@ fun BrowseScreen(
             is CatalogResult.Success -> BrowseContent(
                 titles = result.titles,
                 demoTitle = viewModel.demoTitle,
+                homeConfig = homeConfig,
+                artworkNonce = artworkNonce,
                 library = library,
                 onTitleSelected = onTitleSelected,
                 onContinuePlay = onContinuePlay,
             )
 
             is CatalogResult.Error -> Column(modifier = Modifier.fillMaxSize()) {
-                CatalogErrorState(
-                    message = result.message,
-                    onRetry = viewModel::refresh,
-                )
-                GenreRow(
-                    genre = "Test",
-                    titles = listOf(viewModel.demoTitle),
-                    onSelect = onTitleSelected,
-                )
+                CatalogErrorState(message = result.message, onRetry = viewModel::refresh)
+                GenreRow(genre = "Test", titles = listOf(viewModel.demoTitle), onSelect = onTitleSelected)
             }
         }
 
@@ -115,20 +113,24 @@ fun BrowseScreen(
             )
         }
 
-        IconButton(
-            onClick = onSearchClick,
+        Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .statusBarsPadding()
-                .padding(top = 4.dp, end = 8.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.58f)),
+                .padding(top = 4.dp, end = 8.dp),
         ) {
-            Icon(
-                imageVector = Icons.Filled.Search,
-                contentDescription = "Ara",
-                tint = MaterialTheme.colorScheme.onBackground,
-            )
+            IconButton(
+                onClick = viewModel::refresh,
+                modifier = Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.background.copy(alpha = 0.58f)),
+            ) {
+                Icon(Icons.Filled.Refresh, contentDescription = "Katalogu yenile", tint = MaterialTheme.colorScheme.onBackground)
+            }
+            IconButton(
+                onClick = onSearchClick,
+                modifier = Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.background.copy(alpha = 0.58f)),
+            ) {
+                Icon(Icons.Filled.Search, contentDescription = "Ara", tint = MaterialTheme.colorScheme.onBackground)
+            }
         }
 
         Film2BottomBar(
@@ -148,16 +150,36 @@ fun BrowseScreen(
 private fun BrowseContent(
     titles: List<Title>,
     demoTitle: Title,
+    homeConfig: HomeConfig,
+    artworkNonce: Long,
     library: UserLibraryState,
     onTitleSelected: (Title) -> Unit,
     onContinuePlay: (titleId: String, season: Int?, episode: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val playableTitles = titles.filter { it.status == AssetStatus.READY }
-    val processingTitles = titles.filter {
-        it.status == AssetStatus.PROCESSING || it.status == AssetStatus.PENDING
+    val processingTitles = titles.filter { it.status == AssetStatus.PROCESSING || it.status == AssetStatus.PENDING }
+    val byId = titles.associateBy { it.id }
+
+    val configuredHeroes = homeConfig.heroTitleIds.mapNotNull(byId::get).filter { it.status == AssetStatus.READY }
+    val hero = when {
+        configuredHeroes.isNotEmpty() -> configuredHeroes[(artworkNonce.absoluteIndex(configuredHeroes.size))]
+        else -> playableTitles.firstOrNull() ?: titles.firstOrNull()
     }
-    val hero = playableTitles.firstOrNull() ?: titles.firstOrNull()
+
+    val curatedShelves = homeConfig.shelves
+        .asSequence()
+        .filter { it.enabled }
+        .mapNotNull { shelf ->
+            var shelfTitles = shelf.titleIds.mapNotNull(byId::get)
+            if (shelf.shuffle && shelfTitles.size > 1) {
+                shelfTitles = shelfTitles.shuffled(Random(artworkNonce xor shelf.id.hashCode().toLong()))
+            }
+            shelfTitles = shelfTitles.take(shelf.maxItems.coerceIn(1, 100))
+            shelf.takeIf { shelfTitles.isNotEmpty() }?.let { it to shelfTitles }
+        }
+        .toList()
+
     val genres = playableTitles
         .flatMap { title -> title.genres.map { it to title } }
         .groupBy({ it.first }, { it.second })
@@ -169,8 +191,7 @@ private fun BrowseContent(
     val continueItems = library.continueWatching()
         .mapNotNull { record -> buildContinueItem(titles, record) }
         .take(20)
-
-    val myListTitles = library.myListTitleIds.mapNotNull { id -> titles.firstOrNull { it.id == id } }
+    val myListTitles = library.myListTitleIds.mapNotNull(byId::get)
 
     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
         androidx.compose.foundation.lazy.LazyColumn(modifier = modifier.fillMaxSize()) {
@@ -180,25 +201,30 @@ private fun BrowseContent(
                         title = hero,
                         onPlay = { onTitleSelected(hero) },
                         onMoreInfo = { onTitleSelected(hero) },
+                        artworkNonce = artworkNonce,
                     )
                 }
             }
 
-            if (titles.isEmpty()) {
-                item(key = "empty") { CatalogEmptyState() }
-            }
+            if (titles.isEmpty()) item(key = "empty") { CatalogEmptyState() }
 
             if (continueItems.isNotEmpty()) {
                 item(key = "continue-watching") {
                     ContinueWatchingRow(
                         items = continueItems,
-                        onPlay = { item ->
-                            onContinuePlay(
-                                item.record.titleId,
-                                item.record.seasonNumber,
-                                item.record.episodeNumber,
-                            )
-                        },
+                        onPlay = { item -> onContinuePlay(item.record.titleId, item.record.seasonNumber, item.record.episodeNumber) },
+                    )
+                }
+            }
+
+            curatedShelves.forEach { (shelf, shelfTitles) ->
+                item(key = "curated-${shelf.id}") {
+                    GenreRow(
+                        genre = shelf.title,
+                        titles = shelfTitles,
+                        onSelect = onTitleSelected,
+                        progressByTitle = progressByTitle,
+                        artworkNonce = artworkNonce,
                     )
                 }
             }
@@ -206,10 +232,11 @@ private fun BrowseContent(
             if (processingTitles.isNotEmpty()) {
                 item(key = "processing") {
                     GenreRow(
-                        genre = "Hazirlaniyor",
+                        genre = "Hazırlanıyor",
                         titles = processingTitles,
                         onSelect = onTitleSelected,
                         progressByTitle = progressByTitle,
+                        artworkNonce = artworkNonce,
                     )
                 }
             }
@@ -221,6 +248,7 @@ private fun BrowseContent(
                         titles = myListTitles,
                         onSelect = onTitleSelected,
                         progressByTitle = progressByTitle,
+                        artworkNonce = artworkNonce,
                     )
                 }
             }
@@ -231,22 +259,23 @@ private fun BrowseContent(
                     titles = genreTitles,
                     onSelect = onTitleSelected,
                     progressByTitle = progressByTitle,
+                    artworkNonce = artworkNonce,
                 )
             }
 
             item(key = "demo-row") {
-                GenreRow(
-                    genre = "Demo Stream (test)",
-                    titles = listOf(demoTitle),
-                    onSelect = onTitleSelected,
-                )
+                GenreRow(genre = "Demo Stream (test)", titles = listOf(demoTitle), onSelect = onTitleSelected)
             }
 
-            item(key = "bottom-spacer") {
-                Spacer(modifier = Modifier.height(110.dp))
-            }
+            item(key = "bottom-spacer") { Spacer(modifier = Modifier.height(110.dp)) }
         }
     }
+}
+
+private fun Long.absoluteIndex(size: Int): Int {
+    if (size <= 1) return 0
+    val positive = if (this == Long.MIN_VALUE) 0L else kotlin.math.abs(this)
+    return (positive % size).toInt()
 }
 
 private fun buildContinueItem(titles: List<Title>, record: PlaybackRecord): ContinueWatchingUiItem? {
