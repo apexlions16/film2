@@ -12,7 +12,9 @@
     "Bilim Kurgu & Fantazi"
   ],
   "posterUrl": "https://image.tmdb.org/t/p/w780/yZevl2vHQgmosfwUdVNzviIfaWS.jpg",
+  "posterUrls": [],
   "backdropUrl": "https://image.tmdb.org/t/p/w1280/gFkHcIh7iE5G0oVOgpmY8ONQjhl.jpg",
+  "backdropUrls": [],
   "cast": [
     {
       "name": "Grant Gustin",
@@ -99,7 +101,7 @@
   "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T14:39:40.441735Z",
-  "updatedAt": "2026-08-07T15:36:07.686871Z",
+  "updatedAt": "2026-08-07T16:52:07.885977Z",
   "seasons": [
     {
       "seasonNumber": 1,
@@ -152,7 +154,7 @@
           "airDate": "2014-10-14",
           "stillUrl": "https://image.tmdb.org/t/p/w500/tM61prhWhwHNDYAybsHAgRJbUZk.jpg",
           "runtimeMinutes": 41,
-          "status": "pending"
+          "status": "processing"
         },
         {
           "episodeNumber": 3,
