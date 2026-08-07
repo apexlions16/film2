@@ -14,11 +14,13 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
+import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaSource
+import com.apexlions.film2.player.Film2PlayerApplication
 import com.apexlions.film2.player.catalog.CatalogRepository
 import com.apexlions.film2.player.catalog.DemoContent
 import com.apexlions.film2.player.catalog.PlayableAsset
@@ -47,12 +49,6 @@ data class PlayerRuntimeState(
     val isBuffering: Boolean = false,
 )
 
-/**
- * Tek ExoPlayer + tek MP4 timeline'i. Kalite degisimi ayri MP4 URL'leri arasinda olur;
- * sesler MP4'lerin icindedir ve VTT side-load edilir.
- *
- * Oynatma konumu, kalite, ses ve altyazi tercihi cihazda kalici olarak saklanir.
- */
 class PlayerViewModel(
     application: Application,
     private val titleId: String,
@@ -62,9 +58,12 @@ class PlayerViewModel(
     private val userLibrary: UserLibraryRepository,
 ) : AndroidViewModel(application) {
 
+    private val app = application as Film2PlayerApplication
+    private val offlineRepository = app.offlineDownloadRepository
     private val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-        .setUserAgent("film2-android-player/1.3.0-cinematic")
+        .setUserAgent("film2-android-player/1.4-ux")
         .setAllowCrossProtocolRedirects(true)
+    private val dataSourceFactory = DefaultDataSource.Factory(application, httpDataSourceFactory)
 
     val player: ExoPlayer = ExoPlayer.Builder(application).build()
 
@@ -95,9 +94,7 @@ class PlayerViewModel(
                 updateRuntime()
             }
 
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                updateRuntime()
-            }
+            override fun onIsPlayingChanged(isPlaying: Boolean) = updateRuntime()
 
             override fun onPlaybackStateChanged(playbackState: Int) {
                 updateRuntime()
@@ -115,25 +112,18 @@ class PlayerViewModel(
 
             override fun onPlayerError(error: PlaybackException) {
                 persistNow()
-                val cause = error.cause?.message?.takeIf { it.isNotBlank() }
-                val detail = cause ?: error.message ?: "Bilinmeyen Media3 hatasi"
-                _uiState.value = PlaybackUiState.Error(
-                    "Oynatma hatasi (${error.errorCodeName}): $detail",
-                )
+                val detail = error.cause?.message?.takeIf { it.isNotBlank() } ?: error.message ?: "Bilinmeyen Media3 hatasi"
+                _uiState.value = PlaybackUiState.Error("Oynatma hatasi (${error.errorCodeName}): $detail")
             }
         })
 
         viewModelScope.launch {
             while (isActive) {
                 updateRuntime()
-                val now = System.currentTimeMillis()
-                if (now - lastPersistAtMs >= PROGRESS_SAVE_INTERVAL_MS) {
-                    persistNow()
-                }
+                if (System.currentTimeMillis() - lastPersistAtMs >= PROGRESS_SAVE_INTERVAL_MS) persistNow()
                 delay(RUNTIME_TICK_MS)
             }
         }
-
         resolveAndLoad()
     }
 
@@ -150,31 +140,26 @@ class PlayerViewModel(
             _uiState.value = PlaybackUiState.Ready(title, asset)
             runCatching { playAsset(asset) }
                 .onFailure { t ->
-                    _uiState.value = PlaybackUiState.Error(
-                        "Oynatici hazirlanamadi: ${t.message ?: t::class.java.simpleName}",
-                    )
+                    _uiState.value = PlaybackUiState.Error("Oynatici hazirlanamadi: ${t.message ?: t::class.java.simpleName}")
                 }
         }
     }
 
     private suspend fun resolve(): Pair<Title, PlayableAsset>? {
-        val title = if (titleId == DemoContent.DEMO_TITLE_ID) {
-            DemoContent.demoTitle
-        } else {
-            repository.fetchTitle(titleId) ?: return null
-        }
+        val title = if (titleId == DemoContent.DEMO_TITLE_ID) DemoContent.demoTitle
+        else repository.fetchTitle(titleId) ?: return null
 
-        return if (seasonNumber != null && episodeNumber != null) {
-            val episode = title.seasons
+        val remoteAsset = if (seasonNumber != null && episodeNumber != null) {
+            title.seasons
                 ?.firstOrNull { it.seasonNumber == seasonNumber }
                 ?.episodes
                 ?.firstOrNull { it.episodeNumber == episodeNumber }
-            val asset = episode?.asset ?: return null
-            title to asset
+                ?.asset ?: return null
         } else {
-            val asset = title.asset ?: return null
-            title to asset
+            title.asset ?: return null
         }
+        val localAsset = offlineRepository.localAsset(titleId, seasonNumber, episodeNumber, remoteAsset)
+        return title to (localAsset ?: remoteAsset)
     }
 
     private fun playAsset(asset: PlayableAsset) {
@@ -202,12 +187,8 @@ class PlayerViewModel(
         _selectedQualityHeight.value = null
         val legacyHls = asset.masterPlaylistUrl?.takeIf { it.isNotBlank() }
             ?: throw IllegalStateException("Asset icinde videoUrl veya masterPlaylistUrl yok")
-        val mediaItem = MediaItem.Builder()
-            .setUri(legacyHls)
-            .setMimeType(MimeTypes.APPLICATION_M3U8)
-            .build()
-        val mediaSource = HlsMediaSource.Factory(httpDataSourceFactory)
-            .createMediaSource(mediaItem)
+        val mediaItem = MediaItem.Builder().setUri(legacyHls).setMimeType(MimeTypes.APPLICATION_M3U8).build()
+        val mediaSource = HlsMediaSource.Factory(httpDataSourceFactory).createMediaSource(mediaItem)
         start(mediaSource, resumePosition, true)
     }
 
@@ -225,14 +206,11 @@ class PlayerViewModel(
                 .setLabel(track.label ?: track.language)
                 .build()
         }
-
         val mediaItem = MediaItem.Builder()
             .setUri(videoUrl)
             .setSubtitleConfigurations(subtitleConfigurations)
             .build()
-
-        val mediaSource = DefaultMediaSourceFactory(httpDataSourceFactory)
-            .createMediaSource(mediaItem)
+        val mediaSource = DefaultMediaSourceFactory(dataSourceFactory).createMediaSource(mediaItem)
         start(mediaSource, startPositionMs, playWhenReady)
     }
 
@@ -254,11 +232,8 @@ class PlayerViewModel(
             .clearOverridesOfType(C.TRACK_TYPE_TEXT)
             .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, subtitlesDisabled)
-
         preferredAudioLanguage?.let { builder = builder.setPreferredAudioLanguage(it) }
-        if (!subtitlesDisabled) {
-            preferredSubtitleLanguage?.let { builder = builder.setPreferredTextLanguage(it) }
-        }
+        if (!subtitlesDisabled) preferredSubtitleLanguage?.let { builder = builder.setPreferredTextLanguage(it) }
         player.trackSelectionParameters = builder.build()
     }
 
@@ -284,7 +259,6 @@ class PlayerViewModel(
     fun selectQuality(variant: VideoVariant) {
         val asset = activeAsset ?: return
         if (variant.url == currentVideoUrl) return
-
         val position = player.currentPosition.coerceAtLeast(0L)
         val shouldPlay = player.playWhenReady
         currentVideoUrl = variant.url
@@ -293,7 +267,6 @@ class PlayerViewModel(
         persistNow()
     }
 
-    /** MP4 icindeki ses track'ini native Media3 secimiyle degistirir. */
     fun selectAudioTrack(group: Tracks.Group, trackIndex: Int) {
         preferredAudioLanguage = group.getTrackFormat(trackIndex).language
         val override = TrackSelectionOverride(group.mediaTrackGroup, trackIndex)
@@ -335,7 +308,6 @@ class PlayerViewModel(
         persistNow()
     }
 
-    /** Activity arka plana giderken veya kullanici geri donerken cagrilir. */
     fun pauseAndPersist() {
         player.pause()
         updateRuntime()
@@ -361,10 +333,9 @@ class PlayerViewModel(
     }
 
     private fun updateRuntime() {
-        val duration = safeDuration()
         _runtime.value = PlayerRuntimeState(
             positionMs = player.currentPosition.coerceAtLeast(0L),
-            durationMs = duration,
+            durationMs = safeDuration(),
             bufferedPositionMs = player.bufferedPosition.coerceAtLeast(0L),
             isPlaying = player.isPlaying,
             isBuffering = player.playbackState == Player.STATE_BUFFERING,
@@ -393,14 +364,7 @@ class PlayerViewModel(
         @Suppress("UNCHECKED_CAST")
         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(PlayerViewModel::class.java))
-            return PlayerViewModel(
-                application = application,
-                titleId = titleId,
-                seasonNumber = seasonNumber,
-                episodeNumber = episodeNumber,
-                repository = repository,
-                userLibrary = userLibrary,
-            ) as T
+            return PlayerViewModel(application, titleId, seasonNumber, episodeNumber, repository, userLibrary) as T
         }
     }
 
