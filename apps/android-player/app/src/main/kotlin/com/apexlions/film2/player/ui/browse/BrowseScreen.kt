@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -43,6 +44,8 @@ import com.apexlions.film2.player.ui.common.CatalogErrorState
 import com.apexlions.film2.player.ui.common.Film2BottomBar
 import com.apexlions.film2.player.userdata.PlaybackRecord
 import com.apexlions.film2.player.userdata.UserLibraryState
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 @Composable
 fun BrowseScreen(
@@ -58,6 +61,15 @@ fun BrowseScreen(
     )
     val state by viewModel.state.collectAsState()
     val library by application.userLibraryRepository.state.collectAsState()
+
+    // Only runs while the home screen is in composition. A 5-second request downloads
+    // catalog/version.json only; full catalog reload happens solely when revision changed.
+    LaunchedEffect(viewModel) {
+        while (isActive) {
+            delay(CATALOG_POLL_MS)
+            viewModel.refreshIfChanged()
+        }
+    }
 
     Box(
         modifier = modifier
@@ -142,6 +154,9 @@ private fun BrowseContent(
     modifier: Modifier = Modifier,
 ) {
     val playableTitles = titles.filter { it.status == AssetStatus.READY }
+    val processingTitles = titles.filter {
+        it.status == AssetStatus.PROCESSING || it.status == AssetStatus.PENDING
+    }
     val hero = playableTitles.firstOrNull() ?: titles.firstOrNull()
     val genres = playableTitles
         .flatMap { title -> title.genres.map { it to title } }
@@ -184,6 +199,17 @@ private fun BrowseContent(
                                 item.record.episodeNumber,
                             )
                         },
+                    )
+                }
+            }
+
+            if (processingTitles.isNotEmpty()) {
+                item(key = "processing") {
+                    GenreRow(
+                        genre = "Hazirlaniyor",
+                        titles = processingTitles,
+                        onSelect = onTitleSelected,
+                        progressByTitle = progressByTitle,
                     )
                 }
             }
@@ -249,3 +275,5 @@ private fun buildContinueItem(titles: List<Title>, record: PlaybackRecord): Cont
         subtitle = subtitle,
     )
 }
+
+private const val CATALOG_POLL_MS = 5_000L
