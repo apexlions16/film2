@@ -5,6 +5,11 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Base64
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -42,20 +47,6 @@ data class HfUploadProgress(
     val message: String,
 )
 
-/**
- * Uploads one Storage Access Framework Uri into a Hugging Face dataset repository.
- *
- * The implementation follows the same public Hub protocol used by the official
- * huggingface_hub client:
- *  1. preupload (path + first 512 byte sample + size)
- *  2. Git LFS batch API for large files (basic or multipart transfer)
- *  3. optional verify action
- *  4. newline-delimited JSON commit
- *
- * Files are copied and SHA-256 hashed in one pass into app external cache. That makes a
- * potentially long preparation phase visible instead of appearing frozen, and gives the
- * upload body a seekable source required by multipart/retry requests.
- */
 interface HfUploader {
     suspend fun uploadFile(
         token: String,
@@ -69,6 +60,16 @@ interface HfUploader {
 fun resolveHfUrl(shardId: String, pathInRepo: String): String =
     "https://huggingface.co/datasets/$shardId/resolve/main/$pathInRepo"
 
+/**
+ * Android Hub uploader tuned for large media.
+ *
+ * - content:// input still gets one seekable temp copy (SAF streams are not reliably seekable).
+ * - file:// input produced by FastPublishCoordinator is hashed in-place and uploaded directly;
+ *   a second full-size cache copy is intentionally skipped.
+ * - Hugging Face multipart LFS parts are sent with bounded parallelism instead of serially.
+ *
+ * Video/audio bytes are never transcoded here.
+ */
 class HuggingFaceUploader(
     private val context: Context,
     private val httpClient: OkHttpClient = OkHttpClient.Builder()
@@ -127,7 +128,7 @@ class HuggingFaceUploader(
             )
             resolveHfUrl(shardId, repoPath)
         } finally {
-            prepared.file.delete()
+            if (prepared.deleteAfterUse) prepared.file.delete()
         }
     }
 
@@ -135,6 +136,20 @@ class HuggingFaceUploader(
         uri: Uri,
         onProgress: (HfUploadProgress) -> Unit,
     ): PreparedFile {
+        val directFile = uri.takeIf { it.scheme.equals("file", ignoreCase = true) }
+            ?.path
+            ?.let(::File)
+            ?.takeIf { it.isFile && it.canRead() }
+
+        if (directFile != null) {
+            return prepareSeekableFile(
+                file = directFile,
+                deleteAfterUse = false,
+                message = "Final MP4 dogrudan okunuyor; ikinci cache kopyasi atlandi",
+                onProgress = onProgress,
+            )
+        }
+
         val expectedSize = querySize(uri)
         val cacheRoot = context.externalCacheDir ?: context.cacheDir
         if (expectedSize > 0L && cacheRoot.usableSpace < expectedSize + CACHE_SAFETY_BYTES) {
@@ -209,6 +224,62 @@ class HuggingFaceUploader(
             size = copied,
             sha256 = digest.digest().joinToString("") { "%02x".format(it) },
             sample = sample.copyOf(sampleLength),
+            deleteAfterUse = true,
+        )
+    }
+
+    private fun prepareSeekableFile(
+        file: File,
+        deleteAfterUse: Boolean,
+        message: String,
+        onProgress: (HfUploadProgress) -> Unit,
+    ): PreparedFile {
+        val size = file.length().coerceAtLeast(0L)
+        if (size <= 0L) throw HfUploadException("Yuklenecek dosya bos veya okunamiyor: ${file.name}")
+
+        val digest = MessageDigest.getInstance("SHA-256")
+        val sample = ByteArray(PREUPLOAD_SAMPLE_BYTES)
+        var sampleLength = 0
+        var done = 0L
+        var lastReportAt = 0L
+
+        onProgress(HfUploadProgress(HfUploadStage.PREPARING, 0L, size, message))
+        FileInputStream(file).use { source ->
+            val buffer = ByteArray(HASH_BUFFER_BYTES)
+            while (true) {
+                val read = source.read(buffer)
+                if (read < 0) break
+                if (read == 0) continue
+                digest.update(buffer, 0, read)
+                if (sampleLength < sample.size) {
+                    val n = minOf(read, sample.size - sampleLength)
+                    buffer.copyInto(sample, sampleLength, 0, n)
+                    sampleLength += n
+                }
+                done += read
+                val now = System.currentTimeMillis()
+                if (done == size || now - lastReportAt >= HASH_PROGRESS_THROTTLE_MS) {
+                    lastReportAt = now
+                    onProgress(
+                        HfUploadProgress(
+                            HfUploadStage.PREPARING,
+                            done,
+                            size,
+                            "$message • hash %${((done.toDouble() / size) * 100).toInt().coerceIn(0, 100)}",
+                        ),
+                    )
+                }
+            }
+        }
+        if (done != size) {
+            throw HfUploadException("Dosya hash sirasinda degisti (beklenen $size, okunan $done bayt)")
+        }
+        return PreparedFile(
+            file = file,
+            size = size,
+            sha256 = digest.digest().joinToString("") { "%02x".format(it) },
+            sample = sample.copyOf(sampleLength),
+            deleteAfterUse = deleteAfterUse,
         )
     }
 
@@ -295,7 +366,7 @@ class HuggingFaceUploader(
         )
     }
 
-    private fun uploadLfs(
+    private suspend fun uploadLfs(
         token: String,
         shardId: String,
         repoPath: String,
@@ -330,9 +401,7 @@ class HuggingFaceUploader(
             )
         }
 
-        actions?.verify?.let { verifyAction ->
-            verifyLfsUpload(token, verifyAction, prepared)
-        }
+        actions?.verify?.let { verifyAction -> verifyLfsUpload(token, verifyAction, prepared) }
 
         onProgress(
             HfUploadProgress(
@@ -409,12 +478,12 @@ class HuggingFaceUploader(
         executeNoBody(builder.build(), "Hugging Face LFS yuklemesi")
     }
 
-    private fun uploadMultipart(
+    private suspend fun uploadMultipart(
         prepared: PreparedFile,
         action: LfsAction,
         chunkSize: Long,
         onProgress: (HfUploadProgress) -> Unit,
-    ) {
+    ) = coroutineScope {
         require(chunkSize > 0L) { "Gecersiz LFS parca boyutu: $chunkSize" }
         val partUrls = action.header.orEmpty().entries
             .mapNotNull { (key, value) -> key.toIntOrNull()?.let { it to value.jsonPrimitive.content } }
@@ -427,39 +496,86 @@ class HuggingFaceUploader(
             )
         }
 
-        val completedParts = mutableListOf<CompletedPart>()
-        var uploadedBefore = 0L
-        partUrls.forEachIndexed { index, (_, partUrl) ->
-            val offset = index * chunkSize
-            val length = minOf(chunkSize, prepared.size - offset)
-            val body = ProgressFileRequestBody(
-                file = prepared.file,
-                offset = offset,
-                byteCount = length,
-                onProgress = { partSent ->
-                    onProgress(
-                        HfUploadProgress(
-                            HfUploadStage.UPLOADING,
-                            uploadedBefore + partSent,
-                            prepared.size,
-                            "Dosya yukleniyor: parca ${index + 1}/$expectedParts",
-                        ),
-                    )
-                },
-            )
-            val request = Request.Builder().url(resolveActionUrl(partUrl)).put(body).build()
-            val etag = httpClient.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    throw responseException("LFS parca ${index + 1} yuklemesi", response.code, response.body?.string())
-                }
-                response.header("ETag")
-                    ?: response.header("etag")
-                    ?: throw HfUploadException("LFS parca ${index + 1} yanitinda ETag yok")
-            }
-            completedParts += CompletedPart(partNumber = index + 1, etag = etag)
-            uploadedBefore += length
-        }
+        val parallelism = minOf(MAX_PARALLEL_MULTIPART_PARTS, expectedParts).coerceAtLeast(1)
+        val semaphore = Semaphore(parallelism)
+        val progressByPart = LongArray(expectedParts)
+        val progressLock = Any()
+        var lastReportedBytes = -1L
+        var lastReportedAt = 0L
 
+        onProgress(
+            HfUploadProgress(
+                HfUploadStage.UPLOADING,
+                0L,
+                prepared.size,
+                "Hugging Face multipart: $parallelism paralel baglanti",
+            ),
+        )
+
+        val completedParts = partUrls.mapIndexed { index, (_, partUrl) ->
+            async(Dispatchers.IO) {
+                semaphore.withPermit {
+                    val offset = index.toLong() * chunkSize
+                    val length = minOf(chunkSize, prepared.size - offset)
+                    val body = ProgressFileRequestBody(
+                        file = prepared.file,
+                        offset = offset,
+                        byteCount = length,
+                        onProgress = { partSent ->
+                            var reportBytes: Long? = null
+                            synchronized(progressLock) {
+                                progressByPart[index] = partSent.coerceIn(0L, length)
+                                val totalDone = progressByPart.sum()
+                                val now = System.currentTimeMillis()
+                                if (
+                                    totalDone == prepared.size ||
+                                    totalDone - lastReportedBytes >= MULTIPART_PROGRESS_STEP_BYTES ||
+                                    now - lastReportedAt >= MULTIPART_PROGRESS_THROTTLE_MS
+                                ) {
+                                    lastReportedBytes = totalDone
+                                    lastReportedAt = now
+                                    reportBytes = totalDone
+                                }
+                            }
+                            reportBytes?.let { totalDone ->
+                                onProgress(
+                                    HfUploadProgress(
+                                        HfUploadStage.UPLOADING,
+                                        totalDone,
+                                        prepared.size,
+                                        "Dosya paralel yukleniyor • $parallelism baglanti",
+                                    ),
+                                )
+                            }
+                        },
+                    )
+                    val request = Request.Builder().url(resolveActionUrl(partUrl)).put(body).build()
+                    val etag = httpClient.newCall(request).execute().use { response ->
+                        if (!response.isSuccessful) {
+                            throw responseException(
+                                "LFS parca ${index + 1} yuklemesi",
+                                response.code,
+                                response.body?.string(),
+                            )
+                        }
+                        response.header("ETag")
+                            ?: response.header("etag")
+                            ?: throw HfUploadException("LFS parca ${index + 1} yanitinda ETag yok")
+                    }
+                    synchronized(progressLock) { progressByPart[index] = length }
+                    CompletedPart(partNumber = index + 1, etag = etag)
+                }
+            }
+        }.awaitAll().sortedBy { it.partNumber }
+
+        onProgress(
+            HfUploadProgress(
+                HfUploadStage.UPLOADING,
+                prepared.size,
+                prepared.size,
+                "Tum paralel parcalar yuklendi; multipart tamamlaniyor",
+            ),
+        )
         val completion = MultipartCompletion(oid = prepared.sha256, parts = completedParts)
         val request = Request.Builder()
             .url(resolveActionUrl(action.href))
@@ -502,6 +618,9 @@ class HuggingFaceUploader(
     }
 
     private fun querySize(uri: Uri): Long {
+        if (uri.scheme.equals("file", ignoreCase = true)) {
+            uri.path?.let(::File)?.takeIf { it.isFile }?.let { return it.length().coerceAtLeast(0L) }
+        }
         context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { cursor ->
             val index = cursor.getColumnIndex(OpenableColumns.SIZE)
             if (index >= 0 && cursor.moveToFirst() && !cursor.isNull(index)) {
@@ -523,9 +642,7 @@ class HuggingFaceUploader(
 
     private fun executeNoBody(request: Request, label: String) {
         httpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                throw responseException(label, response.code, response.body?.string())
-            }
+            if (!response.isSuccessful) throw responseException(label, response.code, response.body?.string())
         }
     }
 
@@ -553,11 +670,16 @@ class HuggingFaceUploader(
 
     companion object {
         private const val HF_ENDPOINT = "https://huggingface.co"
-        private const val USER_AGENT = "film2-android-studio/1.1"
+        private const val USER_AGENT = "film2-android-studio/1.5-fast-hf"
         private const val PREUPLOAD_SAMPLE_BYTES = 512
         private const val COPY_BUFFER_BYTES = 256 * 1024
+        private const val HASH_BUFFER_BYTES = 1024 * 1024
         private const val CACHE_SAFETY_BYTES = 64L * 1024 * 1024
         private const val REGULAR_FILE_MEMORY_LIMIT_BYTES = 20L * 1024 * 1024
+        private const val MAX_PARALLEL_MULTIPART_PARTS = 4
+        private const val HASH_PROGRESS_THROTTLE_MS = 350L
+        private const val MULTIPART_PROGRESS_THROTTLE_MS = 250L
+        private const val MULTIPART_PROGRESS_STEP_BYTES = 4L * 1024 * 1024
         private const val LFS_MEDIA_TYPE_STRING = "application/vnd.git-lfs+json"
         private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
         private val NDJSON_MEDIA_TYPE = "application/x-ndjson; charset=utf-8".toMediaType()
@@ -576,6 +698,7 @@ private data class PreparedFile(
     val size: Long,
     val sha256: String,
     val sample: ByteArray,
+    val deleteAfterUse: Boolean,
 )
 
 private class ProgressFileRequestBody(
@@ -593,7 +716,7 @@ private class ProgressFileRequestBody(
             skipFully(input, offset)
             var remaining = byteCount
             var sent = 0L
-            val buffer = ByteArray(256 * 1024)
+            val buffer = ByteArray(512 * 1024)
             while (remaining > 0L) {
                 val read = input.read(buffer, 0, minOf(buffer.size.toLong(), remaining).toInt())
                 if (read < 0) throw EOFException("Dosya beklenenden erken bitti")
