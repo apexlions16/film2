@@ -1,0 +1,43 @@
+name: Build catalog snapshot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "catalog/titles/*.json"
+      - "catalog/version.json"
+      - ".github/scripts/build-catalog-index.mjs"
+      - ".github/workflows/catalog-index.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: film2-catalog-index
+  cancel-in-progress: true
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Katalog snapshotini olustur
+        run: node .github/scripts/build-catalog-index.mjs
+
+      - name: Snapshoti commit et
+        run: |
+          git config user.name "film2-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add catalog/index.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore(catalog): refresh raw catalog snapshot"
+          git pull --rebase origin main
+          git push origin main
