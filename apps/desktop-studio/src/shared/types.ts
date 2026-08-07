@@ -1,5 +1,4 @@
-// Main <-> preload <-> renderer arasinda paylasilan tipler. Sadece tip-only import'lar
-// icerir (runtime kodu yok) ki hem main hem renderer tsconfig'i sorunsuz derlesin.
+// Main <-> preload <-> renderer arasinda paylasilan tipler.
 import type {
   Title,
   Season,
@@ -9,7 +8,11 @@ import type {
   AssetStatus,
   TitleType,
   PlayableAsset,
+  ExternalMediaTrack,
+  VideoVariant,
   ShardRegistry,
+  HomeConfig,
+  HomeShelf,
 } from "@film2/catalog-schema/src/types";
 
 export type {
@@ -21,12 +24,13 @@ export type {
   AssetStatus,
   TitleType,
   PlayableAsset,
+  ExternalMediaTrack,
+  VideoVariant,
   ShardRegistry,
+  HomeConfig,
+  HomeShelf,
 };
 
-/** Studio ayarlar ekraninda toplanan token'lar. Sadece electron-store'da (userData) saklanir.
- * Hugging Face artik TEK token degil, BIRDEN COK hesap (bkz. HfAccount) olarak tutulur —
- * bir hesabin deposu dolunca digerine otomatik gecilebilsin diye. */
 export interface StudioSettings {
   tmdbApiKey: string;
   githubToken: string;
@@ -34,16 +38,12 @@ export interface StudioSettings {
 
 export type SettingsField = keyof StudioSettings;
 
-/** Renderer'in tokenlarin DOLU olup olmadigini bilmesi yeterli — degerlerin kendisini
- * gostermek zorunda degiliz (input'lar odaklaninca mevcut degeri main'den ayrica cekeriz). */
 export interface SettingsPresence {
   tmdbApiKey: boolean;
   githubToken: boolean;
   hfAccountsCount: number;
 }
 
-/** Kayitli bir Hugging Face hesabi. Token renderer'a ASLA gonderilmez — sadece main
- * process icinde tutulur, sadece namespace/fullname gosterilir. */
 export interface HfAccount {
   namespace: string;
   fullname?: string;
@@ -54,13 +54,8 @@ export interface AppError {
   detail?: string;
 }
 
-/** Butun IPC cagrilari bu zarfla doner — basari/hata renderer'da hep ayni sekilde ele alinir. */
 export type IpcResult<T> = { ok: true; data: T } | { ok: false; error: AppError };
-
-export interface GithubFileResult<T = unknown> {
-  content: T;
-  sha: string;
-}
+export interface GithubFileResult<T = unknown> { content: T; sha: string; }
 
 export type UploadMode = "combined" | "separate";
 
@@ -71,7 +66,6 @@ export interface UploadTarget {
   episodeNumber?: number;
 }
 
-/** Renderer'da secilen dosyalarin YEREL diski yollari (dialog.showOpenDialog sonucu). */
 export interface UploadFileSelection {
   mode: UploadMode;
   combinedFile?: string;
@@ -82,14 +76,16 @@ export interface UploadFileSelection {
 
 export interface UploadProgressEvent {
   uploadId: string;
-  phase: "uploading" | "updating-registry" | "dispatching" | "done" | "error";
+  phase: "preparing" | "uploading" | "updating-registry" | "publishing" | "dispatching" | "done" | "error";
   fileName?: string;
   completedFiles: number;
   totalFiles: number;
+  percent?: number;
+  bytesProcessed?: number;
+  totalBytes?: number;
   message?: string;
 }
 
-/** package-media.mjs'in bekledigi client_payload sekli — .github/scripts/package-media.mjs ile birebir eslesmeli. */
 export interface DispatchPackageMediaPayload {
   titleId: string;
   kind: "movie" | "episode";
@@ -104,22 +100,15 @@ export interface DispatchPackageMediaPayload {
   subtitleFiles: Record<string, string>;
 }
 
-export interface UploadStartRequest {
-  target: UploadTarget;
-  selection: UploadFileSelection;
+export interface UploadStartRequest { target: UploadTarget; selection: UploadFileSelection; }
+export interface UploadStartResponse { uploadId: string; shardId: string; fastPath?: boolean; }
+export interface PickFilesOptions { label: string; multi?: boolean; }
+
+export interface TrailerUploadRequest { titleId: string; localPath: string; }
+export interface QualityGenerateRequest extends UploadTarget {
+  heights: number[];
 }
 
-export interface UploadStartResponse {
-  uploadId: string;
-  shardId: string;
-}
-
-export interface PickFilesOptions {
-  label: string;
-  multi?: boolean;
-}
-
-/** window.api yuzeyi — preload'un contextBridge ile expose ettigi tam sozlesme. */
 export interface StudioApi {
   settings: {
     getPresence: () => Promise<IpcResult<SettingsPresence>>;
@@ -128,23 +117,24 @@ export interface StudioApi {
   };
   hfAccounts: {
     list: () => Promise<IpcResult<HfAccount[]>>;
-    /** Token'i dogrular (whoami), hesabi kaydeder, gorunur ozetini dondurur. */
     add: (token: string) => Promise<IpcResult<HfAccount>>;
     remove: (namespace: string) => Promise<IpcResult<void>>;
   };
-  tmdb: {
-    fetchFromImdb: (imdbLinkOrId: string) => Promise<IpcResult<Title | null>>;
-  };
+  tmdb: { fetchFromImdb: (imdbLinkOrId: string) => Promise<IpcResult<Title | null>>; };
   catalog: {
     listTitles: () => Promise<IpcResult<Title[]>>;
     getTitle: (id: string) => Promise<IpcResult<Title>>;
     saveTitle: (title: Title) => Promise<IpcResult<{ sha: string }>>;
+    getHome: () => Promise<IpcResult<HomeConfig>>;
+    saveHome: (config: HomeConfig) => Promise<IpcResult<void>>;
   };
-  files: {
-    pickFiles: (options: PickFilesOptions) => Promise<IpcResult<string[]>>;
-  };
+  files: { pickFiles: (options: PickFilesOptions) => Promise<IpcResult<string[]>>; };
   upload: {
     start: (request: UploadStartRequest) => Promise<IpcResult<UploadStartResponse>>;
     onProgress: (callback: (event: UploadProgressEvent) => void) => () => void;
+  };
+  media: {
+    uploadTrailer: (request: TrailerUploadRequest) => Promise<IpcResult<{ url: string }>>;
+    generateQualities: (request: QualityGenerateRequest) => Promise<IpcResult<void>>;
   };
 }
