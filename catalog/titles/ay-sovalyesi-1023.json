@@ -2,9 +2,9 @@
   "id": "ay-sovalyesi-1023",
   "imdbId": "tt10234724",
   "manualEntry": false,
-  "status": "processing",
+  "status": "ready",
   "createdAt": "2026-08-07T19:51:10.235Z",
-  "updatedAt": "2026-08-07T21:15:00.523Z",
+  "updatedAt": "2026-08-07T21:17:19.632Z",
   "type": "series",
   "tmdbId": 92749,
   "title": "Ay Şövalyesi",
@@ -116,7 +116,35 @@
           "airDate": "2022-03-30",
           "stillUrl": "https://image.tmdb.org/t/p/w500/h88DZpKIDo66Tvt556HCvq2BdR0.jpg",
           "runtimeMinutes": 48,
-          "status": "processing"
+          "status": "ready",
+          "shardId": "mfilms12/film2-media-01",
+          "asset": {
+            "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/video_1786137305099.mp4",
+            "audioLanguages": [
+              "tur",
+              "eng"
+            ],
+            "subtitleLanguages": [
+              "tur",
+              "eng"
+            ],
+            "externalAudioTracks": [],
+            "externalSubtitleTracks": [
+              {
+                "language": "tur",
+                "label": "Türkçe",
+                "mimeType": "text/vtt",
+                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/subs_tur_1786137305099_1.vtt"
+              },
+              {
+                "language": "eng",
+                "label": "İngilizce",
+                "mimeType": "text/vtt",
+                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/subs_eng_1786137305099_2.vtt"
+              }
+            ],
+            "videoVariants": []
+          }
         },
         {
           "episodeNumber": 2,
