@@ -1,14 +1,32 @@
 name: Build desktop apps
 
-# "v*" tag'i atildiginda (ya da elle workflow_dispatch ile) desktop-player ve
-# desktop-studio icin Windows installer'lari uretir ve GitHub Release'e ekler.
-# NOT: push+tags ile ayni anda paths filtresi kullanmak tag push'larini
-# tetiklememe riski tasiyor (dogrulandi) — bilerek path filtresiz birakildi.
 on:
   push:
+    branches:
+      - "agent/windows-ux-v2"
     tags:
       - "v*"
+    paths:
+      - "apps/desktop-player/**"
+      - "apps/desktop-studio/**"
+      - "packages/catalog-schema/**"
+      - "packages/catalog-client/**"
+      - "packages/hf-storage/**"
+      - ".github/workflows/build-desktop.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/desktop-player/**"
+      - "apps/desktop-studio/**"
+      - "packages/catalog-schema/**"
+      - "packages/catalog-client/**"
+      - "packages/hf-storage/**"
+      - ".github/workflows/build-desktop.yml"
   workflow_dispatch: {}
+
+concurrency:
+  group: desktop-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -27,14 +45,12 @@ jobs:
         with:
           node-version: "22"
 
-      # --workspaces=false: kok workspace hoisting'i electron-builder'in "installing
-      # production dependencies" adimini bozuyordu (app-builder-bin'i kendi kendine
-      # silip hemen sonra ona ihtiyac duyuyordu — gercek CI + yerelde tekrar tekrar
-      # dogrulandi). Her app kendi izole node_modules'una sahip olunca sorun cozuluyor.
-      # @film2/* paketleri artik "file:../../packages/X" protokoluyle referans veriliyor,
-      # bu sayede workspace hoisting olmadan da duzgun yerel kurulum yapabiliyor.
       - name: Bagimliliklari kur
         run: npm install --workspaces=false
+        working-directory: apps/${{ matrix.app }}
+
+      - name: TypeScript ve renderer build
+        run: npm run build
         working-directory: apps/${{ matrix.app }}
 
       - name: Windows installer derle
