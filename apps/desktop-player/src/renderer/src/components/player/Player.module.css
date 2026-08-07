@@ -1,279 +1,99 @@
-/* Local keyframes — see Row.module.css (renderer/src/components) for why
-   these must be declared per module file rather than shared from
-   global.css. */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .root {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: #000000;
+  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fade-in 0.22s var(--ease-out) both;
-}
-
-.root.cursorHide {
-  cursor: none;
-}
-
-.video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: #000000;
-}
-
-.centerOverlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.16);
-  border-top-color: var(--accent);
-  animation: spin 0.85s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.errorText {
-  max-width: 420px;
-  text-align: center;
-  font-size: 14.5px;
-  color: var(--text);
-  margin: 0;
-}
-
-.errorClose {
-  appearance: none;
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  color: var(--text);
-  padding: 9px 20px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: 13.5px;
-  font-weight: 600;
-}
-
-.controls {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.28s var(--ease-out);
-}
-
-.controls.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.topBar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 28px;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.75), transparent);
-}
-
-.closeButton {
-  appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 0.2s var(--ease-out);
-}
-
-.closeButton:hover {
-  background: rgba(255, 255, 255, 0.14);
-}
-
-.heading {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.headingTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
+  animation: fade-in .2s ease both;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.headingSub {
-  font-size: 12px;
-  color: var(--text-faint);
-}
+.root.cursorHide { cursor: none; }
+.videoStage { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; max-width: 100%; max-height: 100%; }
+.video { width: 100%; height: 100%; background: #000; }
 
-.bottomBar {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 18px 28px 24px;
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.8), transparent);
-}
+.centerOverlay { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: rgba(0,0,0,.42); }
+.spinner { width: 42px; height: 42px; border-radius: 50%; border: 3px solid rgba(255,255,255,.16); border-top-color: #e50914; animation: spin .85s linear infinite; }
+.errorText { max-width: 480px; text-align: center; color: #fff; }
 
-.seekRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.time {
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-dim);
-  min-width: 40px;
-  text-align: center;
-}
-
-.seekTrack {
-  position: relative;
-  flex: 1;
-  height: 16px;
-  display: flex;
-  align-items: center;
-}
-
-.seekTrack::before {
-  content: '';
+.subtitleOverlay {
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-}
-
-.seekBuffered {
-  position: absolute;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.seekFilled {
-  position: absolute;
-  height: 4px;
-  border-radius: 999px;
-  background: var(--accent);
-}
-
-.seekInput {
-  position: relative;
-  width: 100%;
-  height: 16px;
-  margin: 0;
-  appearance: none;
-  background: transparent;
-  cursor: pointer;
-}
-
-.seekInput::-webkit-slider-thumb {
-  appearance: none;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: var(--accent-strong);
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.35);
-  transition: transform 0.15s var(--ease-out);
-}
-
-.seekInput::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-}
-
-.controlsRow {
+  left: 7%;
+  right: 7%;
+  z-index: 14;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.controlsLeft,
-.controlsRight {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.iconButton {
-  appearance: none;
-  border: none;
-  background: transparent;
-  color: var(--text);
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition:
-    background 0.2s var(--ease-out),
-    transform 0.15s var(--ease-out);
+  text-align: center;
+  white-space: pre-line;
+  line-height: 1.28;
+  font-weight: 650;
+  pointer-events: none;
 }
+.subtitleOverlay span { padding: .12em .34em .18em; border-radius: .16em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 
-.iconButton:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
+.controls { position: absolute; inset: 0; z-index: 20; opacity: 0; pointer-events: none; transition: opacity .22s ease; background: linear-gradient(180deg, rgba(0,0,0,.72), transparent 30%, transparent 62%, rgba(0,0,0,.84)); }
+.controls.visible { opacity: 1; pointer-events: auto; }
 
-.iconButton:active {
-  transform: scale(0.92);
-}
+.topBar { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 14px; padding: 22px 28px; }
+.heading { display: flex; flex-direction: column; min-width: 0; }
+.headingTitle { color: #fff; font-size: 17px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.headingSub { color: rgba(255,255,255,.65); font-size: 12px; margin-top: 2px; }
 
-.volumeInput {
-  width: 84px;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
+.circleButton,
+.roundControl,
+.iconButton,
+.pillButton,
+.optionButton,
+.colorDot { border: 0; font: inherit; cursor: pointer; color: #fff; }
+.circleButton { width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,.48); font-size: 24px; }
+
+.centerControls { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 34px; pointer-events: none; }
+.roundControl { pointer-events: auto; width: 62px; height: 62px; border-radius: 50%; background: rgba(0,0,0,.46); backdrop-filter: blur(5px); font-size: 25px; display: inline-flex; align-items: center; justify-content: center; gap: 1px; }
+.roundControl small { font-size: 10px; margin-left: -6px; margin-top: 7px; }
+.primaryControl { width: 78px; height: 78px; background: #fff; color: #09090b; font-size: 33px; box-shadow: 0 12px 34px rgba(0,0,0,.32); }
+
+.bottomBar { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 28px 24px; }
+.seekRow { display: flex; align-items: center; gap: 12px; }
+.time { width: 48px; color: rgba(255,255,255,.72); font-size: 12px; font-variant-numeric: tabular-nums; text-align: center; }
+.seekTrack { position: relative; flex: 1; height: 18px; display: flex; align-items: center; }
+.seekTrack::before { content: ''; position: absolute; left: 0; right: 0; height: 4px; background: rgba(255,255,255,.22); border-radius: 999px; }
+.seekBuffered { position: absolute; height: 4px; background: rgba(255,255,255,.4); border-radius: 999px; }
+.seekFilled { position: absolute; height: 4px; background: #e50914; border-radius: 999px; }
+.seekInput { position: relative; width: 100%; height: 18px; margin: 0; appearance: none; background: transparent; cursor: pointer; }
+.seekInput::-webkit-slider-thumb { appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(0,0,0,.35); }
+
+.controlFooter { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.volumeGroup, .footerActions { display: flex; align-items: center; gap: 9px; }
+.iconButton { width: 38px; height: 38px; border-radius: 50%; background: rgba(0,0,0,.36); font-size: 16px; }
+.iconButton:hover, .circleButton:hover, .roundControl:hover { background-color: rgba(255,255,255,.15); }
+.volumeInput { width: 92px; accent-color: #e50914; }
+.qualityBadge { color: rgba(255,255,255,.8); background: rgba(0,0,0,.48); border: 1px solid rgba(255,255,255,.15); border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 800; }
+.pillButton { padding: 9px 14px; border-radius: 999px; background: rgba(20,20,22,.72); border: 1px solid rgba(255,255,255,.13); }
+.pillButton:hover { background: rgba(255,255,255,.14); }
+
+.settingsPanel { position: absolute; z-index: 40; top: 18px; right: 18px; bottom: 18px; width: min(430px, calc(100vw - 36px)); overflow-y: auto; padding: 20px; border-radius: 18px; background: rgba(18,18,20,.94); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 24px 60px rgba(0,0,0,.5); backdrop-filter: blur(18px); color: #fff; }
+.settingsHeader { display: flex; align-items: center; justify-content: space-between; font-size: 19px; margin-bottom: 12px; }
+.settingSection { padding: 16px 0; border-top: 1px solid rgba(255,255,255,.1); }
+.settingSection h3 { margin: 0 0 10px; font-size: 13px; color: rgba(255,255,255,.72); text-transform: uppercase; letter-spacing: .05em; }
+.optionGrid { display: flex; flex-wrap: wrap; gap: 8px; }
+.optionButton { padding: 8px 11px; border-radius: 8px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); font-size: 12px; }
+.optionButton:hover { background: rgba(255,255,255,.12); }
+.optionActive { background: #fff; color: #09090b; border-color: #fff; font-weight: 750; }
+.sliderLabel { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: center; margin-top: 13px; font-size: 12px; color: rgba(255,255,255,.8); }
+.sliderLabel input { grid-column: 1 / -1; width: 100%; accent-color: #e50914; }
+.colorDot { width: 30px; height: 30px; border-radius: 50%; border: 3px solid transparent; box-shadow: inset 0 0 0 1px rgba(0,0,0,.28); }
+.activeColor { border-color: #e50914; }
+.hint { font-size: 12px; color: rgba(255,255,255,.5); padding: 8px 0; }
 
 @media (max-width: 720px) {
-  .topBar,
-  .bottomBar {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .volumeInput {
-    display: none;
-  }
+  .topBar, .bottomBar { padding-left: 14px; padding-right: 14px; }
+  .volumeInput { display: none; }
+  .centerControls { gap: 18px; }
+  .roundControl { width: 52px; height: 52px; }
+  .primaryControl { width: 66px; height: 66px; }
 }
