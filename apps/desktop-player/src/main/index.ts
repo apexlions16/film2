@@ -1,7 +1,25 @@
 import { join } from 'node:path'
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import {
+  enqueueOfflineDownload,
+  initializeOfflineDownloads,
+  listOfflineDownloads,
+  localPlaybackFor,
+  removeOfflineDownload,
+  type OfflineEnqueueRequest
+} from './offline'
 
 const isWindows = process.platform === 'win32'
+let ipcRegistered = false
+
+function registerIpc(): void {
+  if (ipcRegistered) return
+  ipcRegistered = true
+  ipcMain.handle('offline:list', () => listOfflineDownloads())
+  ipcMain.handle('offline:enqueue', (_event, request: OfflineEnqueueRequest) => enqueueOfflineDownload(request))
+  ipcMain.handle('offline:remove', (_event, key: string) => removeOfflineDownload(key))
+  ipcMain.handle('offline:localPlayback', (_event, key: string) => localPlaybackFor(key))
+}
 
 function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -12,7 +30,6 @@ function createMainWindow(): BrowserWindow {
     show: false,
     backgroundColor: '#09090b',
     autoHideMenuBar: true,
-    // Dark, app-owned titlebar instead of the stock white Windows chrome.
     titleBarStyle: isWindows ? 'hidden' : 'hiddenInset',
     ...(isWindows
       ? {
@@ -35,8 +52,6 @@ function createMainWindow(): BrowserWindow {
     win.show()
   })
 
-  // Open any target="_blank" / window.open() links in the OS browser instead
-  // of a second Electron window.
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
@@ -49,10 +64,12 @@ function createMainWindow(): BrowserWindow {
     win.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
+  void initializeOfflineDownloads(win)
   return win
 }
 
 app.whenReady().then(() => {
+  registerIpc()
   createMainWindow()
 
   app.on('activate', () => {
