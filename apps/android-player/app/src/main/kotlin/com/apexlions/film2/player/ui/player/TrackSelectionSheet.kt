@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.Tracks
+import com.apexlions.film2.player.catalog.ExternalMediaTrack
 import java.util.Locale
 
 private data class TrackOption(
@@ -35,14 +36,7 @@ private data class TrackOption(
     val selected: Boolean,
 )
 
-private data class RawTrackOption(
-    val group: Tracks.Group,
-    val indexInGroup: Int,
-    val format: Format,
-    val selected: Boolean,
-)
-
-private fun trackLabel(format: Format, fallbackIndex: Int, catalogFallback: String? = null): String {
+private fun trackLabel(format: Format, fallbackIndex: Int): String {
     val languageTag = format.language
     val displayName = languageTag?.let {
         runCatching { Locale.forLanguageTag(it).displayLanguage }.getOrNull()
@@ -51,59 +45,44 @@ private fun trackLabel(format: Format, fallbackIndex: Int, catalogFallback: Stri
         !displayName.isNullOrBlank() -> displayName.replaceFirstChar { it.uppercaseChar() }
         !format.label.isNullOrBlank() -> format.label!!
         !languageTag.isNullOrBlank() -> languageTag
-        !catalogFallback.isNullOrBlank() -> catalogFallback.uppercase(Locale.ROOT)
         else -> "Track ${fallbackIndex + 1}"
     }
 }
 
-private fun optionsForType(
-    tracks: Tracks,
-    type: Int,
-    catalogFallbackLabels: List<String> = emptyList(),
-): List<TrackOption> {
-    val raw = tracks.groups
+private fun optionsForType(tracks: Tracks, type: Int): List<TrackOption> =
+    tracks.groups
         .filter { it.type == type }
         .flatMap { group ->
             (0 until group.length).map { i ->
-                RawTrackOption(
+                TrackOption(
                     group = group,
                     indexInGroup = i,
-                    format = group.getTrackFormat(i),
+                    label = trackLabel(group.getTrackFormat(i), i),
                     selected = group.isTrackSelected(i),
                 )
             }
         }
 
-    // MergingMediaSource'ta ana video source ilk, harici audio source'lar sonradan gelir.
-    // Harici dosyada language metadata yoksa katalogdaki tr/en etiketlerini sondaki
-    // track'lere sirayla uygula.
-    val fallbackStart = (raw.size - catalogFallbackLabels.size).coerceAtLeast(0)
-    return raw.mapIndexed { flatIndex, option ->
-        val fallback = if (flatIndex >= fallbackStart) {
-            catalogFallbackLabels.getOrNull(flatIndex - fallbackStart)
-        } else {
-            null
-        }
-        TrackOption(
-            group = option.group,
-            indexInGroup = option.indexInGroup,
-            label = trackLabel(option.format, flatIndex, fallback),
-            selected = option.selected,
-        )
-    }
+private fun externalTrackLabel(track: ExternalMediaTrack): String {
+    track.label?.takeIf { it.isNotBlank() }?.let { return it }
+    val display = runCatching { Locale.forLanguageTag(track.language).displayLanguage }.getOrNull()
+    return display?.takeIf { it.isNotBlank() }?.replaceFirstChar { it.uppercaseChar() }
+        ?: track.language.uppercase(Locale.ROOT)
 }
 
 @Composable
 fun TrackSelectionSheet(
     tracks: Tracks,
-    audioFallbackLabels: List<String> = emptyList(),
+    externalAudioTracks: List<ExternalMediaTrack> = emptyList(),
+    selectedExternalAudioIndex: Int? = null,
     onSelectAudio: (Tracks.Group, Int) -> Unit,
+    onSelectExternalAudio: (Int) -> Unit,
     onSelectSubtitle: (Tracks.Group, Int) -> Unit,
     onDisableSubtitles: () -> Unit,
     onDismiss: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(),
 ) {
-    val audioOptions = optionsForType(tracks, C.TRACK_TYPE_AUDIO, audioFallbackLabels)
+    val audioOptions = optionsForType(tracks, C.TRACK_TYPE_AUDIO)
     val subtitleOptions = optionsForType(tracks, C.TRACK_TYPE_TEXT)
     val subtitlesOff = subtitleOptions.none { it.selected }
 
@@ -121,7 +100,8 @@ fun TrackSelectionSheet(
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
             }
-            if (audioOptions.isEmpty()) {
+
+            if (audioOptions.isEmpty() && externalAudioTracks.isEmpty()) {
                 item {
                     Text(
                         "Ses track'i bulunamadi",
@@ -130,12 +110,23 @@ fun TrackSelectionSheet(
                     )
                 }
             }
+
             items(audioOptions) { option ->
                 TrackRow(
                     label = option.label,
-                    selected = option.selected,
+                    selected = selectedExternalAudioIndex == null && option.selected,
                     onClick = { onSelectAudio(option.group, option.indexInGroup) },
                 )
+            }
+
+            externalAudioTracks.forEachIndexed { index, track ->
+                item(key = "external-audio-$index-${track.language}") {
+                    TrackRow(
+                        label = externalTrackLabel(track),
+                        selected = selectedExternalAudioIndex == index,
+                        onClick = { onSelectExternalAudio(index) },
+                    )
+                }
             }
 
             item { Divider(modifier = Modifier.padding(vertical = 16.dp)) }
