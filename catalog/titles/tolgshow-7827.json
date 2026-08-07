@@ -4,7 +4,7 @@
   "manualEntry": false,
   "status": "ready",
   "createdAt": "2026-08-06T23:40:13.637Z",
-  "updatedAt": "2026-08-07T09:11:00.000Z",
+  "updatedAt": "2026-08-07T09:19:37.477Z",
   "type": "series",
   "tmdbId": 76579,
   "title": "TOLGSHOW",
@@ -71,6 +71,20 @@
           "asset": {
             "masterPlaylistUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/tolgshow-7827/s1e2/master.m3u8",
             "audioLanguages": [],
+            "subtitleLanguages": []
+          }
+        },
+        {
+          "episodeNumber": 4,
+          "title": "4. Bolum",
+          "overview": "",
+          "status": "ready",
+          "shardId": "mfilms12/film2-media-01",
+          "asset": {
+            "masterPlaylistUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/tolgshow-7827/s1e4/master.m3u8",
+            "audioLanguages": [
+              "tur"
+            ],
             "subtitleLanguages": []
           }
         }
