@@ -58,11 +58,11 @@ private data class UploadedDirectFile(
 )
 
 /**
- * Uzun suren Android yukleme worker'i.
+ * Long-running Android upload worker.
  *
- * Telefon dosyalari Hugging Face'e oldugu gibi yollar. Ardindan GitHub Actions'taki
- * package-media workflow'u videoyu ve secilen sesleri FFmpeg -c copy ile TEK MP4'e
- * remux eder. HLS/m3u8/ts uretilmez; kalite kaybi yoktur. VTT/SRT sidecar kalir.
+ * Preferred path: MP4 + AAC/M4A is muxed on-device without transcoding, the final single
+ * MP4 is uploaded once and the catalog becomes ready immediately. GitHub Actions is only
+ * a compatibility fallback for containers/codecs the Android platform muxer cannot copy.
  */
 class UploadWorker(
     appContext: Context,
@@ -76,6 +76,7 @@ class UploadWorker(
     private var lastProgressStage = ""
     private var currentPercent = 0
     private var currentFileIndex = 0
+    private var completionMessage = "Dosyalar yuklendi; tek MP4 hazirlama GitHub Actions'ta devam ediyor"
 
     override suspend fun getForegroundInfo(): ForegroundInfo =
         buildForegroundInfo(0, "Yukleme bekliyor")
@@ -96,7 +97,7 @@ class UploadWorker(
         val app = applicationContext as Film2StudioApplication
         return try {
             runUpload(app, spec)
-            val doneMessage = "Dosyalar yuklendi; tek MP4 hazirlama GitHub Actions'ta devam ediyor"
+            val doneMessage = completionMessage
             publish(100, STAGE_COMPLETE, doneMessage, spec.files.size, spec.files.size)
             Result.success(
                 workDataOf(
@@ -142,7 +143,49 @@ class UploadWorker(
             }
         }
 
-        publish(1, STAGE_CHECKING, "Depolama hesabi ve shard kontrol ediliyor", 0, spec.files.size)
+        publish(1, STAGE_CHECKING, "GitHub kimligi dogrulaniyor", 0, spec.files.size)
+        app.githubClient.verifyAuthentication()
+
+        // Perceived performance: the title/episode is visible in Player as 'processing'
+        // before any multi-GB transfer begins.
+        val fastCoordinator = FastPublishCoordinator(applicationContext)
+        publish(2, STAGE_CATALOG, "Icerik Player'a hazirlaniyor olarak ekleniyor", 0, spec.files.size)
+        fastCoordinator.markProcessing(app, spec)
+
+        // Zero-transcode fast path. If it succeeds there is no Actions queue, no HF ->
+        // runner download and no runner -> HF second full upload.
+        val fastResult = fastCoordinator.tryPublish(
+            app = app,
+            spec = spec,
+            accounts = hfAccounts,
+            onProgress = { percent, message, bytes, total ->
+                val stage = when {
+                    message.contains("birlestiriliyor", ignoreCase = true) -> STAGE_FAST_MUX
+                    percent >= 95 -> STAGE_CATALOG
+                    else -> STAGE_UPLOADING
+                }
+                publishAsync(
+                    percent = percent,
+                    stage = stage,
+                    message = message,
+                    fileIndex = if (percent >= 29) 1 else 0,
+                    fileCount = spec.files.size,
+                    fileName = if (percent >= 29) "final.mp4" else "",
+                    bytesProcessed = bytes,
+                    totalBytes = total,
+                    bytesPerSecond = 0,
+                    etaSeconds = -1,
+                )
+            },
+        )
+        if (fastResult != null) {
+            completionMessage = fastResult.message
+            return
+        }
+
+        // Compatibility fallback: old proven path stays intact for MKV/unsupported codec
+        // or low temporary device storage.
+        publish(6, STAGE_DISPATCHING, "Hizli yol uygun degil; guvenli sunucu fallback'i kullaniliyor", 0, spec.files.size)
         val registry = app.githubClient.getShardRegistry()
         val capacityChecked = app.shardRegistryManager.ensureCapacity(registry, hfAccounts)
         var currentRegistry = capacityChecked.registry
@@ -232,9 +275,6 @@ class UploadWorker(
         val video = uploaded.firstOrNull { it.role == "combined" || it.role == "video" }
             ?: throw IllegalStateException("Video dosyasi yuklenmedi")
 
-        // package-media.mjs eski, guvenilir path tabanli payload'u kullanir. Bir is icindeki
-        // tum dosyalar ayni shard'da olmali; kota failover'i tam dosyalar arasinda olursa
-        // kullaniciya sessizce bozuk paket uretmek yerine acik hata veriyoruz.
         val shardIds = uploaded.map { it.shardId }.distinct()
         require(shardIds.size == 1) {
             "Bu yuklemedeki dosyalar farkli Hugging Face shard'larina dagildi. Tek MP4 remux icin tekrar deneyin."
@@ -466,6 +506,7 @@ class UploadWorker(
 
         const val STAGE_QUEUED = "queued"
         const val STAGE_PREPARING = "preparing"
+        const val STAGE_FAST_MUX = "fast_mux"
         const val STAGE_CHECKING = "checking"
         const val STAGE_UPLOADING = "uploading"
         const val STAGE_FINALIZING = "finalizing"
