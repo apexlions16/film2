@@ -1,16 +1,12 @@
 package com.apexlions.film2.player.catalog
 
-/** Result of a catalog fetch, distinguishing "still loading" / "empty" / "failed" / "have data". */
+/** Result of a catalog fetch, distinguishing loading / failed / have data. */
 sealed interface CatalogResult {
     data object Loading : CatalogResult
     data class Success(val titles: List<Title>) : CatalogResult
     data class Error(val message: String) : CatalogResult
 }
 
-/**
- * Thin repository wrapping [CatalogClient]. The catalog is fetched fresh every time
- * (no local cache/persistence), matching the JS catalog-client's behavior.
- */
 class CatalogRepository(
     private val client: CatalogClient = CatalogClient(),
 ) {
@@ -24,6 +20,12 @@ class CatalogRepository(
     suspend fun fetchTitle(id: String): Title? = try {
         client.getTitle(id)
     } catch (t: Throwable) {
+        null
+    }
+
+    suspend fun fetchRevision(): String? = try {
+        client.getRevision()
+    } catch (_: Throwable) {
         null
     }
 }
