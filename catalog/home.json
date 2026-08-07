@@ -9,7 +9,12 @@
     {
       "id": "today-popular",
       "title": "Bugün Popüler",
-      "titleIds": [],
+      "titleIds": [
+        "demir-adam-0371",
+        "the-flash-3107",
+        "saplant-3728",
+        "tolgshow-7827"
+      ],
       "enabled": true,
       "shuffle": true,
       "maxItems": 20
@@ -17,7 +22,12 @@
     {
       "id": "week-popular",
       "title": "Bu Hafta Popüler",
-      "titleIds": [],
+      "titleIds": [
+        "demir-adam-0371",
+        "the-flash-3107",
+        "saplant-3728",
+        "tolgshow-7827"
+      ],
       "enabled": true,
       "shuffle": true,
       "maxItems": 20
@@ -25,11 +35,16 @@
     {
       "id": "editors-picks",
       "title": "Editörün Seçtikleri",
-      "titleIds": [],
+      "titleIds": [
+        "tolgshow-7827",
+        "saplant-3728",
+        "the-flash-3107",
+        "demir-adam-0371"
+      ],
       "enabled": true,
       "shuffle": false,
       "maxItems": 20
     }
   ],
-  "updatedAt": "2026-08-07T19:35:56.833Z"
+  "updatedAt": "2026-08-07T19:36:09.094Z"
 }
