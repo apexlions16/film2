@@ -46,7 +46,7 @@ enum class VideoLayoutMode {
 data class PlaybackAppearanceState(
     /** Media3 varsayilanina gore carpandir. */
     val subtitleSizeScale: Float = 1.08f,
-    /** Buyudukce altyazi ekranin altindan yukariya tasinir. */
+    /** Windows Player'daki bottomPercent ile ayni mantik: 0.04 = %4, 0.32 = %32. */
     val subtitleBottomPaddingFraction: Float = 0.12f,
     val subtitleTextColor: SubtitleTextColor = SubtitleTextColor.WHITE,
     val subtitleBackground: SubtitleBackground = SubtitleBackground.SOFT,
@@ -67,7 +67,7 @@ class PlaybackAppearanceRepository(context: Context) {
     }
 
     fun setSubtitleBottomPaddingFraction(value: Float) = mutate {
-        it.copy(subtitleBottomPaddingFraction = value.coerceIn(0.02f, 0.32f))
+        it.copy(subtitleBottomPaddingFraction = value.coerceIn(0.04f, 0.32f))
     }
 
     fun setSubtitleTextColor(value: SubtitleTextColor) = mutate { it.copy(subtitleTextColor = value) }
@@ -98,8 +98,12 @@ class PlaybackAppearanceRepository(context: Context) {
 
     private fun readState(): PlaybackAppearanceState {
         val raw = preferences.getString(KEY_STATE, null) ?: return PlaybackAppearanceState()
-        return runCatching { json.decodeFromString(PlaybackAppearanceState.serializer(), raw) }
+        val decoded = runCatching { json.decodeFromString(PlaybackAppearanceState.serializer(), raw) }
             .getOrDefault(PlaybackAppearanceState())
+        return decoded.copy(
+            subtitleSizeScale = decoded.subtitleSizeScale.coerceIn(0.65f, 1.75f),
+            subtitleBottomPaddingFraction = decoded.subtitleBottomPaddingFraction.coerceIn(0.04f, 0.32f),
+        )
     }
 
     companion object {
