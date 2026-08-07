@@ -45,11 +45,12 @@ jobs:
           DISPATCH_PAYLOAD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.payload || toJson(github.event.client_payload) }}
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
-            JOB_FILE=$(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | grep '^.github/remux-jobs/.*\.json$' | head -n 1)
+            JOB_FILE=$(find .github/remux-jobs -maxdepth 1 -type f -name '*.json' -print | sort | tail -n 1)
             if [ -z "$JOB_FILE" ] || [ ! -f "$JOB_FILE" ]; then
               echo "Remux job dosyasi bulunamadi"
               exit 1
             fi
+            echo "Remux job: $JOB_FILE"
             cp "$JOB_FILE" /tmp/payload.json
           else
             printf '%s' "$DISPATCH_PAYLOAD" > /tmp/payload.json
