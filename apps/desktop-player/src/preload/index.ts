@@ -1,14 +1,19 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 
-// Minimal, read-only surface exposed to the renderer. No IPC channels for
-// filesystem/network access are needed yet — the renderer talks to GitHub
-// and Hugging Face directly over fetch()/HLS, and there is no local
-// download/offline mode in this app. This bridge exists so the renderer can
-// reliably tell "running inside the Electron shell" apart from a plain
-// browser tab (used e.g. to hide/guard Electron-only affordances).
 const api = {
   isElectron: true as const,
-  platform: process.platform
+  platform: process.platform,
+  offline: {
+    list: () => ipcRenderer.invoke('offline:list'),
+    enqueue: (request: unknown) => ipcRenderer.invoke('offline:enqueue', request),
+    remove: (key: string) => ipcRenderer.invoke('offline:remove', key),
+    localPlayback: (key: string) => ipcRenderer.invoke('offline:localPlayback', key),
+    onProgress: (callback: (record: unknown) => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, record: unknown): void => callback(record)
+      ipcRenderer.on('offline:progress', listener)
+      return () => ipcRenderer.removeListener('offline:progress', listener)
+    }
+  }
 }
 
 export type DesktopPlayerApi = typeof api
