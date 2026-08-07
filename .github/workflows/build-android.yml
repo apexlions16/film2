@@ -101,3 +101,19 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.apk.outputs.path }}
+
+      - name: Player build durumunu kaydet
+        if: always() && matrix.app == 'android-player' && github.ref == 'refs/heads/agent/direct-mp4-media'
+        run: |
+          git config user.name "film2-bot"
+          git config user.email "actions@users.noreply.github.com"
+          {
+            echo "status=${{ job.status }}"
+            echo "run_id=${{ github.run_id }}"
+            echo "sha=${{ github.sha }}"
+            echo "time=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          } > .github/android-build-last-status.txt
+          git add .github/android-build-last-status.txt
+          git diff --cached --quiet || git commit -m "chore(ci): player build durumu"
+          git pull --rebase origin agent/direct-mp4-media || true
+          git push origin HEAD:agent/direct-mp4-media || true
