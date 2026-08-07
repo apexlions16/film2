@@ -5,6 +5,9 @@ import type { PickFilesOptions } from "@shared/types";
 
 const MEDIA_EXTENSIONS = [
   "mkv",
+  "ts",
+  "m2ts",
+  "mts",
   "mp4",
   "mov",
   "avi",
