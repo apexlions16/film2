@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Film2 TV</title>
+    <link rel="stylesheet" href="css/app.css">
+    <script type="text/javascript" src="$WEBAPIS/webapis/webapis.js"></script>
+</head>
+<body>
+    <div id="app">
+        <section id="splash" class="screen splash-screen active">
+            <div class="brand-mark">FILM<span>2</span></div>
+            <div id="splash-message" class="splash-message">Katalog yükleniyor…</div>
+        </section>
+
+        <section id="home-screen" class="screen home-screen">
+            <header class="topbar">
+                <div class="brand-mark small">FILM<span>2</span></div>
+                <div class="topbar-right">
+                    <span id="catalog-status" class="catalog-status">Çevrimiçi</span>
+                    <span class="remote-hint">OK: Seç &nbsp; • &nbsp; Geri: Çık</span>
+                </div>
+            </header>
+            <div id="home-content" class="home-content"></div>
+        </section>
+
+        <section id="detail-screen" class="screen detail-screen">
+            <div id="detail-backdrop" class="detail-backdrop"></div>
+            <div class="detail-shade"></div>
+            <div id="detail-content" class="detail-content"></div>
+        </section>
+
+        <section id="player-screen" class="screen player-screen">
+            <object id="av-player" type="application/avplayer"></object>
+            <audio id="sidecar-audio" preload="auto"></audio>
+            <div id="player-dim" class="player-dim"></div>
+            <div id="subtitle-layer" class="subtitle-layer"></div>
+            <div id="buffering" class="buffering hidden">
+                <div class="spinner"></div>
+                <div id="buffering-text">Yükleniyor…</div>
+            </div>
+            <div id="player-controls" class="player-controls visible">
+                <div class="player-title-row">
+                    <div>
+                        <div id="player-title" class="player-title"></div>
+                        <div id="player-subtitle-title" class="player-subtitle-title"></div>
+                    </div>
+                    <div id="player-badge" class="player-badge"></div>
+                </div>
+                <div class="timeline-wrap">
+                    <div id="timeline" class="timeline">
+                        <div id="timeline-buffer" class="timeline-buffer"></div>
+                        <div id="timeline-progress" class="timeline-progress"></div>
+                    </div>
+                    <div class="time-row">
+                        <span id="time-current">00:00</span>
+                        <span id="time-duration">00:00</span>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <button class="focusable control-button" data-action="rewind">−10 sn</button>
+                    <button class="focusable control-button primary" data-action="toggle-play">Duraklat</button>
+                    <button class="focusable control-button" data-action="forward">+10 sn</button>
+                    <button class="focusable control-button" data-action="audio">Ses</button>
+                    <button class="focusable control-button" data-action="subtitles">Altyazı</button>
+                    <button class="focusable control-button" data-action="quality">Kalite</button>
+                    <button class="focusable control-button" data-action="back">Geri</button>
+                </div>
+            </div>
+        </section>
+
+        <div id="modal" class="modal hidden" aria-hidden="true">
+            <div class="modal-panel">
+                <div class="modal-header">
+                    <div id="modal-title" class="modal-title"></div>
+                    <div class="modal-hint">OK: Seç • Geri: Kapat</div>
+                </div>
+                <div id="modal-list" class="modal-list"></div>
+            </div>
+        </div>
+
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script src="js/catalog.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
