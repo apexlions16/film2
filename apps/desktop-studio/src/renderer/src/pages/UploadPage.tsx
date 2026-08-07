@@ -98,24 +98,24 @@ export function UploadPage({ target, onDone, onBack }: UploadPageProps) {
       {!finished && (
         <div className="panel" style={{ maxWidth: 760 }}>
           <div className="panel__title">Hızlı yayın modu</div>
-          <p className="panel__desc">MP4 + AAC/M4A seçildiğinde Windows video/sesleri encode etmeden yerelde tek MP4'e muxlar ve final dosyayı Hugging Face'e tek kez yollar. GitHub Actions remux beklenmez.</p>
+          <p className="panel__desc">Dosya uzantısına güvenilmez. MP4, gerçek MKV veya .mkv diye adlandırılmış MPEG-TS dosyaları FFmpeg tarafından içerikten tanınır; uyumlu video/ses streamleri encode edilmeden yerelde tek MP4'e muxlanır ve final dosya Hugging Face'e yalnızca bir kez yüklenir.</p>
           <div className="radio-row" style={{ marginBottom: 20 }}>
             <label className={`radio-option${mode === "separate" ? " radio-option--checked" : ""}`}>
               <input type="radio" checked={mode === "separate"} onChange={() => setMode("separate")} />
-              <span className="radio-option__text"><span className="radio-option__title">Video + ayrı sesler + altyazılar • Önerilen hızlı yol</span><span className="radio-option__desc">MP4 video + AAC/M4A sesler stream-copy ile tek final MP4 olur.</span></span>
+              <span className="radio-option__text"><span className="radio-option__title">Video + ayrı sesler + altyazılar • Önerilen hızlı yol</span><span className="radio-option__desc">video.mkv + tr.mkv + en.mkv gerçekte MPEG-TS olsa bile content sniffing + stream-copy ile tek final MP4 olur.</span></span>
             </label>
             <label className={`radio-option${mode === "combined" ? " radio-option--checked" : ""}`}>
               <input type="radio" checked={mode === "combined"} onChange={() => setMode("combined")} />
-              <span className="radio-option__text"><span className="radio-option__title">Hazır birleşik dosya</span><span className="radio-option__desc">Hazır çoklu sesli MP4 ise remux bile yapılmadan doğrudan yüklenir. MKV güvenli fallback'e düşebilir.</span></span>
+              <span className="radio-option__text"><span className="radio-option__title">Hazır birleşik dosya</span><span className="radio-option__desc">Gerçek MP4 doğrudan yüklenir; .mkv/.ts gibi diğer container'larda önce yerel stream-copy MP4 remux denenir. Yalnız gerçekten uyumsuz codec varsa fallback kullanılır.</span></span>
             </label>
           </div>
 
           {mode === "combined" ? (
-            <FilePicker label="Birleşik MP4 / medya" value={combinedFile} onPick={() => pickSingle("Birleşik medya dosyasını seçin", setCombinedFile)} />
+            <FilePicker label="Birleşik medya • MP4 / MKV / TS" value={combinedFile} onPick={() => pickSingle("Birleşik medya dosyasını seçin", setCombinedFile)} />
           ) : (
             <div className="stack">
-              <FilePicker label="Video dosyası • MP4 önerilir" value={videoFile} onPick={() => pickSingle("Video dosyasını seçin", setVideoFile)} />
-              <LangFileList label="Ses dosyaları" langPlaceholder="Türkçe, İngilizce…" list={audioFiles} onChangeLang={(i, lang) => { const next = [...audioFiles]; next[i] = { ...next[i], lang }; setAudioFiles(next); }} onPick={(i) => pickForLang("Ses dosyasını seçin", i, audioFiles, setAudioFiles)} onRemove={(i) => setAudioFiles(audioFiles.filter((_, idx) => idx !== i))} onAdd={() => setAudioFiles([...audioFiles, { lang: "", path: "" }])} />
+              <FilePicker label="Video dosyası • MP4 / MKV / TS" value={videoFile} onPick={() => pickSingle("Video dosyasını seçin", setVideoFile)} />
+              <LangFileList label="Ses dosyaları • AAC/M4A veya MPEG-TS olarak saklanan .mkv/.ts" langPlaceholder="Türkçe, İngilizce…" list={audioFiles} onChangeLang={(i, lang) => { const next = [...audioFiles]; next[i] = { ...next[i], lang }; setAudioFiles(next); }} onPick={(i) => pickForLang("Ses dosyasını seçin", i, audioFiles, setAudioFiles)} onRemove={(i) => setAudioFiles(audioFiles.filter((_, idx) => idx !== i))} onAdd={() => setAudioFiles([...audioFiles, { lang: "", path: "" }])} />
               <LangFileList label="Altyazılar • VTT/SRT • opsiyonel" langPlaceholder="Türkçe, İngilizce…" list={subtitleFiles} onChangeLang={(i, lang) => { const next = [...subtitleFiles]; next[i] = { ...next[i], lang }; setSubtitleFiles(next); }} onPick={(i) => pickForLang("Altyazı dosyasını seçin", i, subtitleFiles, setSubtitleFiles)} onRemove={(i) => setSubtitleFiles(subtitleFiles.filter((_, idx) => idx !== i))} onAdd={() => setSubtitleFiles([...subtitleFiles, { lang: "", path: "" }])} />
             </div>
           )}
@@ -139,7 +139,7 @@ export function UploadPage({ target, onDone, onBack }: UploadPageProps) {
             <span aria-hidden="true">{fastPath ? "✓" : "⏳"}</span>
             <div className="processing-banner__text">
               <span className="processing-banner__title">{fastPath ? "Hazır ve yayında" : "Uyumluluk işlemi devam ediyor"}</span>
-              <span className="processing-banner__desc">{fastPath ? "Final tek MP4 doğrudan Hugging Face'e yayınlandı; GitHub Actions remux'u atlandı. Player katalog revision değişimini birkaç saniye içinde görecek." : "Dosya tipi hızlı yerel yola uygun olmadığı için güvenli GitHub fallback'i kullanıldı."}</span>
+              <span className="processing-banner__desc">{fastPath ? "Final tek MP4 doğrudan Hugging Face'e yayınlandı; GitHub Actions remux'u atlandı. Player katalog revision değişimini birkaç saniye içinde görecek." : "Yerel stream-copy gerçekten uyumlu olmadığı için güvenli GitHub fallback'i kullanıldı."}</span>
             </div>
           </div>
           <div className="row" style={{ marginTop: 18 }}><Button variant="primary" onClick={onDone}>Kataloğa dön</Button><Button variant="ghost" onClick={() => { setFinished(false); setProgress(null); setFastPath(null); }}>Başka dosya yükle</Button></div>
