@@ -58,6 +58,7 @@ fun PlayerScreen(
 
     val uiState by viewModel.uiState.collectAsState()
     val tracks by viewModel.currentTracks.collectAsState()
+    val selectedQualityHeight by viewModel.selectedQualityHeight.collectAsState()
     var trackSheetVisible by remember { mutableStateOf(false) }
 
     Box(
@@ -93,13 +94,19 @@ fun PlayerScreen(
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Geri", tint = Color.White)
                     }
                     IconButton(onClick = { trackSheetVisible = true }) {
-                        Icon(Icons.Filled.Subtitles, contentDescription = "Ses ve altyazi", tint = Color.White)
+                        Icon(Icons.Filled.Subtitles, contentDescription = "Kalite, ses ve altyazi", tint = Color.White)
                     }
                 }
 
                 if (trackSheetVisible) {
                     TrackSelectionSheet(
                         tracks = tracks,
+                        videoVariants = state.asset.videoVariants,
+                        selectedQualityHeight = selectedQualityHeight,
+                        onSelectQuality = { variant ->
+                            viewModel.selectQuality(variant)
+                            trackSheetVisible = false
+                        },
                         onSelectAudio = { group, index ->
                             viewModel.selectAudioTrack(group, index)
                         },
