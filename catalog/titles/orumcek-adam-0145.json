@@ -145,8 +145,37 @@
       "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
     }
   ],
-  "status": "processing",
+  "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T23:37:25.035980Z",
-  "updatedAt": "2026-08-07T23:38:19.297288Z"
+  "updatedAt": "2026-08-07T23:41:11.150220Z",
+  "shardId": "mfilms12/film2-media-01",
+  "asset": {
+    "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-0145/video_1786145994532.mp4",
+    "durationSeconds": 7274.934122,
+    "audioLanguages": [
+      "eng",
+      "tur"
+    ],
+    "subtitleLanguages": [
+      "eng",
+      "tur"
+    ],
+    "externalAudioTracks": [],
+    "externalSubtitleTracks": [
+      {
+        "language": "eng",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-0145/subs_eng_1786145994532_1.vtt",
+        "label": "Ingilizce",
+        "mimeType": "text/vtt"
+      },
+      {
+        "language": "tur",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-0145/subs_tur_1786145994532_2.vtt",
+        "label": "Turkce",
+        "mimeType": "text/vtt"
+      }
+    ],
+    "videoVariants": []
+  }
 }
