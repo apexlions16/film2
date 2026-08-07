@@ -76,7 +76,9 @@ import com.apexlions.film2.player.catalog.Episode
 import com.apexlions.film2.player.catalog.Season
 import com.apexlions.film2.player.catalog.Title
 import com.apexlions.film2.player.catalog.TitleType
+import com.apexlions.film2.player.offline.OfflineDownloadRepository
 import com.apexlions.film2.player.ui.browse.StatusBadge
+import com.apexlions.film2.player.ui.browse.rotatingBackdrop
 import com.apexlions.film2.player.ui.common.CatalogErrorState
 import com.apexlions.film2.player.userdata.PlaybackRecord
 import com.apexlions.film2.player.userdata.UserLibraryRepository
@@ -103,13 +105,12 @@ fun TitleDetailScreen(
             is TitleDetailState.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
-
             is TitleDetailState.Error -> CatalogErrorState(message = s.message, onRetry = onBack)
-
             is TitleDetailState.Loaded -> TitleDetailContent(
                 title = s.title,
                 library = library,
                 userLibrary = application.userLibraryRepository,
+                offlineRepository = application.offlineDownloadRepository,
                 onPlayMovie = { onPlay(titleId, null, null) },
                 onPlayEpisode = { season, episode -> onPlay(titleId, season, episode) },
             )
@@ -133,6 +134,7 @@ private fun TitleDetailContent(
     title: Title,
     library: UserLibraryState,
     userLibrary: UserLibraryRepository,
+    offlineRepository: OfflineDownloadRepository,
     onPlayMovie: () -> Unit,
     onPlayEpisode: (Int, Int) -> Unit,
 ) {
@@ -143,9 +145,7 @@ private fun TitleDetailContent(
     val inMyList = title.id in library.myListTitleIds
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        item(key = "trailer-hero") {
-            TrailerHero(title = title)
-        }
+        item(key = "trailer-hero") { TrailerHero(title = title) }
 
         item(key = "main-info") {
             Column(
@@ -179,11 +179,7 @@ private fun TitleDetailContent(
                     else if (title.asset?.videoVariants?.any { it.height >= 720 } == true) add("HD")
                 }
                 if (meta.isNotEmpty()) {
-                    Text(
-                        meta.joinToString("  •  "),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Text(meta.joinToString("  •  "), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
 
                 if (title.type == TitleType.MOVIE) {
@@ -192,36 +188,28 @@ private fun TitleDetailContent(
                         onClick = onPlayMovie,
                         enabled = playable,
                         modifier = Modifier.fillMaxWidth().height(52.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black,
-                        ),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
                     ) {
                         Icon(if (playable) Icons.Filled.PlayArrow else Icons.Filled.Lock, contentDescription = null)
                         Text(
                             when {
-                                !playable -> " Henuz hazir degil"
+                                !playable -> " Henüz hazır değil"
                                 movieProgress?.hasMeaningfulProgress == true -> " Devam Et • ${formatResumeTime(movieProgress.positionMs)}"
                                 else -> " Oynat"
                             },
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
-
+                    if (playable) {
+                        MovieDownloadControl(title = title, repository = offlineRepository)
+                    }
                     movieProgress?.takeIf { it.progressFraction > 0.005f }?.let { progress ->
                         DetailProgressLine(progress.progressFraction)
-                        Text(
-                            "%${(progress.progressFraction * 100).toInt()} izlendi",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        Text("%${(progress.progressFraction * 100).toInt()} izlendi", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(
                         onClick = { userLibrary.toggleMyList(title.id) },
                         modifier = Modifier.weight(1f),
@@ -229,10 +217,7 @@ private fun TitleDetailContent(
                         Icon(if (inMyList) Icons.Filled.Check else Icons.Filled.Add, contentDescription = null)
                         Text(if (inMyList) " Listemde" else " Listem")
                     }
-                    OutlinedButton(
-                        onClick = { listSheetVisible = true },
-                        modifier = Modifier.weight(1f),
-                    ) {
+                    OutlinedButton(onClick = { listSheetVisible = true }, modifier = Modifier.weight(1f)) {
                         Icon(Icons.Filled.PlaylistAdd, contentDescription = null)
                         Text(" Listeler")
                     }
@@ -240,10 +225,7 @@ private fun TitleDetailContent(
 
                 if (title.type == TitleType.MOVIE && movieProgress?.hasMeaningfulProgress == true) {
                     OutlinedButton(
-                        onClick = {
-                            userLibrary.clearProgress(title.id)
-                            onPlayMovie()
-                        },
+                        onClick = { userLibrary.clearProgress(title.id); onPlayMovie() },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Icon(Icons.Filled.RestartAlt, contentDescription = null)
@@ -251,15 +233,11 @@ private fun TitleDetailContent(
                     }
                 }
 
-                Text(
-                    title.overview,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
+                Text(title.overview, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
 
                 if (title.cast.isNotEmpty()) {
                     Text(
-                        "Basroldekiler: ${title.cast.take(5).joinToString(", ") { it.name }}",
+                        "Başroldekiler: ${title.cast.take(5).joinToString(", ") { it.name }}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
@@ -268,7 +246,7 @@ private fun TitleDetailContent(
                 }
                 if (title.crew.isNotEmpty()) {
                     Text(
-                        "Yapim: ${title.crew.take(4).joinToString(", ") { "${it.name} (${it.job})" }}",
+                        "Yapım: ${title.crew.take(4).joinToString(", ") { "${it.name} (${it.job})" }}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
@@ -279,17 +257,16 @@ private fun TitleDetailContent(
         }
 
         if (title.type == TitleType.SERIES) {
-            val seasons = title.seasons.orEmpty()
-            items(seasons, key = { it.seasonNumber }) { season ->
+            items(title.seasons.orEmpty(), key = { it.seasonNumber }) { season ->
                 SeasonBlock(
-                    titleId = title.id,
+                    title = title,
                     season = season,
                     library = library,
+                    offlineRepository = offlineRepository,
                     onPlayEpisode = onPlayEpisode,
                 )
             }
         }
-
         item { Spacer(modifier = Modifier.height(42.dp)) }
     }
 
@@ -302,12 +279,7 @@ private fun TitleDetailContent(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                Text(
-                    "Listeye Ekle",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 10.dp),
-                )
+                Text("Listeye Ekle", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(bottom = 10.dp))
                 library.customLists.forEach { collection ->
                     val selected = title.id in collection.titleIds
                     Row(
@@ -318,11 +290,7 @@ private fun TitleDetailContent(
                             .padding(vertical = 13.dp, horizontal = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(
-                            collection.name,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.weight(1f),
-                        )
+                        Text(collection.name, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
                         if (selected) Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     }
                 }
@@ -345,7 +313,7 @@ private fun TitleDetailContent(
                 OutlinedTextField(
                     value = newListName,
                     onValueChange = { newListName = it },
-                    label = { Text("Liste adi") },
+                    label = { Text("Liste adı") },
                     singleLine = true,
                 )
             },
@@ -358,11 +326,9 @@ private fun TitleDetailContent(
                         newListName = ""
                         createListDialog = false
                     },
-                ) { Text("Olustur ve Ekle") }
+                ) { Text("Oluştur ve Ekle") }
             },
-            dismissButton = {
-                OutlinedButton(onClick = { createListDialog = false }) { Text("Vazgec") }
-            },
+            dismissButton = { OutlinedButton(onClick = { createListDialog = false }) { Text("Vazgeç") } },
         )
     }
 }
@@ -372,6 +338,7 @@ private fun TrailerHero(title: Title) {
     val context = LocalContext.current
     var muted by remember(title.id) { mutableStateOf(true) }
     val trailerUrl = title.trailerUrl?.takeIf { it.isNotBlank() }
+    val backdrop = remember(title.id, title.updatedAt) { title.rotatingBackdrop(System.nanoTime()) }
     val player = remember(trailerUrl) {
         trailerUrl?.let { url ->
             ExoPlayer.Builder(context).build().apply {
@@ -384,18 +351,11 @@ private fun TrailerHero(title: Title) {
         }
     }
 
-    DisposableEffect(player) {
-        onDispose { player?.release() }
-    }
+    DisposableEffect(player) { onDispose { player?.release() } }
 
     Box(modifier = Modifier.fillMaxWidth().height(340.dp)) {
-        if (title.backdropUrl != null) {
-            AsyncImage(
-                model = title.backdropUrl,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
-            )
+        if (backdrop != null) {
+            AsyncImage(model = backdrop, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
         } else {
             Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant))
         }
@@ -415,21 +375,14 @@ private fun TrailerHero(title: Title) {
         }
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(Color.Transparent, Color.Transparent, MaterialTheme.colorScheme.background),
-                    ),
-                ),
+            modifier = Modifier.fillMaxSize().background(
+                Brush.verticalGradient(listOf(Color.Transparent, Color.Transparent, MaterialTheme.colorScheme.background)),
+            ),
         )
 
         if (player != null) {
             IconButton(
-                onClick = {
-                    muted = !muted
-                    player.volume = if (muted) 0f else 1f
-                },
+                onClick = { muted = !muted; player.volume = if (muted) 0f else 1f },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 14.dp, bottom = 28.dp)
@@ -438,7 +391,7 @@ private fun TrailerHero(title: Title) {
             ) {
                 Icon(
                     imageVector = if (muted) Icons.Filled.VolumeOff else Icons.Filled.VolumeUp,
-                    contentDescription = if (muted) "Trailer sesini ac" else "Trailer sesini kapat",
+                    contentDescription = if (muted) "Trailer sesini aç" else "Trailer sesini kapat",
                     tint = Color.White,
                 )
             }
@@ -448,19 +401,17 @@ private fun TrailerHero(title: Title) {
 
 @Composable
 private fun SeasonBlock(
-    titleId: String,
+    title: Title,
     season: Season,
     library: UserLibraryState,
+    offlineRepository: OfflineDownloadRepository,
     onPlayEpisode: (Int, Int) -> Unit,
 ) {
     var expanded by remember { mutableStateOf(season.seasonNumber == 1) }
 
     Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded }
-                .padding(vertical = 10.dp),
+            modifier = Modifier.fillMaxWidth().clickable { expanded = !expanded }.padding(vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -472,12 +423,22 @@ private fun SeasonBlock(
             )
         }
 
+        SeasonDownloadControl(
+            title = title,
+            season = season,
+            repository = offlineRepository,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+
         AnimatedVisibility(visible = expanded, enter = expandVertically(), exit = shrinkVertically()) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 season.episodes.forEach { episode ->
                     EpisodeRow(
+                        titleId = title.id,
+                        seasonNumber = season.seasonNumber,
                         episode = episode,
-                        progress = library.record(titleId, season.seasonNumber, episode.episodeNumber),
+                        progress = library.record(title.id, season.seasonNumber, episode.episodeNumber),
+                        offlineRepository = offlineRepository,
                         onClick = { onPlayEpisode(season.seasonNumber, episode.episodeNumber) },
                     )
                 }
@@ -488,8 +449,11 @@ private fun SeasonBlock(
 
 @Composable
 private fun EpisodeRow(
+    titleId: String,
+    seasonNumber: Int,
     episode: Episode,
     progress: PlaybackRecord?,
+    offlineRepository: OfflineDownloadRepository,
     onClick: () -> Unit,
 ) {
     val playable = episode.status == AssetStatus.READY && episode.asset != null
@@ -497,11 +461,13 @@ private fun EpisodeRow(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.58f))
-            .clickable(enabled = playable, onClick = onClick),
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.58f)),
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(enabled = playable, onClick = onClick)
+                .padding(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -513,10 +479,7 @@ private fun EpisodeRow(
                     contentScale = ContentScale.Crop,
                 )
             } else {
-                Box(
-                    modifier = Modifier.size(width = 46.dp, height = 46.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
+                Box(modifier = Modifier.size(width = 46.dp, height = 46.dp), contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = if (playable) Icons.Filled.PlayArrow else Icons.Filled.Lock,
                         contentDescription = null,
@@ -548,15 +511,22 @@ private fun EpisodeRow(
                 }
             }
         }
+        if (playable) {
+            EpisodeDownloadControl(
+                titleId = titleId,
+                seasonNumber = seasonNumber,
+                episode = episode,
+                repository = offlineRepository,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
+            )
+        }
         progress?.takeIf { it.progressFraction > 0.005f }?.let { DetailProgressLine(it.progressFraction) }
     }
 }
 
 @Composable
 private fun DetailProgressLine(progress: Float) {
-    Box(
-        modifier = Modifier.fillMaxWidth().height(4.dp).background(Color(0xFF333336)),
-    ) {
+    Box(modifier = Modifier.fillMaxWidth().height(4.dp).background(Color(0xFF333336))) {
         Box(
             modifier = Modifier
                 .fillMaxWidth(progress.coerceIn(0f, 1f))
