@@ -56,20 +56,28 @@ jobs:
           fi
           cat /tmp/payload.json
 
+      - name: Script syntax kontrolu
+        run: node --check .github/scripts/package-media.mjs
+
       - name: Sesleri tek MP4'e mux et ve yukle
         id: package
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_ACCOUNTS_JSON: ${{ secrets.HF_ACCOUNTS_JSON }}
         run: |
+          set +e
           PAYLOAD=$(cat /tmp/payload.json)
-          node .github/scripts/package-media.mjs "$PAYLOAD" > /tmp/result.json
-          cat /tmp/result.json
+          node .github/scripts/package-media.mjs "$PAYLOAD" > /tmp/result.json 2> /tmp/remux-error.log
+          CODE=$?
+          set -e
+          cat /tmp/result.json || true
+          cat /tmp/remux-error.log >&2 || true
+          exit "$CODE"
 
       - name: Katalogu guncelle
         run: node .github/scripts/update-catalog.mjs "$(cat /tmp/result.json)"
 
-      - name: Commit ve push
+      - name: Katalog commit ve push
         run: |
           git config user.name "film2-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -77,3 +85,28 @@ jobs:
           git add catalog/
           git diff --cached --quiet || git commit -m "chore(catalog): tek MP4 medya hazir ($TITLE_ID)"
           git push
+
+      - name: Remux durumunu kaydet
+        if: always()
+        run: |
+          git config user.name "film2-bot"
+          git config user.email "actions@users.noreply.github.com"
+          mkdir -p .github
+          {
+            echo "status=${{ job.status }}"
+            echo "run_id=${{ github.run_id }}"
+            echo "sha=${{ github.sha }}"
+            echo "time=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            if [ -f /tmp/remux-error.log ]; then
+              echo "--- error ---"
+              tail -n 80 /tmp/remux-error.log
+            fi
+            if [ -f /tmp/result.json ]; then
+              echo "--- result ---"
+              cat /tmp/result.json
+            fi
+          } > .github/remux-last-status.txt
+          git add .github/remux-last-status.txt
+          git diff --cached --quiet || git commit -m "chore(remux): son is durumu"
+          git pull --rebase origin main || true
+          git push || true
