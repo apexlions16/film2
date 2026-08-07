@@ -23,6 +23,7 @@ import com.apexlions.film2.player.catalog.CatalogRepository
 import com.apexlions.film2.player.catalog.DemoContent
 import com.apexlions.film2.player.catalog.PlayableAsset
 import com.apexlions.film2.player.catalog.Title
+import com.apexlions.film2.player.catalog.VideoVariant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,10 +38,9 @@ sealed interface PlaybackUiState {
 /**
  * Tek oynaticili medya modeli.
  *
- * Yeni medya pipeline'i video + tum sesleri FFmpeg stream-copy ile tek MP4'e mux eder.
- * Bu nedenle Player tarafinda ikinci ExoPlayer, MergingMediaSource veya sidecar AAC
- * senkronizasyonu YOKTUR. Seek ve ses degistirme ayni MP4 timeline'i icinde Media3'ün
- * native track secimiyle yapilir. VTT/SRT altyazilar side-load edilmeye devam eder.
+ * Her kalite ayri bir MP4'tur; MP4'lerin icinde ayni ses track'leri bulunur. Kalite
+ * degisiminde yeni MP4 acilir, mevcut zaman konumu korunur ve secili ses/altyazi dili
+ * preferred-language olarak yeni kaynaga uygulanir. HLS/segment yoktur.
  */
 class PlayerViewModel(
     application: Application,
@@ -51,7 +51,7 @@ class PlayerViewModel(
 ) : AndroidViewModel(application) {
 
     private val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-        .setUserAgent("film2-android-player/1.1.3-single-mp4")
+        .setUserAgent("film2-android-player/1.2.0-quality")
         .setAllowCrossProtocolRedirects(true)
 
     val player: ExoPlayer = ExoPlayer.Builder(application).build()
@@ -61,6 +61,15 @@ class PlayerViewModel(
 
     private val _currentTracks = MutableStateFlow<Tracks>(Tracks.EMPTY)
     val currentTracks: StateFlow<Tracks> = _currentTracks.asStateFlow()
+
+    private val _selectedQualityHeight = MutableStateFlow<Int?>(null)
+    val selectedQualityHeight: StateFlow<Int?> = _selectedQualityHeight.asStateFlow()
+
+    private var activeAsset: PlayableAsset? = null
+    private var currentVideoUrl: String? = null
+    private var preferredAudioLanguage: String? = null
+    private var preferredSubtitleLanguage: String? = null
+    private var subtitlesDisabled: Boolean = false
 
     init {
         player.addListener(object : Player.Listener {
@@ -88,6 +97,7 @@ class PlayerViewModel(
                 return@launch
             }
             val (title, asset) = resolved
+            activeAsset = asset
             _uiState.value = PlaybackUiState.Ready(title, asset)
             runCatching { playAsset(asset) }
                 .onFailure { t ->
@@ -119,12 +129,24 @@ class PlayerViewModel(
     }
 
     private fun playAsset(asset: PlayableAsset) {
-        val directUrl = asset.videoUrl?.takeIf { it.isNotBlank() }
-        if (directUrl != null) {
-            playDirectAsset(asset, directUrl)
+        val bestVariant = asset.videoVariants.maxByOrNull { it.height }
+        if (bestVariant != null) {
+            _selectedQualityHeight.value = bestVariant.height
+            currentVideoUrl = bestVariant.url
+            playDirectAsset(asset, bestVariant.url, 0L, true)
             return
         }
 
+        val directUrl = asset.videoUrl?.takeIf { it.isNotBlank() }
+        if (directUrl != null) {
+            currentVideoUrl = directUrl
+            _selectedQualityHeight.value = null
+            playDirectAsset(asset, directUrl, 0L, true)
+            return
+        }
+
+        currentVideoUrl = null
+        _selectedQualityHeight.value = null
         val legacyHls = asset.masterPlaylistUrl?.takeIf { it.isNotBlank() }
             ?: throw IllegalStateException("Asset icinde videoUrl veya masterPlaylistUrl yok")
         val mediaItem = MediaItem.Builder()
@@ -133,10 +155,15 @@ class PlayerViewModel(
             .build()
         val mediaSource = HlsMediaSource.Factory(httpDataSourceFactory)
             .createMediaSource(mediaItem)
-        start(mediaSource)
+        start(mediaSource, 0L, true)
     }
 
-    private fun playDirectAsset(asset: PlayableAsset, videoUrl: String) {
+    private fun playDirectAsset(
+        asset: PlayableAsset,
+        videoUrl: String,
+        startPositionMs: Long,
+        playWhenReady: Boolean,
+    ) {
         val subtitleConfigurations = asset.externalSubtitleTracks.mapIndexed { index, track ->
             MediaItem.SubtitleConfiguration.Builder(Uri.parse(track.url))
                 .setId("sidecar-sub-$index-${track.language}")
@@ -153,20 +180,52 @@ class PlayerViewModel(
 
         val mediaSource = DefaultMediaSourceFactory(httpDataSourceFactory)
             .createMediaSource(mediaItem)
-        start(mediaSource)
+        start(mediaSource, startPositionMs, playWhenReady)
     }
 
-    private fun start(mediaSource: MediaSource) {
+    private fun start(mediaSource: MediaSource, startPositionMs: Long, shouldPlay: Boolean) {
         player.stop()
         player.clearMediaItems()
         player.volume = 1f
         player.setMediaSource(mediaSource)
+        applyLanguagePreferences()
         player.prepare()
-        player.playWhenReady = true
+        if (startPositionMs > 0L) player.seekTo(startPositionMs)
+        player.playWhenReady = shouldPlay
+    }
+
+    private fun applyLanguagePreferences() {
+        var builder = player.trackSelectionParameters.buildUpon()
+            .clearOverridesOfType(C.TRACK_TYPE_AUDIO)
+            .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+            .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
+            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, subtitlesDisabled)
+
+        preferredAudioLanguage?.let { builder = builder.setPreferredAudioLanguage(it) }
+        if (!subtitlesDisabled) {
+            preferredSubtitleLanguage?.let { builder = builder.setPreferredTextLanguage(it) }
+        }
+        player.trackSelectionParameters = builder.build()
+    }
+
+    /**
+     * Kalite degisirken video yeniden encode edilmez; katalogdaki diger MP4 URL'i acilir.
+     * Oynatma konumu ve play/pause durumu korunur.
+     */
+    fun selectQuality(variant: VideoVariant) {
+        val asset = activeAsset ?: return
+        if (variant.url == currentVideoUrl) return
+
+        val position = player.currentPosition.coerceAtLeast(0L)
+        val shouldPlay = player.playWhenReady
+        currentVideoUrl = variant.url
+        _selectedQualityHeight.value = variant.height
+        playDirectAsset(asset, variant.url, position, shouldPlay)
     }
 
     /** MP4 icindeki ses track'ini native Media3 secimiyle degistirir. */
     fun selectAudioTrack(group: Tracks.Group, trackIndex: Int) {
+        preferredAudioLanguage = group.getTrackFormat(trackIndex).language
         val override = TrackSelectionOverride(group.mediaTrackGroup, trackIndex)
         player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
             .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
@@ -176,6 +235,8 @@ class PlayerViewModel(
     }
 
     fun selectSubtitleTrack(group: Tracks.Group, trackIndex: Int) {
+        subtitlesDisabled = false
+        preferredSubtitleLanguage = group.getTrackFormat(trackIndex).language
         val override = TrackSelectionOverride(group.mediaTrackGroup, trackIndex)
         player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
             .setOverrideForType(override)
@@ -184,6 +245,7 @@ class PlayerViewModel(
     }
 
     fun disableSubtitles() {
+        subtitlesDisabled = true
         player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
             .clearOverridesOfType(C.TRACK_TYPE_TEXT)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
@@ -191,6 +253,7 @@ class PlayerViewModel(
     }
 
     fun setAudioTrackAuto() {
+        preferredAudioLanguage = null
         player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
             .clearOverridesOfType(C.TRACK_TYPE_AUDIO)
             .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
