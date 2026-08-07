@@ -61,12 +61,11 @@ private data class UploadedDirectFile(
 )
 
 /**
- * Direct-media upload worker.
+ * Long-running foreground direct-media upload.
  *
- * Eski akis: ham dosya -> HF incoming -> GitHub Actions -> ffmpeg HLS -> yuzlerce .ts -> katalog.
- * Yeni akis: MP4/ses/VTT -> HF media -> katalog. Video hic parcalanmaz ve yeniden encode edilmez.
- * Combined modda ideal sonuc bolum basina TEK video dosyasidir. Separate modda da sadece
- * kullanicinin sectigi video + ses + altyazi dosyalari bulunur; HLS/m3u8/segment uretilmez.
+ * HLS paketleme yoktur. Kullanici bir video verdiyse tek video dosyasi olarak kalir;
+ * harici ses ve altyazilar ayri sidecar dosyalaridir. Yukleme tamamlaninca katalog direkt
+ * bu resolve URL'lere baglanir; GitHub Actions'ta yuzlerce segment uretilmez.
  */
 class UploadWorker(
     appContext: Context,
@@ -106,7 +105,7 @@ class UploadWorker(
         val app = applicationContext as Film2StudioApplication
         return try {
             runUpload(app, spec)
-            val doneMessage = "Medya hazir: video dogrudan oynatilacak (HLS parcasi uretilmedi)"
+            val doneMessage = "Yukleme tamamlandi; medya Player'da hazir"
             publish(
                 percent = 100,
                 stage = STAGE_COMPLETE,
@@ -223,8 +222,6 @@ class UploadWorker(
                 },
             )
 
-            // Failover olursa her dosya farkli shard'a dusebilir. Kullanim sayacini dosya
-            // bazinda dogru shard'a yaz; asset URL'leri zaten mutlak URL oldugu icin bu sorun degil.
             currentRegistry = app.shardRegistryManager.recordUsage(
                 result.registry,
                 result.shard.id,
@@ -385,7 +382,10 @@ class UploadWorker(
         ?: "und"
 
     private fun audioMime(path: String): String? = when (path.substringAfterLast('.', "").lowercase()) {
-        "m4a", "mp4", "aac" -> "audio/mp4"
+        "m4a", "mp4" -> "audio/mp4"
+        // Ham ADTS AAC bir MP4 container degildir. Onceki audio/mp4 degeri Media3'e
+        // yanlis extractor sectirip sessizlik/glitch uretebiliyordu.
+        "aac" -> "audio/mp4a-latm"
         "mp3" -> "audio/mpeg"
         "ogg", "opus" -> "audio/ogg"
         "wav" -> "audio/wav"
@@ -439,8 +439,16 @@ class UploadWorker(
         etaSeconds: Long = -1L,
     ) {
         val data = progressData(
-            percent, stage, message, fileIndex, fileCount, fileName,
-            bytesProcessed, totalBytes, bytesPerSecond, etaSeconds,
+            percent,
+            stage,
+            message,
+            fileIndex,
+            fileCount,
+            fileName,
+            bytesProcessed,
+            totalBytes,
+            bytesPerSecond,
+            etaSeconds,
         )
         currentPercent = percent.coerceIn(0, 100)
         currentFileIndex = fileIndex
@@ -473,8 +481,16 @@ class UploadWorker(
         lastProgressStage = stage
         lastProgressAtMs = now
         val data = progressData(
-            percent, stage, message, fileIndex, fileCount, fileName,
-            bytesProcessed, totalBytes, bytesPerSecond, etaSeconds,
+            percent,
+            stage,
+            message,
+            fileIndex,
+            fileCount,
+            fileName,
+            bytesProcessed,
+            totalBytes,
+            bytesPerSecond,
+            etaSeconds,
         )
         setProgressAsync(data)
 
@@ -531,9 +547,8 @@ class UploadWorker(
         val context = applicationContext
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, "Medya yukleme", NotificationManager.IMPORTANCE_LOW),
-            )
+            val channel = NotificationChannel(CHANNEL_ID, "Medya yukleme", NotificationManager.IMPORTANCE_LOW)
+            manager.createNotificationChannel(channel)
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -573,7 +588,7 @@ class UploadWorker(
         const val STAGE_FINALIZING = "finalizing"
         const val STAGE_FILE_COMPLETE = "file_complete"
         const val STAGE_CATALOG = "catalog"
-        const val STAGE_DISPATCHING = "dispatching" // legacy UI sabiti; artik kullanilmiyor
+        const val STAGE_DISPATCHING = "dispatching"
         const val STAGE_RETRYING = "retrying"
         const val STAGE_COMPLETE = "complete"
         const val STAGE_FAILED = "failed"
