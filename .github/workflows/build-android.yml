@@ -22,6 +22,12 @@ on:
 permissions:
   contents: write
 
+# UI gelistirirken pes pese commitlerde eski APK build'leri kuyrukta beklemesin.
+# Ayni branch/ref icin sadece en son commit'in build'i kaynak tutsun.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     strategy:
