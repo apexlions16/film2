@@ -112,7 +112,7 @@ fun SeasonDownloadControl(
             )
         }
         if (anyActive) {
-            LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth().padding(top = 5.dp))
+            LinearProgressIndicator(progress = progress, modifier = Modifier.fillMaxWidth().padding(top = 5.dp))
             Text(
                 "%${(progress * 100).toInt()} • ${records.count { it.status == OfflineDownloadStatus.COMPLETE }}/${downloadable.size} bölüm",
                 style = MaterialTheme.typography.labelSmall,
@@ -177,7 +177,7 @@ fun EpisodeDownloadControl(
             }
         }
         if (active) {
-            LinearProgressIndicator(progress = { record?.progressFraction ?: 0f }, modifier = Modifier.fillMaxWidth())
+            LinearProgressIndicator(progress = record?.progressFraction ?: 0f, modifier = Modifier.fillMaxWidth())
         }
     }
 }
@@ -186,7 +186,7 @@ fun EpisodeDownloadControl(
 private fun DownloadProgress(progress: Float?, status: OfflineDownloadStatus?) {
     if (status != OfflineDownloadStatus.DOWNLOADING && status != OfflineDownloadStatus.QUEUED) return
     val value = progress ?: 0f
-    LinearProgressIndicator(progress = { value }, modifier = Modifier.fillMaxWidth())
+    LinearProgressIndicator(progress = value, modifier = Modifier.fillMaxWidth())
     Text(
         "%${(value * 100).toInt()} indirildi",
         style = MaterialTheme.typography.labelSmall,
