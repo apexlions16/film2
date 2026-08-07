@@ -96,10 +96,10 @@
       "profileUrl": "https://image.tmdb.org/t/p/w300/1T24SiIIDMa9gAmq7QaYwZywq4y.jpg"
     }
   ],
-  "status": "processing",
+  "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T14:39:40.441735Z",
-  "updatedAt": "2026-08-07T15:34:31.972769Z",
+  "updatedAt": "2026-08-07T15:36:07.686871Z",
   "seasons": [
     {
       "seasonNumber": 1,
@@ -114,7 +114,36 @@
           "airDate": "2014-10-07",
           "stillUrl": "https://image.tmdb.org/t/p/w500/piyGyhwbqqyIxcyuZXYmDUWSylb.jpg",
           "runtimeMinutes": 44,
-          "status": "processing"
+          "status": "ready",
+          "shardId": "mfilms12/film2-media-01",
+          "asset": {
+            "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e1/video_1786116903066.mp4",
+            "durationSeconds": 2673.725045,
+            "audioLanguages": [
+              "eng",
+              "tur"
+            ],
+            "subtitleLanguages": [
+              "eng",
+              "tur"
+            ],
+            "externalAudioTracks": [],
+            "externalSubtitleTracks": [
+              {
+                "language": "eng",
+                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e1/subs_eng_1786116903066_1.vtt",
+                "label": "Ingilizce",
+                "mimeType": "text/vtt"
+              },
+              {
+                "language": "tur",
+                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e1/subs_tur_1786116903066_2.vtt",
+                "label": "Turkce",
+                "mimeType": "text/vtt"
+              }
+            ],
+            "videoVariants": []
+          }
         },
         {
           "episodeNumber": 2,
