@@ -15,6 +15,7 @@ android {
         versionCode = 11
         versionName = "1.4.2"
 
+        // 1.4.2: Windows-style custom subtitle overlay with real movable height.
         vectorDrawables {
             useSupportLibrary = true
         }
