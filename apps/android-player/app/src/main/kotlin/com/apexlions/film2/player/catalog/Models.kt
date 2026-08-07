@@ -98,7 +98,11 @@ data class Title(
     val genres: List<String> = emptyList(),
     val runtimeMinutes: Int? = null,
     val posterUrl: String? = null,
+    /** Admin panelinden eklenen alternatif posterler; her yeni oturum/refresh'te degisebilir. */
+    val posterUrls: List<String> = emptyList(),
     val backdropUrl: String? = null,
+    /** Hero/detay arka plani icin alternatif gorsel havuzu. */
+    val backdropUrls: List<String> = emptyList(),
     val logoUrl: String? = null,
     /** Detay ekraninda sessiz otomatik oynatilan kisa MP4 preview/trailer. */
     val trailerUrl: String? = null,
