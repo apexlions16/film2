@@ -23,6 +23,7 @@ function positiveInteger(value, label) {
 }
 
 const titlePath = join(REPO_ROOT, "catalog", "titles", `${titleId}.json`);
+const versionPath = join(REPO_ROOT, "catalog", "version.json");
 const title = JSON.parse(await readFile(titlePath, "utf-8"));
 const now = new Date().toISOString();
 
@@ -60,4 +61,6 @@ if (kind === "episode") {
 
 title.updatedAt = now;
 await writeFile(titlePath, JSON.stringify(title, null, 2) + "\n", "utf-8");
+await writeFile(versionPath, JSON.stringify({ revision: now }, null, 2) + "\n", "utf-8");
 console.log(`Katalog guncellendi: ${titlePath}`);
+console.log(`Player revision guncellendi: ${versionPath}`);
