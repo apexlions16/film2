@@ -3,13 +3,6 @@ package com.apexlions.film2.player.catalog
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Kotlin port of packages/catalog-schema/src/types.ts.
- * Kept in lockstep by hand — there is no shared module between the JS desktop apps
- * and these Android apps, so any shape change on the JS side must be mirrored here
- * (and in the equivalent Models.kt under apps/android-studio).
- */
-
 @Serializable
 enum class TitleType {
     @SerialName("movie") MOVIE,
@@ -39,12 +32,24 @@ data class CrewMember(
 )
 
 @Serializable
+data class ExternalMediaTrack(
+    val language: String,
+    val url: String,
+    val label: String? = null,
+    val mimeType: String? = null,
+)
+
+@Serializable
 data class PlayableAsset(
-    /** HLS master playlist (.m3u8) absolute URL — Hugging Face resolve URL. */
-    val masterPlaylistUrl: String,
+    /** Yeni varsayilan: dogrudan MP4/MKV/progressive medya URL'i. */
+    val videoUrl: String? = null,
+    /** Eski HLS katalog kayitlari icin geriye donuk destek. */
+    val masterPlaylistUrl: String? = null,
     val durationSeconds: Double? = null,
     val audioLanguages: List<String> = emptyList(),
     val subtitleLanguages: List<String> = emptyList(),
+    val externalAudioTracks: List<ExternalMediaTrack> = emptyList(),
+    val externalSubtitleTracks: List<ExternalMediaTrack> = emptyList(),
 )
 
 @Serializable
@@ -56,7 +61,6 @@ data class Episode(
     val stillUrl: String? = null,
     val runtimeMinutes: Int? = null,
     val status: AssetStatus,
-    /** Hugging Face dataset repo id hosting this episode's media. */
     val shardId: String? = null,
     val asset: PlayableAsset? = null,
 )
@@ -72,7 +76,6 @@ data class Season(
 
 @Serializable
 data class Title(
-    /** Slug id, e.g. "kayip-sehir" — also the filename: catalog/titles/{id}.json */
     val id: String,
     val type: TitleType,
     val imdbId: String,
@@ -82,7 +85,6 @@ data class Title(
     val overview: String,
     val releaseYear: Int? = null,
     val genres: List<String> = emptyList(),
-    /** Movie only. */
     val runtimeMinutes: Int? = null,
     val posterUrl: String? = null,
     val backdropUrl: String? = null,
@@ -90,11 +92,9 @@ data class Title(
     val cast: List<CastMember> = emptyList(),
     val crew: List<CrewMember> = emptyList(),
     val status: AssetStatus,
-    /** True when TMDB had nothing and every field was entered by hand. */
     val manualEntry: Boolean? = null,
     val createdAt: String,
     val updatedAt: String,
-    /** Movie media; series use episode.asset under seasons instead. */
     val shardId: String? = null,
     val asset: PlayableAsset? = null,
     val seasons: List<Season>? = null,
