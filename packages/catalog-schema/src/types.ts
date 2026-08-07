@@ -34,14 +34,14 @@ export interface VideoVariant {
 }
 
 export interface PlayableAsset {
-  /** Yeni varsayılan: doğrudan MP4/MKV/progressive medya URL'i. */
+  /** Yeni varsayılan: doğrudan tek MP4 / progressive medya URL'i. */
   videoUrl?: string;
   /** Eski katalog kayıtları için geriye dönük HLS desteği. Yeni yüklemeler bunu üretmez. */
   masterPlaylistUrl?: string;
   durationSeconds?: number;
   audioLanguages: string[];
   subtitleLanguages: string[];
-  /** Video dosyasına gömülü olmayan ilave ses dosyaları. */
+  /** Video dosyasına gömülü olmayan ilave ses dosyaları (legacy). */
   externalAudioTracks?: ExternalMediaTrack[];
   /** WebVTT/SRT gibi sidecar altyazılar. */
   externalSubtitleTracks?: ExternalMediaTrack[];
@@ -81,8 +81,14 @@ export interface Title {
   genres: string[];
   runtimeMinutes?: number;
   posterUrl?: string;
+  /** Admin tarafindan eklenen alternatif poster havuzu. */
+  posterUrls?: string[];
   backdropUrl?: string;
+  /** Hero / detay ekraninda kullanilan alternatif backdrop havuzu. */
+  backdropUrls?: string[];
   logoUrl?: string;
+  /** Detay ekraninda sessiz autoplay edilen kisa trailer / preview. */
+  trailerUrl?: string;
   cast: CastMember[];
   crew: CrewMember[];
   status: AssetStatus;
@@ -92,6 +98,23 @@ export interface Title {
   shardId?: string;
   asset?: PlayableAsset;
   seasons?: Season[];
+}
+
+/** Studio tarafindan yonetilen ana sayfa rafi. */
+export interface HomeShelf {
+  id: string;
+  title: string;
+  titleIds: string[];
+  enabled: boolean;
+  shuffle: boolean;
+  maxItems: number;
+}
+
+/** Player ana sayfasinin editoryal konfigurasyonu. */
+export interface HomeConfig {
+  heroTitleIds: string[];
+  shelves: HomeShelf[];
+  updatedAt: string;
 }
 
 export interface ShardEntry {
