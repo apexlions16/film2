@@ -6,9 +6,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.C
 import androidx.media3.common.Format
@@ -167,11 +170,19 @@ fun TrackSelectionSheet(
                 )
             }
             item {
-                Text("Dikey konum  •  ${positionLabel(appearance.subtitleBottomPaddingFraction)}", style = MaterialTheme.typography.bodyMedium)
+                val heightPercent = (appearance.subtitleBottomPaddingFraction * 100f).toInt()
+                Text("Yükseklik  •  %$heightPercent", style = MaterialTheme.typography.bodyMedium)
                 Slider(
-                    value = appearance.subtitleBottomPaddingFraction,
+                    value = appearance.subtitleBottomPaddingFraction.coerceIn(0.04f, 0.32f),
                     onValueChange = onSubtitlePosition,
-                    valueRange = 0.02f..0.32f,
+                    valueRange = 0.04f..0.32f,
+                    steps = 27,
+                )
+                Text(
+                    "Sola doğru en alta, sağa doğru yukarı taşır. VTT içindeki konum bilgisi bu ayarı artık ezmez.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 8.dp),
                 )
             }
             item {
@@ -272,19 +283,25 @@ private fun SubtitlePreview(appearance: PlaybackAppearanceState) {
         SubtitleBackground.SOFT -> Color.Black.copy(alpha = 0.55f)
         SubtitleBackground.STRONG -> Color.Black.copy(alpha = 0.86f)
     }
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
+            .height(150.dp)
             .padding(vertical = 8.dp)
-            .background(Color(0xFF252525), RoundedCornerShape(10.dp))
-            .padding(vertical = 22.dp),
-        contentAlignment = Alignment.Center,
+            .background(Color(0xFF252525), RoundedCornerShape(10.dp)),
     ) {
+        val fraction = appearance.subtitleBottomPaddingFraction.coerceIn(0.04f, 0.32f)
+        val bottomPadding = maxHeight * fraction
         Text(
             "Film2 altyazı önizlemesi",
             color = textColor,
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.background(background, RoundedCornerShape(3.dp)).padding(horizontal = 5.dp, vertical = 2.dp),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(horizontal = 8.dp, bottom = bottomPadding)
+                .background(background, RoundedCornerShape(3.dp))
+                .padding(horizontal = 5.dp, vertical = 2.dp),
         )
     }
 }
@@ -310,13 +327,6 @@ private fun <T> ChoiceRow(
             }
         }
     }
-}
-
-private fun positionLabel(value: Float): String = when {
-    value < 0.07f -> "En alt"
-    value < 0.14f -> "Alt"
-    value < 0.22f -> "Orta-alt"
-    else -> "Yukarı"
 }
 
 @Composable
