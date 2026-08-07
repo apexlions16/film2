@@ -13,9 +13,12 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.apexlions.film2.studio.Film2StudioApplication
 import com.apexlions.film2.studio.R
-import com.apexlions.film2.studio.dispatch.MediaKind
-import com.apexlions.film2.studio.dispatch.PackageMediaRequest
-import com.apexlions.film2.studio.dispatch.UploadMode
+import com.apexlions.film2.studio.catalog.AssetStatus
+import com.apexlions.film2.studio.catalog.Episode
+import com.apexlions.film2.studio.catalog.ExternalMediaTrack
+import com.apexlions.film2.studio.catalog.PlayableAsset
+import com.apexlions.film2.studio.catalog.Season
+import com.apexlions.film2.studio.catalog.Title
 import com.apexlions.film2.studio.hf.HfAccountEntry
 import com.apexlions.film2.studio.hf.HfUploadException
 import com.apexlions.film2.studio.hf.HfUploadProgress
@@ -24,6 +27,7 @@ import com.apexlions.film2.studio.hf.uploadFileWithFailover
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.io.IOException
+import java.time.Instant
 import kotlin.math.roundToInt
 
 @Serializable
@@ -47,10 +51,22 @@ data class UploadJobSpec(
     val files: List<UploadJobFile>,
 )
 
+private data class UploadedDirectFile(
+    val role: String,
+    val language: String?,
+    val url: String,
+    val shardId: String,
+    val repoPath: String,
+    val bytes: Long,
+)
+
 /**
- * Long-running foreground upload with UI-observable progress. WorkManager persists the
- * job, so it continues when the screen closes. Every meaningful phase is published in
- * WorkInfo.progress and mirrored in the foreground notification.
+ * Direct-media upload worker.
+ *
+ * Eski akis: ham dosya -> HF incoming -> GitHub Actions -> ffmpeg HLS -> yuzlerce .ts -> katalog.
+ * Yeni akis: MP4/ses/VTT -> HF media -> katalog. Video hic parcalanmaz ve yeniden encode edilmez.
+ * Combined modda ideal sonuc bolum basina TEK video dosyasidir. Separate modda da sadece
+ * kullanicinin sectigi video + ses + altyazi dosyalari bulunur; HLS/m3u8/segment uretilmez.
  */
 class UploadWorker(
     appContext: Context,
@@ -90,10 +106,11 @@ class UploadWorker(
         val app = applicationContext as Film2StudioApplication
         return try {
             runUpload(app, spec)
+            val doneMessage = "Medya hazir: video dogrudan oynatilacak (HLS parcasi uretilmedi)"
             publish(
                 percent = 100,
                 stage = STAGE_COMPLETE,
-                message = "Yukleme tamamlandi; paketleme GitHub Actions'ta devam ediyor",
+                message = doneMessage,
                 fileIndex = spec.files.size,
                 fileCount = spec.files.size,
             )
@@ -101,7 +118,9 @@ class UploadWorker(
                 workDataOf(
                     KEY_PROGRESS_PERCENT to 100,
                     KEY_STAGE to STAGE_COMPLETE,
-                    KEY_MESSAGE to "Yukleme tamamlandi; paketleme GitHub Actions'ta devam ediyor",
+                    KEY_MESSAGE to doneMessage,
+                    KEY_FILE_INDEX to spec.files.size,
+                    KEY_FILE_COUNT to spec.files.size,
                 ),
             )
         } catch (t: Throwable) {
@@ -130,33 +149,38 @@ class UploadWorker(
 
     private suspend fun runUpload(app: Film2StudioApplication, spec: UploadJobSpec) {
         val tokens = app.settingsRepository.currentTokens()
+        require(!tokens.githubPat.isNullOrBlank()) { "GitHub PAT ayarlanmamis" }
+
         val hfAccounts = app.settingsRepository.currentHfAccounts()
             .map { HfAccountEntry(namespace = it.namespace, token = it.token) }
-        val githubToken = requireNotNull(tokens.githubPat?.takeIf { it.isNotBlank() }) {
-            "GitHub PAT ayarlanmamis"
-        }
         require(hfAccounts.isNotEmpty()) {
             "Hicbir Hugging Face hesabi eklenmemis. Ayarlar ekranindan en az bir hesap ekleyin."
+        }
+
+        if (spec.kind == "episode") {
+            require(spec.seasonNumber != null && spec.episodeNumber != null) {
+                "Dizi yuklemesi icin sezon ve bolum numarasi gerekli"
+            }
         }
 
         publish(1, STAGE_CHECKING, "Depolama hesabi ve shard kontrol ediliyor", 0, spec.files.size)
         val registry = app.githubClient.getShardRegistry()
         val capacityChecked = app.shardRegistryManager.ensureCapacity(registry, hfAccounts)
         var currentRegistry = capacityChecked.registry
-        var shard = app.shardRegistryManager.getActiveShard(currentRegistry)
 
-        val incomingPrefix = if (spec.kind == "episode") {
-            "incoming/${spec.titleId}/s${spec.seasonNumber}e${spec.episodeNumber}"
+        val mediaPrefix = if (spec.kind == "episode") {
+            "media/${spec.titleId}/s${spec.seasonNumber}e${spec.episodeNumber}"
         } else {
-            "incoming/${spec.titleId}"
+            "media/${spec.titleId}"
         }
 
         val uploader = app.newHfUploader()
-        var totalBytesUploaded = 0L
+        val uploaded = mutableListOf<UploadedDirectFile>()
         val totalFiles = spec.files.size
 
         spec.files.forEachIndexed { index, file ->
-            val repoPath = "$incomingPrefix/${file.fileName}"
+            val targetName = directFileName(file, index)
+            val repoPath = "$mediaPrefix/$targetName"
             var speedStage: HfUploadStage? = null
             var speedStartedAtMs = 0L
             var speedStartedBytes = 0L
@@ -178,23 +202,19 @@ class UploadWorker(
                     val processedSinceStage = (hfProgress.bytesProcessed - speedStartedBytes).coerceAtLeast(0L)
                     val bytesPerSecond = processedSinceStage * 1000L / elapsedMs
                     val etaSeconds = if (bytesPerSecond > 0L && hfProgress.totalBytes > 0L) {
-                        ((hfProgress.totalBytes - hfProgress.bytesProcessed).coerceAtLeast(0L) / bytesPerSecond)
+                        (hfProgress.totalBytes - hfProgress.bytesProcessed).coerceAtLeast(0L) / bytesPerSecond
                     } else {
                         -1L
                     }
 
-                    val overallPercent = calculateOverallPercent(
-                        fileIndex = index,
-                        fileCount = totalFiles,
-                        progress = hfProgress,
-                    )
+                    val overallPercent = calculateOverallPercent(index, totalFiles, hfProgress)
                     publishAsync(
                         percent = overallPercent,
                         stage = hfProgress.stage.toUiStage(),
                         message = hfProgress.message,
                         fileIndex = index + 1,
                         fileCount = totalFiles,
-                        fileName = file.fileName,
+                        fileName = targetName,
                         bytesProcessed = hfProgress.bytesProcessed,
                         totalBytes = hfProgress.totalBytes,
                         bytesPerSecond = bytesPerSecond,
@@ -202,48 +222,180 @@ class UploadWorker(
                     )
                 },
             )
-            currentRegistry = result.registry
-            shard = result.shard
-            totalBytesUploaded += result.bytes
+
+            // Failover olursa her dosya farkli shard'a dusebilir. Kullanim sayacini dosya
+            // bazinda dogru shard'a yaz; asset URL'leri zaten mutlak URL oldugu icin bu sorun degil.
+            currentRegistry = app.shardRegistryManager.recordUsage(
+                result.registry,
+                result.shard.id,
+                result.bytes,
+            )
+            uploaded += UploadedDirectFile(
+                role = file.role,
+                language = file.language,
+                url = result.url,
+                shardId = result.shard.id,
+                repoPath = repoPath,
+                bytes = result.bytes,
+            )
 
             publish(
                 percent = (((index + 1).toDouble() / totalFiles) * UPLOAD_PHASE_MAX_PERCENT).roundToInt(),
                 stage = STAGE_FILE_COMPLETE,
-                message = "${file.fileName} yuklendi",
+                message = "$targetName yuklendi",
                 fileIndex = index + 1,
                 fileCount = totalFiles,
-                fileName = file.fileName,
+                fileName = targetName,
                 bytesProcessed = result.bytes,
                 totalBytes = result.bytes,
             )
         }
 
         publish(92, STAGE_CATALOG, "Shard kullanim bilgisi GitHub'a yaziliyor", totalFiles, totalFiles)
-        val withUsage = app.shardRegistryManager.recordUsage(currentRegistry, shard.id, totalBytesUploaded)
-        app.githubClient.putShardRegistry(withUsage)
+        app.githubClient.putShardRegistry(currentRegistry)
 
-        val combinedFile = spec.files.firstOrNull { it.role == "combined" }?.fileName
-        val videoFile = spec.files.firstOrNull { it.role == "video" }?.fileName
-        val audioFiles = spec.files.filter { it.role == "audio" }
-            .associate { (it.language ?: "und") to it.fileName }
-        val subtitleFiles = spec.files.filter { it.role == "subtitle" }
-            .associate { (it.language ?: "und") to it.fileName }
+        publish(96, STAGE_CATALOG, "Video ve track bilgileri kataloga baglaniyor", totalFiles, totalFiles)
+        val video = uploaded.firstOrNull { it.role == "combined" || it.role == "video" }
+            ?: throw IllegalStateException("Video dosyasi yuklenmedi")
+        val asset = buildDirectAsset(video, uploaded)
+        val existingTitle = app.githubClient.getTitle(spec.titleId)
+            ?: throw IllegalStateException("Katalog basligi bulunamadi: ${spec.titleId}")
+        val updatedTitle = attachAsset(existingTitle, spec, asset, video.shardId)
+        app.githubClient.putTitle(updatedTitle)
 
-        publish(97, STAGE_DISPATCHING, "Paketleme islemi GitHub Actions'a gonderiliyor", totalFiles, totalFiles)
-        val request = PackageMediaRequest(
-            titleId = spec.titleId,
-            kind = if (spec.kind == "episode") MediaKind.EPISODE else MediaKind.MOVIE,
-            seasonNumber = spec.seasonNumber,
-            episodeNumber = spec.episodeNumber,
-            shardId = shard.id,
-            mode = if (spec.mode == "separate") UploadMode.SEPARATE else UploadMode.COMBINED,
-            incomingPrefix = incomingPrefix,
-            combinedFile = combinedFile,
-            videoFile = videoFile,
-            audioFiles = audioFiles,
-            subtitleFiles = subtitleFiles,
+        publish(99, STAGE_CATALOG, "Katalog hazir; Player MP4'u dogrudan acacak", totalFiles, totalFiles)
+    }
+
+    private fun buildDirectAsset(
+        video: UploadedDirectFile,
+        uploaded: List<UploadedDirectFile>,
+    ): PlayableAsset {
+        val audioTracks = uploaded.filter { it.role == "audio" }.map { file ->
+            val lang = normalizedLanguage(file.language)
+            ExternalMediaTrack(
+                language = lang,
+                label = lang,
+                url = file.url,
+                mimeType = audioMime(file.repoPath),
+            )
+        }
+        val subtitleTracks = uploaded.filter { it.role == "subtitle" }.map { file ->
+            val lang = normalizedLanguage(file.language)
+            ExternalMediaTrack(
+                language = lang,
+                label = lang,
+                url = file.url,
+                mimeType = subtitleMime(file.repoPath),
+            )
+        }
+        return PlayableAsset(
+            videoUrl = video.url,
+            masterPlaylistUrl = null,
+            audioLanguages = audioTracks.map { it.language },
+            subtitleLanguages = subtitleTracks.map { it.language },
+            externalAudioTracks = audioTracks,
+            externalSubtitleTracks = subtitleTracks,
         )
-        app.packageMediaDispatcher.dispatch(request, githubToken)
+    }
+
+    private fun attachAsset(
+        title: Title,
+        spec: UploadJobSpec,
+        asset: PlayableAsset,
+        videoShardId: String,
+    ): Title {
+        val now = Instant.now().toString()
+        if (spec.kind != "episode") {
+            return title.copy(
+                status = AssetStatus.READY,
+                updatedAt = now,
+                shardId = videoShardId,
+                asset = asset,
+            )
+        }
+
+        val seasonNumber = requireNotNull(spec.seasonNumber)
+        val episodeNumber = requireNotNull(spec.episodeNumber)
+        val seasons = title.seasons.orEmpty().toMutableList()
+        val seasonIndex = seasons.indexOfFirst { it.seasonNumber == seasonNumber }
+
+        if (seasonIndex < 0) {
+            seasons += Season(
+                seasonNumber = seasonNumber,
+                name = "Sezon $seasonNumber",
+                overview = "",
+                episodes = listOf(
+                    Episode(
+                        episodeNumber = episodeNumber,
+                        title = "$episodeNumber. Bolum",
+                        overview = "",
+                        status = AssetStatus.READY,
+                        shardId = videoShardId,
+                        asset = asset,
+                    ),
+                ),
+            )
+        } else {
+            val season = seasons[seasonIndex]
+            val episodes = season.episodes.toMutableList()
+            val episodeIndex = episodes.indexOfFirst { it.episodeNumber == episodeNumber }
+            if (episodeIndex < 0) {
+                episodes += Episode(
+                    episodeNumber = episodeNumber,
+                    title = "$episodeNumber. Bolum",
+                    overview = "",
+                    status = AssetStatus.READY,
+                    shardId = videoShardId,
+                    asset = asset,
+                )
+            } else {
+                episodes[episodeIndex] = episodes[episodeIndex].copy(
+                    status = AssetStatus.READY,
+                    shardId = videoShardId,
+                    asset = asset,
+                )
+            }
+            seasons[seasonIndex] = season.copy(episodes = episodes.sortedBy { it.episodeNumber })
+        }
+
+        return title.copy(
+            status = AssetStatus.READY,
+            updatedAt = now,
+            seasons = seasons.sortedBy { it.seasonNumber },
+        )
+    }
+
+    private fun directFileName(file: UploadJobFile, index: Int): String {
+        val ext = file.fileName.substringAfterLast('.', "").lowercase()
+            .replace(Regex("[^a-z0-9]"), "")
+        val lang = normalizedLanguage(file.language)
+        return when (file.role) {
+            "combined", "video" -> "video.${ext.ifBlank { "mp4" }}"
+            "audio" -> "audio_${lang}_${index + 1}.${ext.ifBlank { "m4a" }}"
+            "subtitle" -> "subs_${lang}_${index + 1}.${ext.ifBlank { "vtt" }}"
+            else -> "file_${index + 1}.${ext.ifBlank { "bin" }}"
+        }
+    }
+
+    private fun normalizedLanguage(value: String?): String = value
+        ?.trim()
+        ?.lowercase()
+        ?.replace(Regex("[^a-z0-9-]"), "")
+        ?.takeIf { it.isNotBlank() }
+        ?: "und"
+
+    private fun audioMime(path: String): String? = when (path.substringAfterLast('.', "").lowercase()) {
+        "m4a", "mp4", "aac" -> "audio/mp4"
+        "mp3" -> "audio/mpeg"
+        "ogg", "opus" -> "audio/ogg"
+        "wav" -> "audio/wav"
+        "flac" -> "audio/flac"
+        else -> null
+    }
+
+    private fun subtitleMime(path: String): String = when (path.substringAfterLast('.', "").lowercase()) {
+        "srt" -> "application/x-subrip"
+        else -> "text/vtt"
     }
 
     private fun calculateOverallPercent(
@@ -263,7 +415,8 @@ class UploadWorker(
             HfUploadStage.FINALIZING -> 0.96
         }
         val filesDoneFraction = (fileIndex + withinFile) / fileCount.toDouble()
-        return (filesDoneFraction * UPLOAD_PHASE_MAX_PERCENT).roundToInt().coerceIn(0, UPLOAD_PHASE_MAX_PERCENT)
+        return (filesDoneFraction * UPLOAD_PHASE_MAX_PERCENT).roundToInt()
+            .coerceIn(0, UPLOAD_PHASE_MAX_PERCENT)
     }
 
     private fun HfUploadStage.toUiStage(): String = when (this) {
@@ -286,16 +439,8 @@ class UploadWorker(
         etaSeconds: Long = -1L,
     ) {
         val data = progressData(
-            percent,
-            stage,
-            message,
-            fileIndex,
-            fileCount,
-            fileName,
-            bytesProcessed,
-            totalBytes,
-            bytesPerSecond,
-            etaSeconds,
+            percent, stage, message, fileIndex, fileCount, fileName,
+            bytesProcessed, totalBytes, bytesPerSecond, etaSeconds,
         )
         currentPercent = percent.coerceIn(0, 100)
         currentFileIndex = fileIndex
@@ -328,16 +473,8 @@ class UploadWorker(
         lastProgressStage = stage
         lastProgressAtMs = now
         val data = progressData(
-            percent,
-            stage,
-            message,
-            fileIndex,
-            fileCount,
-            fileName,
-            bytesProcessed,
-            totalBytes,
-            bytesPerSecond,
-            etaSeconds,
+            percent, stage, message, fileIndex, fileCount, fileName,
+            bytesProcessed, totalBytes, bytesPerSecond, etaSeconds,
         )
         setProgressAsync(data)
 
@@ -394,8 +531,9 @@ class UploadWorker(
         val context = applicationContext
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "Medya yukleme", NotificationManager.IMPORTANCE_LOW)
-            manager.createNotificationChannel(channel)
+            manager.createNotificationChannel(
+                NotificationChannel(CHANNEL_ID, "Medya yukleme", NotificationManager.IMPORTANCE_LOW),
+            )
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -435,7 +573,7 @@ class UploadWorker(
         const val STAGE_FINALIZING = "finalizing"
         const val STAGE_FILE_COMPLETE = "file_complete"
         const val STAGE_CATALOG = "catalog"
-        const val STAGE_DISPATCHING = "dispatching"
+        const val STAGE_DISPATCHING = "dispatching" // legacy UI sabiti; artik kullanilmiyor
         const val STAGE_RETRYING = "retrying"
         const val STAGE_COMPLETE = "complete"
         const val STAGE_FAILED = "failed"
