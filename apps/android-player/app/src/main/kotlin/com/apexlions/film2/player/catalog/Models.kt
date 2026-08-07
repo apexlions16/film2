@@ -100,6 +100,8 @@ data class Title(
     val posterUrl: String? = null,
     val backdropUrl: String? = null,
     val logoUrl: String? = null,
+    /** Detay ekraninda sessiz otomatik oynatilan kisa MP4 preview/trailer. */
+    val trailerUrl: String? = null,
     val cast: List<CastMember> = emptyList(),
     val crew: List<CrewMember> = emptyList(),
     val status: AssetStatus,
