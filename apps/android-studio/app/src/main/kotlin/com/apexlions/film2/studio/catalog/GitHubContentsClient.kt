@@ -7,7 +7,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -19,12 +18,9 @@ import java.util.Base64
 /**
  * Reads AND writes the film2 GitHub catalog via the Contents API.
  *
- * Reads mirror packages/catalog-client/src/index.js (same endpoints as android-player's
- * CatalogClient). Writes (used only by Studio) go through the authenticated Contents API:
- * GET a file first to learn its `sha` (needed to update vs. create), then PUT base64
- * content. A GitHub PAT with `repo` contents write scope is required for writes; reads
- * work unauthenticated too but we attach the token when present to raise the (very low,
- * 60/hr) unauthenticated rate limit.
+ * Read calls can work anonymously. Every write call, however, MUST have a non-empty PAT.
+ * Keeping these paths separate prevents a missing DataStore value from silently becoming
+ * an anonymous PUT which GitHub reports only as a generic 401 "Requires authentication".
  */
 class GitHubContentsClient(
     private val tokenProvider: suspend () -> String?,
@@ -62,16 +58,61 @@ class GitHubContentsClient(
         val sha: String? = null,
     )
 
-    private suspend fun authHeader(builder: Request.Builder): Request.Builder {
-        val token = tokenProvider()
-        if (!token.isNullOrBlank()) {
+    /**
+     * Accepts a raw PAT as well as an accidentally pasted `Bearer ...` / `token ...`
+     * value. Quotes/newlines copied from a backup file are removed too.
+     */
+    private suspend fun normalizedToken(): String? {
+        var value = tokenProvider()?.trim()?.takeIf { it.isNotBlank() } ?: return null
+        value = value.removeSurrounding("\"").trim()
+        value = when {
+            value.startsWith("Bearer ", ignoreCase = true) -> value.substringAfter(' ').trim()
+            value.startsWith("token ", ignoreCase = true) -> value.substringAfter(' ').trim()
+            else -> value
+        }
+        return value.takeIf { it.isNotBlank() }
+    }
+
+    private suspend fun authHeader(
+        builder: Request.Builder,
+        requireAuthentication: Boolean = false,
+    ): Request.Builder {
+        val token = normalizedToken()
+        if (requireAuthentication && token == null) {
+            throw GitHubApiException(
+                "GitHub PAT Studio'da kayitli degil. Ayarlar > GitHub PAT alanina token'i girip Kaydet'e basin.",
+            )
+        }
+        if (token != null) {
             builder.header("Authorization", "Bearer $token")
         }
         builder.header("Accept", "application/vnd.github+json")
+        builder.header("X-GitHub-Api-Version", "2022-11-28")
         return builder
     }
 
-    // ---- Reads (same shape as the JS catalog-client / android-player's CatalogClient) ----
+    /**
+     * Performs a real authenticated request before a long HF upload starts. This lets the
+     * UI fail immediately if the saved PAT disappeared/expired instead of uploading the
+     * trailer first and failing at catalog/shards.json afterwards.
+     */
+    suspend fun verifyAuthentication() = withContext(Dispatchers.IO) {
+        val request = authHeader(
+            Request.Builder().url("https://api.github.com/user"),
+            requireAuthentication = true,
+        ).build()
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                val detail = response.body?.string().orEmpty()
+                throw GitHubApiException(
+                    "GitHub PAT dogrulanamadi (${response.code}). Token ayni olsa bile Studio'daki kayitli deger " +
+                        "GitHub'a kimlik dogrulamasi yapamiyor. $detail",
+                )
+            }
+        }
+    }
+
+    // ---- Reads ----
 
     suspend fun listTitleIds(): List<String> = withContext(Dispatchers.IO) {
         val url = "https://api.github.com/repos/$repo/contents/catalog/titles?ref=$branch"
@@ -108,14 +149,21 @@ class GitHubContentsClient(
         }
     }
 
-    // ---- Writes (Studio only, requires a GitHub PAT with contents:write) ----
+    // ---- Writes (authentication is mandatory) ----
 
     private suspend fun getFileSha(path: String): String? = withContext(Dispatchers.IO) {
         val url = "https://api.github.com/repos/$repo/contents/$path?ref=$branch"
-        val request = authHeader(Request.Builder().url(url)).build()
+        val request = authHeader(
+            Request.Builder().url(url),
+            requireAuthentication = true,
+        ).build()
         httpClient.newCall(request).execute().use { response ->
             if (response.code == 404) return@use null
-            if (!response.isSuccessful) throw GitHubApiException("Dosya bilgisi alinamadi ($path): ${response.code}")
+            if (!response.isSuccessful) {
+                throw GitHubApiException(
+                    "Dosya bilgisi alinamadi ($path): ${response.code} ${response.body?.string().orEmpty()}",
+                )
+            }
             json.decodeFromString(ContentsFile.serializer(), response.body?.string().orEmpty()).sha
         }
     }
@@ -136,6 +184,7 @@ class GitHubContentsClient(
                 Request.Builder()
                     .url(url)
                     .put(bodyJson.toRequestBody("application/json".toMediaType())),
+                requireAuthentication = true,
             ).build()
             httpClient.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
@@ -146,7 +195,6 @@ class GitHubContentsClient(
             }
         }
 
-    /** Commits catalog/titles/{id}.json (create or update — sha is resolved automatically). */
     suspend fun putTitle(title: Title) {
         val body = json.encodeToString(Title.serializer(), title)
         putFile(
@@ -156,7 +204,6 @@ class GitHubContentsClient(
         )
     }
 
-    /** Commits the updated shard registry after an upload / new shard creation. */
     suspend fun putShardRegistry(registry: ShardRegistry) {
         val body = json.encodeToString(ShardRegistry.serializer(), registry)
         putFile(
