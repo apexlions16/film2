@@ -158,9 +158,7 @@ fun TrackSelectionSheet(
 
             item { Divider(modifier = Modifier.padding(vertical = 16.dp)) }
             item { SectionTitle("Altyazı Görünümü") }
-            item {
-                SubtitlePreview(appearance)
-            }
+            item { SubtitlePreview(appearance) }
             item {
                 Text("Boyut  •  %${(appearance.subtitleSizeScale * 100).toInt()}", style = MaterialTheme.typography.bodyMedium)
                 Slider(
@@ -299,7 +297,8 @@ private fun SubtitlePreview(appearance: PlaybackAppearanceState) {
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(horizontal = 8.dp, bottom = bottomPadding)
+                .padding(horizontal = 8.dp)
+                .padding(bottom = bottomPadding)
                 .background(background, RoundedCornerShape(3.dp))
                 .padding(horizontal = 5.dp, vertical = 2.dp),
         )
