@@ -32,7 +32,6 @@ class CatalogClient(
     @Serializable
     private data class CatalogRevision(val revision: String)
 
-    /** Lists all title ids under catalog/titles/ (excluding `_`-prefixed example files). */
     suspend fun listTitleIds(): List<String> = withContext(Dispatchers.IO) {
         val url = "https://api.github.com/repos/$repo/contents/catalog/titles?ref=$branch"
         val request = Request.Builder()
@@ -51,7 +50,6 @@ class CatalogClient(
         }
     }
 
-    /** Fetches one title fresh; the nonce prevents raw.githubusercontent CDN staleness. */
     suspend fun getTitle(id: String): Title = withContext(Dispatchers.IO) {
         val nonce = System.currentTimeMillis()
         val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/titles/$id.json?v=$nonce"
@@ -63,15 +61,25 @@ class CatalogClient(
             if (!response.isSuccessful) {
                 throw CatalogException("Title bulunamadi: $id (${response.code})")
             }
-            val body = response.body?.string().orEmpty()
-            json.decodeFromString(Title.serializer(), body)
+            json.decodeFromString(Title.serializer(), response.body?.string().orEmpty())
         }
     }
 
-    /**
-     * Tiny, cache-busted signal. Player can ask every few seconds; only a changed revision
-     * triggers the more expensive catalog directory + title fetches.
-     */
+    suspend fun getHomeConfig(): HomeConfig = withContext(Dispatchers.IO) {
+        val nonce = System.currentTimeMillis()
+        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/home.json?v=$nonce"
+        val request = Request.Builder()
+            .url(url)
+            .header("Cache-Control", "no-cache")
+            .build()
+        httpClient.newCall(request).execute().use { response ->
+            if (response.code == 404) return@use HomeConfig.DEFAULT
+            if (!response.isSuccessful) throw CatalogException("Ana sayfa ayarlari alinamadi: ${response.code}")
+            runCatching { json.decodeFromString(HomeConfig.serializer(), response.body?.string().orEmpty()) }
+                .getOrDefault(HomeConfig.DEFAULT)
+        }
+    }
+
     suspend fun getRevision(): String? = withContext(Dispatchers.IO) {
         val nonce = System.currentTimeMillis()
         val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/version.json?v=$nonce"
