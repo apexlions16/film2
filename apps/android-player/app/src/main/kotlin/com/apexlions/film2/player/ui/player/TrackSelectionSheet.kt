@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.Tracks
+import com.apexlions.film2.player.catalog.VideoVariant
 import java.util.Locale
 
 private data class TrackOption(
@@ -65,6 +66,9 @@ private fun optionsForType(tracks: Tracks, type: Int): List<TrackOption> =
 @Composable
 fun TrackSelectionSheet(
     tracks: Tracks,
+    videoVariants: List<VideoVariant> = emptyList(),
+    selectedQualityHeight: Int? = null,
+    onSelectQuality: (VideoVariant) -> Unit,
     onSelectAudio: (Tracks.Group, Int) -> Unit,
     onSelectSubtitle: (Tracks.Group, Int) -> Unit,
     onDisableSubtitles: () -> Unit,
@@ -81,6 +85,25 @@ fun TrackSelectionSheet(
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
         LazyColumn(modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)) {
+            if (videoVariants.size > 1) {
+                item {
+                    Text(
+                        "Goruntu Kalitesi",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+                }
+                items(videoVariants.sortedByDescending { it.height }, key = { "quality-${it.height}-${it.url}" }) { variant ->
+                    TrackRow(
+                        label = if (variant.source) "${variant.label} (Kaynak)" else variant.label,
+                        selected = selectedQualityHeight == variant.height,
+                        onClick = { onSelectQuality(variant) },
+                    )
+                }
+                item { Divider(modifier = Modifier.padding(vertical = 16.dp)) }
+            }
+
             item {
                 Text(
                     "Ses Dili",
