@@ -8,8 +8,8 @@ export {
   recordUsage,
 } from "./registry.js";
 
-export { resolveUrl, uploadDirectoryToShard, uploadFileToShard } from "./upload.js";
+export { resolveUrl, uploadDirectoryToShard, uploadFileToShard, uploadFilesToShard } from "./upload.js";
 
-export { uploadFileWithFailover, uploadDirectoryWithFailover } from "./failover.js";
+export { uploadFileWithFailover, uploadFilesWithFailover, uploadDirectoryWithFailover } from "./failover.js";
 
 export { resolveHfAccount } from "./accounts.js";
