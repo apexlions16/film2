@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.apexlions.film2.player.ui.browse.BrowseScreen
 import com.apexlions.film2.player.ui.detail.TitleDetailScreen
+import com.apexlions.film2.player.ui.library.LibraryScreen
 import com.apexlions.film2.player.ui.player.PlayerScreen
 import com.apexlions.film2.player.ui.search.SearchScreen
 
@@ -15,13 +16,24 @@ import com.apexlions.film2.player.ui.search.SearchScreen
 fun Film2PlayerNavGraph() {
     val navController = rememberNavController()
 
+    fun navigateHome() {
+        navController.navigate(Destinations.BROWSE) {
+            popUpTo(Destinations.BROWSE) { inclusive = false }
+            launchSingleTop = true
+        }
+    }
+
     NavHost(navController = navController, startDestination = Destinations.BROWSE) {
         composable(Destinations.BROWSE) {
             BrowseScreen(
                 onTitleSelected = { title ->
                     navController.navigate(Destinations.titleDetail(title.id))
                 },
+                onContinuePlay = { id, season, episode ->
+                    navController.navigate(Destinations.player(id, season, episode))
+                },
                 onSearchClick = { navController.navigate(Destinations.SEARCH) },
+                onLibraryClick = { navController.navigate(Destinations.LIBRARY) },
             )
         }
 
@@ -31,6 +43,16 @@ fun Film2PlayerNavGraph() {
                     navController.navigate(Destinations.titleDetail(title.id))
                 },
                 onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(Destinations.LIBRARY) {
+            LibraryScreen(
+                onTitleSelected = { title ->
+                    navController.navigate(Destinations.titleDetail(title.id))
+                },
+                onHome = ::navigateHome,
+                onSearch = { navController.navigate(Destinations.SEARCH) },
             )
         }
 
