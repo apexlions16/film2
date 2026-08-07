@@ -6,6 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.apexlions.film2.studio.Film2StudioApplication
+import com.apexlions.film2.studio.catalog.GitHubContentsClient
 import com.apexlions.film2.studio.hf.HfAccountEntry
 import com.apexlions.film2.studio.hf.HfUploadProgress
 import com.apexlions.film2.studio.hf.HfUploadStage
@@ -35,12 +36,29 @@ class TrailerUploadWorker(
 
         val app = applicationContext as Film2StudioApplication
         return try {
-            publish(1, "Depolama hesabi kontrol ediliyor")
+            /*
+             * PAT'i isin basinda tek sefer oku ve bu worker boyunca ayni degeri kullan.
+             * Boylece DataStore/UI zamanlamasi yuzunden GitHub client'in daha sonra bos
+             * bir token okuma ihtimali ortadan kalkar.
+             */
+            publish(1, "GitHub yetkisi kontrol ediliyor")
+            val githubPat = app.settingsRepository.currentTokens().githubPat
+                ?.trim()
+                ?.takeIf { it.isNotBlank() }
+                ?: throw IllegalStateException(
+                    "GitHub PAT Studio'da kayitli degil. Ayarlar > GitHub PAT alanina token'i girip Kaydet'e basin.",
+                )
+            val githubClient = GitHubContentsClient(tokenProvider = { githubPat })
+
+            // Gercek authenticated request: HF'ye tek byte yuklemeden once PAT'i dogrula.
+            githubClient.verifyAuthentication()
+
+            publish(3, "Depolama hesabi kontrol ediliyor")
             val accounts = app.settingsRepository.currentHfAccounts()
                 .map { HfAccountEntry(namespace = it.namespace, token = it.token) }
             require(accounts.isNotEmpty()) { "Hugging Face hesabi eklenmemis" }
 
-            val registry = app.githubClient.getShardRegistry()
+            val registry = githubClient.getShardRegistry()
             val capacity = app.shardRegistryManager.ensureCapacity(registry, accounts)
             val repoPath = "media/$titleId/trailer.$extension"
 
@@ -60,11 +78,11 @@ class TrailerUploadWorker(
                 upload.shard.id,
                 upload.bytes,
             )
-            app.githubClient.putShardRegistry(updatedRegistry)
+            githubClient.putShardRegistry(updatedRegistry)
 
-            val title = app.githubClient.getTitle(titleId)
+            val title = githubClient.getTitle(titleId)
                 ?: throw IllegalStateException("Katalogda $titleId bulunamadi")
-            app.githubClient.putTitle(
+            githubClient.putTitle(
                 title.copy(
                     trailerUrl = upload.url,
                     updatedAt = Instant.now().toString(),
@@ -89,9 +107,9 @@ class TrailerUploadWorker(
             progress.bytesProcessed.toDouble() / progress.totalBytes.toDouble()
         } else 0.0
         val percent = when (progress.stage) {
-            HfUploadStage.PREPARING -> (2 + ratio * 12).toInt()
-            HfUploadStage.CHECKING -> 15
-            HfUploadStage.UPLOADING -> (15 + ratio * 75).toInt()
+            HfUploadStage.PREPARING -> (5 + ratio * 10).toInt()
+            HfUploadStage.CHECKING -> 16
+            HfUploadStage.UPLOADING -> (16 + ratio * 74).toInt()
             HfUploadStage.FINALIZING -> 92
         }.coerceIn(0, 93)
         setProgressAsync(
