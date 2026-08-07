@@ -3,7 +3,8 @@
     "demir-adam-0371",
     "the-flash-3107",
     "saplant-3728",
-    "tolgshow-7827"
+    "tolgshow-7827",
+    "ay-sovalyesi-1023"
   ],
   "shelves": [
     {
@@ -13,7 +14,8 @@
         "demir-adam-0371",
         "the-flash-3107",
         "saplant-3728",
-        "tolgshow-7827"
+        "tolgshow-7827",
+        "ay-sovalyesi-1023"
       ],
       "enabled": true,
       "shuffle": true,
@@ -26,7 +28,8 @@
         "demir-adam-0371",
         "the-flash-3107",
         "saplant-3728",
-        "tolgshow-7827"
+        "tolgshow-7827",
+        "ay-sovalyesi-1023"
       ],
       "enabled": true,
       "shuffle": true,
@@ -39,12 +42,13 @@
         "tolgshow-7827",
         "saplant-3728",
         "the-flash-3107",
-        "demir-adam-0371"
+        "demir-adam-0371",
+        "ay-sovalyesi-1023"
       ],
       "enabled": true,
-      "shuffle": false,
+      "shuffle": true,
       "maxItems": 20
     }
   ],
-  "updatedAt": "2026-08-07T19:36:09.094Z"
+  "updatedAt": "2026-08-07T21:50:41.593Z"
 }
