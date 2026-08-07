@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
+import android.graphics.Color as AndroidColor
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -53,7 +55,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -65,9 +66,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.CaptionStyleCompat
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.SubtitleView
 import com.apexlions.film2.player.Film2PlayerApplication
 import com.apexlions.film2.player.ui.common.CatalogErrorState
+import com.apexlions.film2.player.userdata.PlaybackAppearanceState
+import com.apexlions.film2.player.userdata.SubtitleBackground
+import com.apexlions.film2.player.userdata.SubtitleEdge
+import com.apexlions.film2.player.userdata.SubtitleTextColor
+import com.apexlions.film2.player.userdata.VideoLayoutMode
 import kotlinx.coroutines.delay
 
 private val ProgressRed = Color(0xFFE50914)
@@ -98,6 +106,8 @@ fun PlayerScreen(
     val tracks by viewModel.currentTracks.collectAsState()
     val selectedQualityHeight by viewModel.selectedQualityHeight.collectAsState()
     val runtime by viewModel.runtime.collectAsState()
+    val appearance by application.playbackAppearanceRepository.state.collectAsState()
+    val appearanceRepository = application.playbackAppearanceRepository
 
     var trackSheetVisible by remember { mutableStateOf(false) }
     var controlsVisible by remember { mutableStateOf(true) }
@@ -130,14 +140,10 @@ fun PlayerScreen(
         onDispose {
             viewModel.pauseAndPersist()
             if (window != null) {
-                WindowCompat.getInsetsController(window, window.decorView)
-                    .show(WindowInsetsCompat.Type.systemBars())
-                // MainActivity edge-to-edge kullaniyor; normal ekranlara donerken bunu koru.
+                WindowCompat.getInsetsController(window, window.decorView).show(WindowInsetsCompat.Type.systemBars())
                 WindowCompat.setDecorFitsSystemWindows(window, false)
             }
-            if (activity != null && previousOrientation != null) {
-                activity.requestedOrientation = previousOrientation
-            }
+            if (activity != null && previousOrientation != null) activity.requestedOrientation = previousOrientation
         }
     }
 
@@ -159,8 +165,7 @@ fun PlayerScreen(
                         interactionNonce++
                     },
                     onDoubleTap = { offset ->
-                        if (offset.x < size.width / 2f) viewModel.seekBy(-10_000L)
-                        else viewModel.seekBy(10_000L)
+                        if (offset.x < size.width / 2f) viewModel.seekBy(-10_000L) else viewModel.seekBy(10_000L)
                         interact()
                     },
                 )
@@ -174,18 +179,27 @@ fun PlayerScreen(
             is PlaybackUiState.Error -> CatalogErrorState(message = state.message, onRetry = ::leavePlayer)
 
             is PlaybackUiState.Ready -> {
+                val videoModifier = when (appearance.videoLayoutMode) {
+                    VideoLayoutMode.RATIO_16_9 -> Modifier.align(Alignment.Center).fillMaxWidth(0.96f).aspectRatio(16f / 9f)
+                    VideoLayoutMode.RATIO_4_3 -> Modifier.align(Alignment.Center).fillMaxWidth(0.72f).aspectRatio(4f / 3f)
+                    VideoLayoutMode.RATIO_21_9 -> Modifier.align(Alignment.Center).fillMaxWidth().aspectRatio(21f / 9f)
+                    else -> Modifier.fillMaxSize()
+                }
                 AndroidView(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = videoModifier,
                     factory = { ctx ->
                         PlayerView(ctx).apply {
                             player = viewModel.player
                             useController = false
-                            resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
                             keepScreenOn = true
                             setShowSubtitleButton(false)
+                            applyPlayerAppearance(this, appearance)
                         }
                     },
-                    update = { it.player = viewModel.player },
+                    update = {
+                        it.player = viewModel.player
+                        applyPlayerAppearance(it, appearance)
+                    },
                 )
 
                 if (runtime.isBuffering) {
@@ -207,26 +221,11 @@ fun PlayerScreen(
                         runtime = runtime,
                         qualityLabel = selectedQualityHeight?.let { "${it}p" } ?: "Kalite",
                         onBack = ::leavePlayer,
-                        onTogglePlay = {
-                            viewModel.togglePlayPause()
-                            interact()
-                        },
-                        onRewind = {
-                            viewModel.seekBy(-10_000L)
-                            interact()
-                        },
-                        onForward = {
-                            viewModel.seekBy(10_000L)
-                            interact()
-                        },
-                        onSeek = {
-                            viewModel.seekTo(it)
-                            interact()
-                        },
-                        onOpenSettings = {
-                            trackSheetVisible = true
-                            interact()
-                        },
+                        onTogglePlay = { viewModel.togglePlayPause(); interact() },
+                        onRewind = { viewModel.seekBy(-10_000L); interact() },
+                        onForward = { viewModel.seekBy(10_000L); interact() },
+                        onSeek = { viewModel.seekTo(it); interact() },
+                        onOpenSettings = { trackSheetVisible = true; interact() },
                     )
                 }
 
@@ -235,31 +234,65 @@ fun PlayerScreen(
                         tracks = tracks,
                         videoVariants = state.asset.videoVariants,
                         selectedQualityHeight = selectedQualityHeight,
-                        onSelectQuality = { variant ->
-                            viewModel.selectQuality(variant)
-                            trackSheetVisible = false
-                            interact()
-                        },
-                        onSelectAudio = { group, index ->
-                            viewModel.selectAudioTrack(group, index)
-                            interact()
-                        },
-                        onSelectSubtitle = { group, index ->
-                            viewModel.selectSubtitleTrack(group, index)
-                            interact()
-                        },
-                        onDisableSubtitles = {
-                            viewModel.disableSubtitles()
-                            interact()
-                        },
-                        onDismiss = {
-                            trackSheetVisible = false
-                            interact()
-                        },
+                        appearance = appearance,
+                        onSelectQuality = { variant -> viewModel.selectQuality(variant); interact() },
+                        onSelectAudio = { group, index -> viewModel.selectAudioTrack(group, index); interact() },
+                        onSelectSubtitle = { group, index -> viewModel.selectSubtitleTrack(group, index); interact() },
+                        onDisableSubtitles = { viewModel.disableSubtitles(); interact() },
+                        onSubtitleSize = appearanceRepository::setSubtitleSizeScale,
+                        onSubtitlePosition = appearanceRepository::setSubtitleBottomPaddingFraction,
+                        onSubtitleTextColor = appearanceRepository::setSubtitleTextColor,
+                        onSubtitleBackground = appearanceRepository::setSubtitleBackground,
+                        onSubtitleEdge = appearanceRepository::setSubtitleEdge,
+                        onVideoLayout = appearanceRepository::setVideoLayoutMode,
+                        onResetSubtitles = appearanceRepository::resetSubtitles,
+                        onDismiss = { trackSheetVisible = false; interact() },
                     )
                 }
             }
         }
+    }
+}
+
+private fun applyPlayerAppearance(view: PlayerView, appearance: PlaybackAppearanceState) {
+    view.resizeMode = when (appearance.videoLayoutMode) {
+        VideoLayoutMode.SCREEN_CROP -> AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+        VideoLayoutMode.STRETCH -> AspectRatioFrameLayout.RESIZE_MODE_FILL
+        else -> AspectRatioFrameLayout.RESIZE_MODE_FIT
+    }
+
+    val foreground = when (appearance.subtitleTextColor) {
+        SubtitleTextColor.WHITE -> AndroidColor.WHITE
+        SubtitleTextColor.YELLOW -> AndroidColor.rgb(255, 235, 59)
+        SubtitleTextColor.CYAN -> AndroidColor.rgb(128, 222, 234)
+    }
+    val background = when (appearance.subtitleBackground) {
+        SubtitleBackground.NONE -> AndroidColor.TRANSPARENT
+        SubtitleBackground.SOFT -> AndroidColor.argb(145, 0, 0, 0)
+        SubtitleBackground.STRONG -> AndroidColor.argb(225, 0, 0, 0)
+    }
+    val edgeType = when (appearance.subtitleEdge) {
+        SubtitleEdge.OUTLINE -> CaptionStyleCompat.EDGE_TYPE_OUTLINE
+        SubtitleEdge.SHADOW -> CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW
+        SubtitleEdge.NONE -> CaptionStyleCompat.EDGE_TYPE_NONE
+    }
+    view.subtitleView?.apply {
+        setApplyEmbeddedStyles(false)
+        setApplyEmbeddedFontSizes(false)
+        setFractionalTextSize(
+            SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * appearance.subtitleSizeScale.coerceIn(0.65f, 1.75f),
+        )
+        setBottomPaddingFraction(appearance.subtitleBottomPaddingFraction.coerceIn(0.02f, 0.32f))
+        setStyle(
+            CaptionStyleCompat(
+                foreground,
+                background,
+                AndroidColor.TRANSPARENT,
+                edgeType,
+                AndroidColor.BLACK,
+                null,
+            ),
+        )
     }
 }
 
@@ -289,31 +322,16 @@ private fun CinematicControls(
             ),
     ) {
         Row(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 12.dp),
+            modifier = Modifier.align(Alignment.TopStart).fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             PlayerCircleButton(onClick = onBack, size = 44) {
                 Icon(Icons.Filled.ArrowBack, contentDescription = "Geri", tint = Color.White)
             }
             Column(modifier = Modifier.padding(start = 14.dp).weight(1f)) {
-                Text(
-                    text = title,
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 17.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 17.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 episodeLabel?.let {
-                    Text(
-                        text = it,
-                        color = Color.White.copy(alpha = 0.72f),
-                        fontSize = 13.sp,
-                        maxLines = 1,
-                    )
+                    Text(it, color = Color.White.copy(alpha = 0.72f), fontSize = 13.sp, maxLines = 1)
                 }
             }
         }
@@ -340,10 +358,7 @@ private fun CinematicControls(
         }
 
         Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(horizontal = 22.dp, vertical = 12.dp),
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(horizontal = 22.dp, vertical = 12.dp),
         ) {
             val max = runtime.durationMs.coerceAtLeast(1L).toFloat()
             Slider(
@@ -357,31 +372,17 @@ private fun CinematicControls(
                 ),
                 modifier = Modifier.fillMaxWidth().height(28.dp),
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = formatTime(runtime.positionMs),
-                    color = Color.White.copy(alpha = 0.88f),
-                    fontSize = 12.sp,
-                )
-                Text(
-                    text = "  /  ${formatTime(runtime.durationMs)}",
-                    color = Color.White.copy(alpha = 0.55f),
-                    fontSize = 12.sp,
-                )
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(formatTime(runtime.positionMs), color = Color.White.copy(alpha = 0.88f), fontSize = 12.sp)
+                Text("  /  ${formatTime(runtime.durationMs)}", color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp)
                 Spacer(Modifier.weight(1f))
                 Row(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(Color.Black.copy(alpha = 0.38f))
-                        .padding(start = 10.dp),
+                    modifier = Modifier.clip(CircleShape).background(Color.Black.copy(alpha = 0.38f)).padding(start = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(qualityLabel, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                     IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Kalite, ses ve altyazi", tint = Color.White)
+                        Icon(Icons.Filled.Settings, contentDescription = "Kalite, ses, altyazı ve ekran", tint = Color.White)
                     }
                 }
             }
@@ -390,21 +391,11 @@ private fun CinematicControls(
 }
 
 @Composable
-private fun PlayerCircleButton(
-    onClick: () -> Unit,
-    size: Int,
-    strong: Boolean = false,
-    content: @Composable () -> Unit,
-) {
+private fun PlayerCircleButton(onClick: () -> Unit, size: Int, strong: Boolean = false, content: @Composable () -> Unit) {
     IconButton(
         onClick = onClick,
-        modifier = Modifier
-            .size(size.dp)
-            .clip(CircleShape)
-            .background(if (strong) Color.White else Color.Black.copy(alpha = 0.48f)),
-    ) {
-        content()
-    }
+        modifier = Modifier.size(size.dp).clip(CircleShape).background(if (strong) Color.White else Color.Black.copy(alpha = 0.48f)),
+    ) { content() }
 }
 
 private fun episodeLabel(title: com.apexlions.film2.player.catalog.Title, season: Int?, episode: Int?): String? {
@@ -421,12 +412,11 @@ private fun episodeLabel(title: com.apexlions.film2.player.catalog.Title, season
 }
 
 private fun formatTime(milliseconds: Long): String {
-    val totalSeconds = (milliseconds.coerceAtLeast(0L) / 1000L)
+    val totalSeconds = milliseconds.coerceAtLeast(0L) / 1000L
     val hours = totalSeconds / 3600L
     val minutes = (totalSeconds % 3600L) / 60L
     val seconds = totalSeconds % 60L
-    return if (hours > 0L) "%d:%02d:%02d".format(hours, minutes, seconds)
-    else "%02d:%02d".format(minutes, seconds)
+    return if (hours > 0L) "%d:%02d:%02d".format(hours, minutes, seconds) else "%02d:%02d".format(minutes, seconds)
 }
 
 private tailrec fun Context.findActivity(): Activity? = when (this) {
