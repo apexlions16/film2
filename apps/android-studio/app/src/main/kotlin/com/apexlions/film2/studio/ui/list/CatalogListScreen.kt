@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -46,6 +47,7 @@ fun CatalogListScreen(
     onAddNew: () -> Unit,
     onOpenSettings: () -> Unit,
     onAttachMedia: (titleId: String, titleType: com.apexlions.film2.studio.catalog.TitleType) -> Unit,
+    onGenerateQualities: (titleId: String, titleType: com.apexlions.film2.studio.catalog.TitleType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val application = LocalContext.current.applicationContext as Film2StudioApplication
@@ -101,7 +103,11 @@ fun CatalogListScreen(
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         items(s.titles, key = { it.id }) { title ->
-                            TitleRow(title, onClick = { onAttachMedia(title.id, title.type) })
+                            TitleRow(
+                                title = title,
+                                onClick = { onAttachMedia(title.id, title.type) },
+                                onQuality = { onGenerateQualities(title.id, title.type) },
+                            )
                         }
                     }
                 }
@@ -111,14 +117,14 @@ fun CatalogListScreen(
 }
 
 @Composable
-private fun TitleRow(title: Title, onClick: () -> Unit) {
+private fun TitleRow(title: Title, onClick: () -> Unit, onQuality: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
-            .padding(14.dp),
+            .padding(horizontal = 14.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -132,7 +138,12 @@ private fun TitleRow(title: Title, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        StudioStatusBadge(status = title.status)
+        Column(horizontalAlignment = Alignment.End) {
+            StudioStatusBadge(status = title.status)
+            TextButton(onClick = onQuality, enabled = title.status == AssetStatus.READY) {
+                Text("Kalite")
+            }
+        }
     }
 }
 
