@@ -77,7 +77,7 @@ fun PlayerScreen(
                         PlayerView(ctx).apply {
                             player = viewModel.player
                             useController = true
-                            setShowSubtitleButton(false) // custom track sheet replaces the built-in picker
+                            setShowSubtitleButton(false)
                         }
                     },
                 )
@@ -100,6 +100,7 @@ fun PlayerScreen(
                 if (trackSheetVisible) {
                     TrackSelectionSheet(
                         tracks = tracks,
+                        audioFallbackLabels = state.asset.externalAudioTracks.map { it.label ?: it.language },
                         onSelectAudio = { group, index ->
                             viewModel.selectAudioTrack(group, index)
                         },
