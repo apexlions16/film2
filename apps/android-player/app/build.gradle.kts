@@ -12,8 +12,8 @@ android {
         applicationId = "com.apexlions.film2.player"
         minSdk = 26
         targetSdk = 35
-        versionCode = 9
-        versionName = "1.4.0"
+        versionCode = 10
+        versionName = "1.4.1"
 
         vectorDrawables {
             useSupportLibrary = true
