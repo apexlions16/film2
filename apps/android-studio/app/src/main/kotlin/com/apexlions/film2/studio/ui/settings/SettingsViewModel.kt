@@ -12,22 +12,29 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class SettingsViewModel(
     private val repository: SettingsRepository,
     private val shardRegistryManager: ShardRegistryManager,
 ) : ViewModel() {
 
+    /*
+     * SettingsScreen only copies the first StateFlow value into its text fields. Using an
+     * empty synthetic initial value here used to race DataStore: the screen could lock in
+     * blank fields before the saved PAT arrived, and pressing Save would then erase it.
+     * Read the tiny Preferences DataStore once for the real initial value instead.
+     */
     val tokens: StateFlow<StudioTokens> = repository.tokens.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = StudioTokens(),
+        initialValue = runBlocking { repository.currentTokens() },
     )
 
     val hfAccounts: StateFlow<List<HfAccountToken>> = repository.hfAccounts.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList(),
+        initialValue = runBlocking { repository.currentHfAccounts() },
     )
 
     private val _saved = MutableStateFlow(false)
