@@ -101,7 +101,7 @@
   "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T14:39:40.441735Z",
-  "updatedAt": "2026-08-07T16:53:21.347120Z",
+  "updatedAt": "2026-08-07T21:22:12.963Z",
   "seasons": [
     {
       "seasonNumber": 1,
@@ -1896,5 +1896,6 @@
         }
       ]
     }
-  ]
+  ],
+  "trailerUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/trailer_1786137728274.mp4"
 }
