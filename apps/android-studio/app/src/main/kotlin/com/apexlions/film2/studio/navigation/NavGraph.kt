@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.apexlions.film2.studio.catalog.TitleType
+import com.apexlions.film2.studio.ui.editorial.EditorialScreen
 import com.apexlions.film2.studio.ui.list.CatalogListScreen
 import com.apexlions.film2.studio.ui.newtitle.AttachFilesScreen
 import com.apexlions.film2.studio.ui.newtitle.NewTitleScreen
@@ -23,21 +24,19 @@ fun Film2StudioNavGraph() {
             CatalogListScreen(
                 onAddNew = { navController.navigate(Destinations.NEW_TITLE) },
                 onOpenSettings = { navController.navigate(Destinations.SETTINGS) },
+                onOpenEditorial = { navController.navigate(Destinations.EDITORIAL) },
                 onAttachMedia = { titleId, titleType ->
                     navController.navigate(Destinations.attachFiles(titleId, titleType.name))
                 },
                 onGenerateQualities = { titleId, titleType ->
                     navController.navigate(Destinations.quality(titleId, titleType.name))
                 },
-                onManageTrailer = { titleId ->
-                    navController.navigate(Destinations.trailer(titleId))
-                },
+                onManageTrailer = { titleId -> navController.navigate(Destinations.trailer(titleId)) },
             )
         }
 
-        composable(Destinations.SETTINGS) {
-            SettingsScreen()
-        }
+        composable(Destinations.SETTINGS) { SettingsScreen() }
+        composable(Destinations.EDITORIAL) { EditorialScreen(onBack = { navController.popBackStack() }) }
 
         composable(Destinations.NEW_TITLE) {
             NewTitleScreen(
@@ -93,10 +92,7 @@ fun Film2StudioNavGraph() {
             arguments = listOf(navArgument(Destinations.ARG_TITLE_ID) { type = NavType.StringType }),
         ) { backStackEntry ->
             val titleId = backStackEntry.arguments?.getString(Destinations.ARG_TITLE_ID).orEmpty()
-            TrailerUploadScreen(
-                titleId = titleId,
-                onBack = { navController.popBackStack() },
-            )
+            TrailerUploadScreen(titleId = titleId, onBack = { navController.popBackStack() })
         }
     }
 }
