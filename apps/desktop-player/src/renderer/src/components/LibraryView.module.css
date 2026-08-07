@@ -1,0 +1,7 @@
+.root { min-height: 100vh; padding: 26px 0 80px; background: #09090b; color: #fff; }
+.header { display: flex; align-items: center; gap: 16px; padding: 18px 56px 34px; }
+.header h1 { margin: 0; font-size: 32px; }
+.header p { margin: 4px 0 0; color: rgba(255,255,255,.5); }
+.back { width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,.12); background: #151517; color: #fff; cursor: pointer; font-size: 20px; }
+.empty { padding: 80px 56px; color: rgba(255,255,255,.46); font-size: 15px; }
+@media (max-width: 900px) { .header { padding-left: 20px; padding-right: 20px; } .empty { padding-left: 20px; } }
