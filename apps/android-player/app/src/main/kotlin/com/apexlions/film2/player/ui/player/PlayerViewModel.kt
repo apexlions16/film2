@@ -24,9 +24,13 @@ import com.apexlions.film2.player.catalog.DemoContent
 import com.apexlions.film2.player.catalog.PlayableAsset
 import com.apexlions.film2.player.catalog.Title
 import com.apexlions.film2.player.catalog.VideoVariant
+import com.apexlions.film2.player.userdata.PlaybackRecord
+import com.apexlions.film2.player.userdata.UserLibraryRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 sealed interface PlaybackUiState {
@@ -35,12 +39,19 @@ sealed interface PlaybackUiState {
     data class Error(val message: String) : PlaybackUiState
 }
 
+data class PlayerRuntimeState(
+    val positionMs: Long = 0L,
+    val durationMs: Long = 0L,
+    val bufferedPositionMs: Long = 0L,
+    val isPlaying: Boolean = false,
+    val isBuffering: Boolean = false,
+)
+
 /**
- * Tek oynaticili medya modeli.
+ * Tek ExoPlayer + tek MP4 timeline'i. Kalite degisimi ayri MP4 URL'leri arasinda olur;
+ * sesler MP4'lerin icindedir ve VTT side-load edilir.
  *
- * Her kalite ayri bir MP4'tur; MP4'lerin icinde ayni ses track'leri bulunur. Kalite
- * degisiminde yeni MP4 acilir, mevcut zaman konumu korunur ve secili ses/altyazi dili
- * preferred-language olarak yeni kaynaga uygulanir. HLS/segment yoktur.
+ * Oynatma konumu, kalite, ses ve altyazi tercihi cihazda kalici olarak saklanir.
  */
 class PlayerViewModel(
     application: Application,
@@ -48,10 +59,11 @@ class PlayerViewModel(
     private val seasonNumber: Int?,
     private val episodeNumber: Int?,
     private val repository: CatalogRepository,
+    private val userLibrary: UserLibraryRepository,
 ) : AndroidViewModel(application) {
 
     private val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-        .setUserAgent("film2-android-player/1.2.0-quality")
+        .setUserAgent("film2-android-player/1.3.0-cinematic")
         .setAllowCrossProtocolRedirects(true)
 
     val player: ExoPlayer = ExoPlayer.Builder(application).build()
@@ -65,19 +77,44 @@ class PlayerViewModel(
     private val _selectedQualityHeight = MutableStateFlow<Int?>(null)
     val selectedQualityHeight: StateFlow<Int?> = _selectedQualityHeight.asStateFlow()
 
+    private val _runtime = MutableStateFlow(PlayerRuntimeState())
+    val runtime: StateFlow<PlayerRuntimeState> = _runtime.asStateFlow()
+
+    private val savedRecord: PlaybackRecord? = userLibrary.record(titleId, seasonNumber, episodeNumber)
     private var activeAsset: PlayableAsset? = null
     private var currentVideoUrl: String? = null
-    private var preferredAudioLanguage: String? = null
-    private var preferredSubtitleLanguage: String? = null
-    private var subtitlesDisabled: Boolean = false
+    private var preferredAudioLanguage: String? = savedRecord?.audioLanguage
+    private var preferredSubtitleLanguage: String? = savedRecord?.subtitleLanguage
+    private var subtitlesDisabled: Boolean = savedRecord?.subtitlesDisabled ?: false
+    private var lastPersistAtMs = 0L
 
     init {
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
                 _currentTracks.value = tracks
+                updateRuntime()
+            }
+
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                updateRuntime()
+            }
+
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                updateRuntime()
+                if (playbackState == Player.STATE_ENDED) persistNow()
+            }
+
+            override fun onPositionDiscontinuity(
+                oldPosition: Player.PositionInfo,
+                newPosition: Player.PositionInfo,
+                reason: Int,
+            ) {
+                updateRuntime()
+                if (reason == Player.DISCONTINUITY_REASON_SEEK) persistNow()
             }
 
             override fun onPlayerError(error: PlaybackException) {
+                persistNow()
                 val cause = error.cause?.message?.takeIf { it.isNotBlank() }
                 val detail = cause ?: error.message ?: "Bilinmeyen Media3 hatasi"
                 _uiState.value = PlaybackUiState.Error(
@@ -85,6 +122,18 @@ class PlayerViewModel(
                 )
             }
         })
+
+        viewModelScope.launch {
+            while (isActive) {
+                updateRuntime()
+                val now = System.currentTimeMillis()
+                if (now - lastPersistAtMs >= PROGRESS_SAVE_INTERVAL_MS) {
+                    persistNow()
+                }
+                delay(RUNTIME_TICK_MS)
+            }
+        }
+
         resolveAndLoad()
     }
 
@@ -129,19 +178,23 @@ class PlayerViewModel(
     }
 
     private fun playAsset(asset: PlayableAsset) {
-        val bestVariant = asset.videoVariants.maxByOrNull { it.height }
-        if (bestVariant != null) {
-            _selectedQualityHeight.value = bestVariant.height
-            currentVideoUrl = bestVariant.url
-            playDirectAsset(asset, bestVariant.url, 0L, true)
+        val resumePosition = savedRecord?.resumePositionMs() ?: 0L
+        val savedQuality = savedRecord?.qualityHeight
+        val selectedVariant = asset.videoVariants.firstOrNull { it.height == savedQuality }
+            ?: asset.videoVariants.maxByOrNull { it.height }
+
+        if (selectedVariant != null) {
+            _selectedQualityHeight.value = selectedVariant.height
+            currentVideoUrl = selectedVariant.url
+            playDirectAsset(asset, selectedVariant.url, resumePosition, true)
             return
         }
 
         val directUrl = asset.videoUrl?.takeIf { it.isNotBlank() }
         if (directUrl != null) {
             currentVideoUrl = directUrl
-            _selectedQualityHeight.value = null
-            playDirectAsset(asset, directUrl, 0L, true)
+            _selectedQualityHeight.value = savedQuality
+            playDirectAsset(asset, directUrl, resumePosition, true)
             return
         }
 
@@ -155,7 +208,7 @@ class PlayerViewModel(
             .build()
         val mediaSource = HlsMediaSource.Factory(httpDataSourceFactory)
             .createMediaSource(mediaItem)
-        start(mediaSource, 0L, true)
+        start(mediaSource, resumePosition, true)
     }
 
     private fun playDirectAsset(
@@ -192,6 +245,7 @@ class PlayerViewModel(
         player.prepare()
         if (startPositionMs > 0L) player.seekTo(startPositionMs)
         player.playWhenReady = shouldPlay
+        updateRuntime()
     }
 
     private fun applyLanguagePreferences() {
@@ -208,10 +262,25 @@ class PlayerViewModel(
         player.trackSelectionParameters = builder.build()
     }
 
-    /**
-     * Kalite degisirken video yeniden encode edilmez; katalogdaki diger MP4 URL'i acilir.
-     * Oynatma konumu ve play/pause durumu korunur.
-     */
+    fun togglePlayPause() {
+        if (player.isPlaying) player.pause() else player.play()
+        updateRuntime()
+    }
+
+    fun seekBy(deltaMs: Long) {
+        val duration = safeDuration()
+        val target = (player.currentPosition + deltaMs).coerceAtLeast(0L)
+        player.seekTo(if (duration > 0L) target.coerceAtMost(duration) else target)
+        updateRuntime()
+    }
+
+    fun seekTo(positionMs: Long) {
+        val duration = safeDuration()
+        val target = if (duration > 0L) positionMs.coerceIn(0L, duration) else positionMs.coerceAtLeast(0L)
+        player.seekTo(target)
+        updateRuntime()
+    }
+
     fun selectQuality(variant: VideoVariant) {
         val asset = activeAsset ?: return
         if (variant.url == currentVideoUrl) return
@@ -221,6 +290,7 @@ class PlayerViewModel(
         currentVideoUrl = variant.url
         _selectedQualityHeight.value = variant.height
         playDirectAsset(asset, variant.url, position, shouldPlay)
+        persistNow()
     }
 
     /** MP4 icindeki ses track'ini native Media3 secimiyle degistirir. */
@@ -232,6 +302,7 @@ class PlayerViewModel(
             .clearOverridesOfType(C.TRACK_TYPE_AUDIO)
             .setOverrideForType(override)
             .build()
+        persistNow()
     }
 
     fun selectSubtitleTrack(group: Tracks.Group, trackIndex: Int) {
@@ -242,14 +313,17 @@ class PlayerViewModel(
             .setOverrideForType(override)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
             .build()
+        persistNow()
     }
 
     fun disableSubtitles() {
         subtitlesDisabled = true
+        preferredSubtitleLanguage = null
         player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
             .clearOverridesOfType(C.TRACK_TYPE_TEXT)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
             .build()
+        persistNow()
     }
 
     fun setAudioTrackAuto() {
@@ -258,9 +332,52 @@ class PlayerViewModel(
             .clearOverridesOfType(C.TRACK_TYPE_AUDIO)
             .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false)
             .build()
+        persistNow()
+    }
+
+    /** Activity arka plana giderken veya kullanici geri donerken cagrilir. */
+    fun pauseAndPersist() {
+        player.pause()
+        updateRuntime()
+        persistNow()
+    }
+
+    fun persistNow() {
+        val duration = safeDuration()
+        if (duration <= 0L) return
+        val position = player.currentPosition.coerceAtLeast(0L)
+        userLibrary.savePlaybackSnapshot(
+            titleId = titleId,
+            seasonNumber = seasonNumber,
+            episodeNumber = episodeNumber,
+            positionMs = position,
+            durationMs = duration,
+            audioLanguage = preferredAudioLanguage,
+            subtitleLanguage = preferredSubtitleLanguage,
+            subtitlesDisabled = subtitlesDisabled,
+            qualityHeight = _selectedQualityHeight.value,
+        )
+        lastPersistAtMs = System.currentTimeMillis()
+    }
+
+    private fun updateRuntime() {
+        val duration = safeDuration()
+        _runtime.value = PlayerRuntimeState(
+            positionMs = player.currentPosition.coerceAtLeast(0L),
+            durationMs = duration,
+            bufferedPositionMs = player.bufferedPosition.coerceAtLeast(0L),
+            isPlaying = player.isPlaying,
+            isBuffering = player.playbackState == Player.STATE_BUFFERING,
+        )
+    }
+
+    private fun safeDuration(): Long {
+        val raw = player.duration
+        return if (raw == C.TIME_UNSET || raw < 0L) 0L else raw
     }
 
     override fun onCleared() {
+        persistNow()
         player.release()
         super.onCleared()
     }
@@ -271,11 +388,24 @@ class PlayerViewModel(
         private val seasonNumber: Int?,
         private val episodeNumber: Int?,
         private val repository: CatalogRepository,
+        private val userLibrary: UserLibraryRepository,
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
             require(modelClass.isAssignableFrom(PlayerViewModel::class.java))
-            return PlayerViewModel(application, titleId, seasonNumber, episodeNumber, repository) as T
+            return PlayerViewModel(
+                application = application,
+                titleId = titleId,
+                seasonNumber = seasonNumber,
+                episodeNumber = episodeNumber,
+                repository = repository,
+                userLibrary = userLibrary,
+            ) as T
         }
+    }
+
+    companion object {
+        private const val RUNTIME_TICK_MS = 500L
+        private const val PROGRESS_SAVE_INTERVAL_MS = 5_000L
     }
 }
