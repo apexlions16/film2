@@ -50,9 +50,7 @@ data class VideoVariant(
 
 @Serializable
 data class PlayableAsset(
-    /** Yeni varsayilan: dogrudan MP4/MKV/progressive medya. */
     val videoUrl: String? = null,
-    /** Eski HLS katalog kayitlari icin geriye donuk destek. */
     val masterPlaylistUrl: String? = null,
     val durationSeconds: Double? = null,
     val audioLanguages: List<String> = emptyList(),
@@ -99,6 +97,7 @@ data class Title(
     val posterUrl: String? = null,
     val backdropUrl: String? = null,
     val logoUrl: String? = null,
+    val trailerUrl: String? = null,
     val cast: List<CastMember> = emptyList(),
     val crew: List<CrewMember> = emptyList(),
     val status: AssetStatus,
