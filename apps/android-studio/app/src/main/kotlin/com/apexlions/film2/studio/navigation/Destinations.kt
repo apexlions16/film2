@@ -3,6 +3,7 @@ package com.apexlions.film2.studio.navigation
 object Destinations {
     const val LIST = "list"
     const val SETTINGS = "settings"
+    const val EDITORIAL = "editorial"
     const val NEW_TITLE = "new-title"
 
     const val ATTACH_FILES_ROUTE = "attach-files/{titleId}/{titleType}"
