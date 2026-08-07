@@ -162,8 +162,48 @@
       "job": "Producer"
     }
   ],
-  "status": "pending",
+  "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T10:00:45.970165Z",
-  "updatedAt": "2026-08-07T10:00:51.571803Z"
+  "updatedAt": "2026-08-07T10:08:40.410132Z",
+  "shardId": "mfilms12/film2-media-01",
+  "asset": {
+    "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/video.mp4",
+    "audioLanguages": [
+      "ingilizce",
+      "trke"
+    ],
+    "subtitleLanguages": [
+      "ingilizce",
+      "trke"
+    ],
+    "externalAudioTracks": [
+      {
+        "language": "ingilizce",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/audio_ingilizce_2.aac",
+        "label": "ingilizce",
+        "mimeType": "audio/mp4"
+      },
+      {
+        "language": "trke",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/audio_trke_3.aac",
+        "label": "trke",
+        "mimeType": "audio/mp4"
+      }
+    ],
+    "externalSubtitleTracks": [
+      {
+        "language": "ingilizce",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/subs_ingilizce_4.vtt",
+        "label": "ingilizce",
+        "mimeType": "text/vtt"
+      },
+      {
+        "language": "trke",
+        "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/saplant-3728/subs_trke_5.vtt",
+        "label": "trke",
+        "mimeType": "text/vtt"
+      }
+    ]
+  }
 }
