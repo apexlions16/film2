@@ -110,7 +110,7 @@ export function EpisodePicker({
                 <span className={styles.info}>
                   <span className={styles.epTitle}>{episode.title}</span>
                   {runtime ? <span className={styles.epRuntime}>{runtime}</span> : null}
-                  {record && progress > .005 && progress < .95 ? <span className={styles.resume}>${Math.floor(record.positionSeconds / 60)} dk konumundan devam et</span> : null}
+                  {record && progress > .005 && progress < .95 ? <span className={styles.resume}>{Math.floor(record.positionSeconds / 60)} dk konumundan devam et</span> : null}
                   {episode.overview ? <span className={styles.epOverview}>{episode.overview}</span> : null}
                 </span>
               </button>
