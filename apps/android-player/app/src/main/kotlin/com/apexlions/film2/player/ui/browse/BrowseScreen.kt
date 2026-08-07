@@ -163,7 +163,7 @@ private fun BrowseContent(
 
     val configuredHeroes = homeConfig.heroTitleIds.mapNotNull(byId::get).filter { it.status == AssetStatus.READY }
     val hero = when {
-        configuredHeroes.isNotEmpty() -> configuredHeroes[(artworkNonce.absoluteIndex(configuredHeroes.size))]
+        configuredHeroes.isNotEmpty() -> configuredHeroes[artworkNonce.absoluteIndex(configuredHeroes.size)]
         else -> playableTitles.firstOrNull() ?: titles.firstOrNull()
     }
 
@@ -173,7 +173,8 @@ private fun BrowseContent(
         .mapNotNull { shelf ->
             var shelfTitles = shelf.titleIds.mapNotNull(byId::get)
             if (shelf.shuffle && shelfTitles.size > 1) {
-                shelfTitles = shelfTitles.shuffled(Random(artworkNonce xor shelf.id.hashCode().toLong()))
+                val seed = (artworkNonce xor shelf.id.hashCode().toLong()).toInt()
+                shelfTitles = shelfTitles.shuffled(Random(seed))
             }
             shelfTitles = shelfTitles.take(shelf.maxItems.coerceIn(1, 100))
             shelf.takeIf { shelfTitles.isNotEmpty() }?.let { it to shelfTitles }
