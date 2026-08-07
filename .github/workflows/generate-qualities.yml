@@ -1,0 +1,122 @@
+name: Generate MP4 qualities
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/quality-jobs/*.json"
+  workflow_dispatch:
+    inputs:
+      payload:
+        description: "Quality job JSON"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: film2-quality-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Runner diskini hazirla
+        run: |
+          echo "Disk (once):"
+          df -h /
+          # Bu job Android/.NET/GHC kullanmiyor. Ephemeral runner'da bu toolchain'leri
+          # silerek video encode icin daha fazla gecici alan birakiyoruz.
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup || true
+          sudo apt-get clean || true
+          echo "Disk (sonra):"
+          df -h /
+
+      - name: FFmpeg kur
+        run: |
+          if ! command -v ffmpeg >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+          ffprobe -version | head -n 1
+
+      - name: Hugging Face kutuphanesini kur
+        run: npm install --workspaces=false --no-save @huggingface/hub
+
+      - name: Payload hazirla
+        env:
+          DISPATCH_PAYLOAD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.payload || '' }}
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            JOB_FILE=$(find .github/quality-jobs -maxdepth 1 -type f -name '*.json' -print | sort | tail -n 1)
+            test -n "$JOB_FILE" && test -f "$JOB_FILE"
+            cp "$JOB_FILE" /tmp/quality-payload.json
+          else
+            printf '%s' "$DISPATCH_PAYLOAD" > /tmp/quality-payload.json
+          fi
+          echo "Quality payload:"
+          cat /tmp/quality-payload.json
+
+      - name: Script syntax kontrolu
+        run: node --check .github/scripts/generate-qualities.mjs
+
+      - name: Kaliteleri uret ve Hugging Face'e yukle
+        id: quality
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_ACCOUNTS_JSON: ${{ secrets.HF_ACCOUNTS_JSON }}
+        run: |
+          set +e
+          node .github/scripts/generate-qualities.mjs "$(cat /tmp/quality-payload.json)" > /tmp/quality-result.log 2> /tmp/quality-error.log
+          CODE=$?
+          set -e
+          cat /tmp/quality-result.log || true
+          cat /tmp/quality-error.log >&2 || true
+          df -h /
+          exit "$CODE"
+
+      - name: Katalog ve shard kaydini commit et
+        if: success()
+        run: |
+          git config user.name "film2-bot"
+          git config user.email "actions@users.noreply.github.com"
+          TITLE_ID=$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/quality-payload.json','utf8')).titleId)")
+          git add catalog/
+          git diff --cached --quiet || git commit -m "chore(quality): MP4 kalite varyantlari hazir ($TITLE_ID)"
+          git pull --rebase origin main
+          git push
+
+      - name: Son kalite is durumunu kaydet
+        if: always()
+        run: |
+          git config user.name "film2-bot"
+          git config user.email "actions@users.noreply.github.com"
+          mkdir -p .github
+          {
+            echo "status=${{ job.status }}"
+            echo "run_id=${{ github.run_id }}"
+            echo "sha=${{ github.sha }}"
+            echo "time=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            if [ -f /tmp/quality-result.log ]; then
+              echo "--- result ---"
+              tail -n 120 /tmp/quality-result.log
+            fi
+            if [ -s /tmp/quality-error.log ]; then
+              echo "--- error ---"
+              tail -n 120 /tmp/quality-error.log
+            fi
+          } > .github/quality-last-status.txt
+          git add .github/quality-last-status.txt
+          git diff --cached --quiet || git commit -m "chore(quality): son is durumu"
+          git pull --rebase origin main || true
+          git push || true
