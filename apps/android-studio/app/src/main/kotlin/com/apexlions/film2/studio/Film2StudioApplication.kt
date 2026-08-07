@@ -3,7 +3,8 @@ package com.apexlions.film2.studio
 import android.app.Application
 import com.apexlions.film2.studio.catalog.GitHubContentsClient
 import com.apexlions.film2.studio.dispatch.PackageMediaDispatcher
-import com.apexlions.film2.studio.hf.HuggingFaceUploader
+import com.apexlions.film2.studio.hf.CommitRepairingHfUploader
+import com.apexlions.film2.studio.hf.HfUploader
 import com.apexlions.film2.studio.hf.ShardRegistryManager
 import com.apexlions.film2.studio.settings.SettingsRepository
 import com.apexlions.film2.studio.tmdb.TmdbClient
@@ -26,9 +27,8 @@ class Film2StudioApplication : Application() {
 
     val packageMediaDispatcher: PackageMediaDispatcher by lazy { PackageMediaDispatcher() }
 
-    /** New instance per call: HuggingFaceUploader materializes SAF Uris via this app's
-     *  cacheDir and shouldn't be shared across unrelated upload jobs. Token is no longer
-     *  fixed at construction time — which account's token to use is decided dynamically
-     *  per shard during failover (see uploadFileWithFailover), so it's passed per-call. */
-    fun newHfUploader(): HuggingFaceUploader = HuggingFaceUploader(context = this)
+    /** New instance per job. CommitRepairingHfUploader keeps the normal uploader as the
+     * primary path and only activates its raw-NDJSON fallback for the specific Hub
+     * value.summary parser error seen on a real Android upload. */
+    fun newHfUploader(): HfUploader = CommitRepairingHfUploader(context = this)
 }
