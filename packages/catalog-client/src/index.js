@@ -1,50 +1,54 @@
-// Player ve Studio uygulamalarinin GitHub'daki katalogu okumasi icin ortak istemci.
-// Yerel indirme/kurulum yok — her seferinde GitHub'dan taze cekilir.
-// NOT: GitHub Contents API kimliksiz istemciler icin saatte 60 istekle sinirlidir.
-// Kisisel kullanim icin yeterlidir; sorun olursa GITHUB_TOKEN ile Authorization header eklenebilir.
+// Player ve Studio uygulamalarinin katalogu okudugu ortak istemci.
+// ONEMLI: Player tarafinda GitHub REST Contents API KULLANILMAZ.
+// Public/anonymous Contents API 60 istek/saat/IP sinirina sahip oldugu icin katalog,
+// GitHub Actions tarafindan uretilen tek bir raw snapshot'tan okunur.
 
 const DEFAULT_REPO = "apexlions16/film2";
 const DEFAULT_BRANCH = "main";
 
-function contentsUrl(repo, path) {
-  return `https://api.github.com/repos/${repo}/contents/${path}`;
+function rawUrl(repo, branch, path) {
+  return `https://raw.githubusercontent.com/${repo}/${branch}/${path}`;
 }
 
 /**
- * catalog/titles/ altindaki tum title id'lerini listeler (ornek _ dosyalari haric).
+ * Tum katalogu tek HTTP isteginde getirir. Query nonce raw CDN/browser cache'inin
+ * kullanici elle yenilediginde eski katalog gostermesini engeller.
  * @param {{ repo?: string, branch?: string }} [options]
- * @returns {Promise<string[]>}
  */
-export async function listTitleIds(options = {}) {
+export async function getCatalogSnapshot(options = {}) {
   const repo = options.repo ?? DEFAULT_REPO;
   const branch = options.branch ?? DEFAULT_BRANCH;
-  const res = await fetch(`${contentsUrl(repo, "catalog/titles")}?ref=${branch}`);
-  if (!res.ok) throw new Error(`Katalog listelenemedi: ${res.status}`);
-  const entries = await res.json();
-  return entries
-    .filter((e) => e.type === "file" && e.name.endsWith(".json") && !e.name.startsWith("_"))
-    .map((e) => e.name.replace(/\.json$/, ""));
+  const nonce = Date.now();
+  const res = await fetch(`${rawUrl(repo, branch, "catalog/index.json")}?v=${nonce}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Katalog snapshot alinamadi: ${res.status}`);
+  const snapshot = await res.json();
+  if (!snapshot || !Array.isArray(snapshot.titles)) {
+    throw new Error("catalog/index.json gecersiz: titles dizisi yok");
+  }
+  return snapshot;
 }
 
-/**
- * Tek bir title'in tam JSON'unu ceker.
- * @param {string} id
- * @param {{ repo?: string, branch?: string }} [options]
- */
+/** catalog/titles klasorunu GitHub API ile listelemek yerine snapshot'taki id'leri kullanir. */
+export async function listTitleIds(options = {}) {
+  const snapshot = await getCatalogSnapshot(options);
+  return snapshot.titles.map((title) => title.id).filter(Boolean);
+}
+
+/** Tek title icin raw dosya okumasi API kotasi tuketmez. */
 export async function getTitle(id, options = {}) {
   const repo = options.repo ?? DEFAULT_REPO;
   const branch = options.branch ?? DEFAULT_BRANCH;
-  const res = await fetch(`https://raw.githubusercontent.com/${repo}/${branch}/catalog/titles/${id}.json`);
+  const res = await fetch(`${rawUrl(repo, branch, `catalog/titles/${id}.json`)}?v=${Date.now()}`, {
+    cache: "no-store",
+  });
   if (!res.ok) throw new Error(`Title bulunamadi: ${id} (${res.status})`);
   return res.json();
 }
 
-/**
- * Tum katalogu (tum title'lari) ceker. Kucuk kisisel katalog beklendigi icin
- * (birkac dizi/film) N+1 istek burada sorun degil.
- * @param {{ repo?: string, branch?: string }} [options]
- */
+/** Tum katalog tek raw snapshot istegiyle gelir; N+1 ve Contents API yoktur. */
 export async function listTitles(options = {}) {
-  const ids = await listTitleIds(options);
-  return Promise.all(ids.map((id) => getTitle(id, options)));
+  const snapshot = await getCatalogSnapshot(options);
+  return snapshot.titles;
 }
