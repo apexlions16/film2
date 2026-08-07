@@ -1,5 +1,3 @@
-// contextIsolation acik oldugu icin renderer'a SADECE bu dar `window.api` yuzeyi
-// contextBridge ile expose edilir — renderer'in dogrudan Node/ipcRenderer erisimi yoktur.
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from "electron";
 import type { StudioApi, UploadProgressEvent } from "../shared/types";
 
@@ -21,6 +19,8 @@ const api: StudioApi = {
     listTitles: () => ipcRenderer.invoke("catalog:listTitles"),
     getTitle: (id) => ipcRenderer.invoke("catalog:getTitle", id),
     saveTitle: (title) => ipcRenderer.invoke("catalog:saveTitle", title),
+    getHome: () => ipcRenderer.invoke("catalog:getHome"),
+    saveHome: (config) => ipcRenderer.invoke("catalog:saveHome", config),
   },
   files: {
     pickFiles: (options) => ipcRenderer.invoke("files:pickFiles", options),
@@ -32,6 +32,10 @@ const api: StudioApi = {
       ipcRenderer.on("upload:progress", listener);
       return () => ipcRenderer.removeListener("upload:progress", listener);
     },
+  },
+  media: {
+    uploadTrailer: (request) => ipcRenderer.invoke("media:uploadTrailer", request),
+    generateQualities: (request) => ipcRenderer.invoke("media:generateQualities", request),
   },
 };
 
