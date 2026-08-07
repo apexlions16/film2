@@ -39,6 +39,12 @@ class SettingsViewModel(
     private val _accountError = MutableStateFlow<String?>(null)
     val accountError: StateFlow<String?> = _accountError
 
+    private val _backupBusy = MutableStateFlow(false)
+    val backupBusy: StateFlow<Boolean> = _backupBusy
+
+    private val _backupMessage = MutableStateFlow<String?>(null)
+    val backupMessage: StateFlow<String?> = _backupMessage
+
     fun save(tmdbApiKey: String, githubPat: String) {
         viewModelScope.launch {
             repository.setTmdbApiKey(tmdbApiKey.trim())
@@ -51,8 +57,10 @@ class SettingsViewModel(
         _saved.value = false
     }
 
-    /** Validates the pasted token via whoami (auto-detects the namespace), then registers
-     *  it as a Hugging Face account. Mirrors the desktop app's addHfAccount flow. */
+    fun clearBackupMessage() {
+        _backupMessage.value = null
+    }
+
     fun addHfAccount(token: String, onDone: () -> Unit = {}) {
         val trimmed = token.trim()
         if (trimmed.isEmpty()) return
@@ -78,6 +86,47 @@ class SettingsViewModel(
                 repository.removeHfAccount(namespace)
             } catch (t: Throwable) {
                 _accountError.value = t.message ?: "Hesap kaldirilamadi"
+            }
+        }
+    }
+
+    /** Saves currently visible fields first, then returns a portable JSON backup. */
+    fun exportBackup(
+        tmdbApiKey: String,
+        githubPat: String,
+        onReady: (String) -> Unit,
+    ) {
+        if (_backupBusy.value) return
+        _backupBusy.value = true
+        _backupMessage.value = null
+        viewModelScope.launch {
+            try {
+                repository.setTmdbApiKey(tmdbApiKey.trim())
+                repository.setGithubPat(githubPat.trim())
+                onReady(repository.exportBackup())
+                _backupMessage.value = "Token yedegi hazirlandi"
+            } catch (t: Throwable) {
+                _backupMessage.value = "Yedek olusturulamadi: ${t.message}"
+            } finally {
+                _backupBusy.value = false
+            }
+        }
+    }
+
+    fun importBackup(raw: String, onDone: (StudioTokens) -> Unit = {}) {
+        if (_backupBusy.value) return
+        _backupBusy.value = true
+        _backupMessage.value = null
+        viewModelScope.launch {
+            try {
+                repository.importBackup(raw)
+                val restoredTokens = repository.currentTokens()
+                onDone(restoredTokens)
+                _backupMessage.value = "Tokenlar ve hesaplar geri yuklendi"
+            } catch (t: Throwable) {
+                _backupMessage.value = "Yedek geri yuklenemedi: ${t.message}"
+            } finally {
+                _backupBusy.value = false
             }
         }
     }

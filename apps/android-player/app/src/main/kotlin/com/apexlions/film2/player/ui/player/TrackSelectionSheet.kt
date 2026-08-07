@@ -4,7 +4,6 @@ package com.apexlions.film2.player.ui.player
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.Tracks
+import com.apexlions.film2.player.catalog.ExternalMediaTrack
 import java.util.Locale
 
 private data class TrackOption(
@@ -63,10 +63,20 @@ private fun optionsForType(tracks: Tracks, type: Int): List<TrackOption> =
             }
         }
 
+private fun externalTrackLabel(track: ExternalMediaTrack): String {
+    track.label?.takeIf { it.isNotBlank() }?.let { return it }
+    val display = runCatching { Locale.forLanguageTag(track.language).displayLanguage }.getOrNull()
+    return display?.takeIf { it.isNotBlank() }?.replaceFirstChar { it.uppercaseChar() }
+        ?: track.language.uppercase(Locale.ROOT)
+}
+
 @Composable
 fun TrackSelectionSheet(
     tracks: Tracks,
+    externalAudioTracks: List<ExternalMediaTrack> = emptyList(),
+    selectedExternalAudioIndex: Int? = null,
     onSelectAudio: (Tracks.Group, Int) -> Unit,
+    onSelectExternalAudio: (Int) -> Unit,
     onSelectSubtitle: (Tracks.Group, Int) -> Unit,
     onDisableSubtitles: () -> Unit,
     onDismiss: () -> Unit,
@@ -90,7 +100,8 @@ fun TrackSelectionSheet(
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
             }
-            if (audioOptions.isEmpty()) {
+
+            if (audioOptions.isEmpty() && externalAudioTracks.isEmpty()) {
                 item {
                     Text(
                         "Ses track'i bulunamadi",
@@ -99,12 +110,23 @@ fun TrackSelectionSheet(
                     )
                 }
             }
+
             items(audioOptions) { option ->
                 TrackRow(
                     label = option.label,
-                    selected = option.selected,
+                    selected = selectedExternalAudioIndex == null && option.selected,
                     onClick = { onSelectAudio(option.group, option.indexInGroup) },
                 )
+            }
+
+            externalAudioTracks.forEachIndexed { index, track ->
+                item(key = "external-audio-$index-${track.language}") {
+                    TrackRow(
+                        label = externalTrackLabel(track),
+                        selected = selectedExternalAudioIndex == index,
+                        onClick = { onSelectExternalAudio(index) },
+                    )
+                }
             }
 
             item { Divider(modifier = Modifier.padding(vertical = 16.dp)) }

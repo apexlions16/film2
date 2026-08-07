@@ -1,16 +1,9 @@
-name: Package media (HLS)
+name: Package media (single MP4)
 
-# Studio uygulamasi (desktop veya Android) ham dosyalari Hugging Face'e yukledikten sonra
-# bu workflow'u workflow_dispatch ile tetikler. ffmpeg ile HLS paketler, sonucu Hugging
-# Face'e yukler ve catalog/titles/{id}.json'u gunceller.
-#
-# NOT: Once repository_dispatch kullaniliyordu ama bu repoda push/repository_dispatch
-# tetikleyicileri GERCEKTEN CALISIYOR ama GitHub bunlari 20-30 DAKIKA gecikmeyle teslim
-# ediyor (canli olarak dogrulandi — v0.1.8/v0.2.0 push-tetikli kosumlar gercekten olustu,
-# sadece cok gec). workflow_dispatch ise bu oturumda defalarca ANINDA ve guvenilir
-# calisti, o yuzden asil tetikleyici bu oldu. repository_dispatch da geriye donuk
-# uyumluluk icin birakildi (gecikmeli de olsa calisir) ama Studio uygulamalari artik
-# workflow_dispatch kullaniyor.
+# Studio ham video + ses + altyaziyi Hugging Face'e yukledikten sonra bu workflow'u
+# workflow_dispatch ile tetikler. ffmpeg yalnizca stream-copy REMUX yapar:
+# video ve ses yeniden encode edilmez, HLS/m3u8/ts segmenti uretilmez.
+# Son oynatma medyasi tek video.mp4 olur; VTT/SRT altyazilar sidecar kalir.
 on:
   repository_dispatch:
     types: [package-media]
@@ -45,13 +38,10 @@ jobs:
       - name: Bagimliliklari kur
         run: npm install --workspaces=false --no-save @huggingface/hub
 
-      - name: Medyayi paketle ve yukle
+      - name: Sesleri tek MP4'e mux et ve yukle
         id: package
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          # Coklu Hugging Face hesabi (opsiyonel): '[{"namespace":"...","token":"hf_..."}]'
-          # Bir hesabin kotasi dolunca otomatik siradaki hesaba gecmek icin. Yeni bir
-          # hesap eklediginizde bu secret'i de guncelleyin (Studio ayarlariyla senkron).
           HF_ACCOUNTS_JSON: ${{ secrets.HF_ACCOUNTS_JSON }}
         run: |
           node .github/scripts/package-media.mjs '${{ github.event_name == 'workflow_dispatch' && github.event.inputs.payload || toJson(github.event.client_payload) }}' > /tmp/result.json
@@ -66,5 +56,5 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           TITLE_ID=$(node -e "console.log(JSON.parse(require('fs').readFileSync('/tmp/result.json','utf-8')).titleId)")
           git add catalog/
-          git diff --cached --quiet || git commit -m "chore(catalog): pakete hazir icerik guncellendi ($TITLE_ID)"
+          git diff --cached --quiet || git commit -m "chore(catalog): tek MP4 medya hazir ($TITLE_ID)"
           git push

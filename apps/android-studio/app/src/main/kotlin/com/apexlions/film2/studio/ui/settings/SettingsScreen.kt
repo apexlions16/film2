@@ -1,5 +1,7 @@
 package com.apexlions.film2.studio.ui.settings
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,7 +51,8 @@ import com.apexlions.film2.studio.settings.HfAccountToken
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier) {
-    val application = LocalContext.current.applicationContext as Film2StudioApplication
+    val context = LocalContext.current
+    val application = context.applicationContext as Film2StudioApplication
     val viewModel: SettingsViewModel = viewModel(
         factory = SettingsViewModel.Factory(application.settingsRepository, application.shardRegistryManager),
     )
@@ -58,11 +61,15 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val saved by viewModel.saved.collectAsState()
     val addingAccount by viewModel.addingAccount.collectAsState()
     val accountError by viewModel.accountError.collectAsState()
+    val backupBusy by viewModel.backupBusy.collectAsState()
+    val backupMessage by viewModel.backupMessage.collectAsState()
 
     var tmdbKey by remember { mutableStateOf("") }
     var githubPat by remember { mutableStateOf("") }
     var newHfToken by remember { mutableStateOf("") }
     var loadedOnce by remember { mutableStateOf(false) }
+    var pendingBackupContent by remember { mutableStateOf<String?>(null) }
+    var localBackupError by remember { mutableStateOf<String?>(null) }
 
     var showTmdb by remember { mutableStateOf(false) }
     var showGithub by remember { mutableStateOf(false) }
@@ -76,11 +83,53 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json"),
+    ) { uri ->
+        val content = pendingBackupContent
+        pendingBackupContent = null
+        if (uri != null && content != null) {
+            runCatching {
+                context.contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { writer ->
+                    writer.write(content)
+                } ?: error("Yedek dosyasi acilamadi")
+            }.onFailure { localBackupError = "Yedek dosyasi yazilamadi: ${it.message}" }
+        }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        if (uri != null) {
+            runCatching {
+                context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+                    ?: error("Yedek dosyasi acilamadi")
+            }.onSuccess { raw ->
+                viewModel.importBackup(raw) { restored ->
+                    tmdbKey = restored.tmdbApiKey.orEmpty()
+                    githubPat = restored.githubPat.orEmpty()
+                }
+            }.onFailure { localBackupError = "Yedek dosyasi okunamadi: ${it.message}" }
+        }
+    }
+
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(saved) {
         if (saved) {
             snackbarHostState.showSnackbar("Ayarlar kaydedildi")
             viewModel.clearSavedFlag()
+        }
+    }
+    LaunchedEffect(backupMessage) {
+        backupMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearBackupMessage()
+        }
+    }
+    LaunchedEffect(localBackupError) {
+        localBackupError?.let {
+            snackbarHostState.showSnackbar(it)
+            localBackupError = null
         }
     }
 
@@ -112,9 +161,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 onToggleShowNewToken = { showNewHfToken = !showNewHfToken },
                 adding = addingAccount,
                 error = accountError,
-                onAdd = {
-                    viewModel.addHfAccount(newHfToken) { newHfToken = "" }
-                },
+                onAdd = { viewModel.addHfAccount(newHfToken) { newHfToken = "" } },
                 onRemove = { namespace -> viewModel.removeHfAccount(namespace) },
             )
 
@@ -145,16 +192,54 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             ) {
                 Text("Kaydet")
             }
+
+            Divider()
+
+            Text("Token yedegi", style = MaterialTheme.typography.titleSmall)
+            Text(
+                "Yeni APK eski uygulamanin ustune kurulamiyorsa once bu uygulamadan yedek alin. " +
+                    "Yedek; TMDB anahtarini, GitHub PAT'i ve tum Hugging Face tokenlarini icerir. " +
+                    "Dosyayi kimseyle paylasmayin ve geri yukledikten sonra guvenli bir yerde saklayin veya silin.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.exportBackup(tmdbKey, githubPat) { content ->
+                            pendingBackupContent = content
+                            exportLauncher.launch("film2-studio-token-yedegi.json")
+                        }
+                    },
+                    enabled = !backupBusy,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Yedekle")
+                }
+                OutlinedButton(
+                    onClick = { importLauncher.launch(arrayOf("application/json", "text/plain")) },
+                    enabled = !backupBusy,
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text("Geri Yukle")
+                }
+            }
+            if (backupBusy) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    CircularProgressIndicator(strokeWidth = 2.dp)
+                    Text("Token yedegi isleniyor", style = MaterialTheme.typography.bodySmall)
+                }
+            }
         }
     }
 }
 
-/**
- * Multiple registered Hugging Face accounts, with the ability to add a new one (auto
- * namespace-detection via whoami) and remove existing ones. Mirrors the desktop app's
- * SettingsPage Hugging Face accounts panel: paste a token, it fails over automatically
- * to whichever registered account still has storage.
- */
 @Composable
 private fun HfAccountsSection(
     accounts: List<HfAccountToken>,
@@ -175,9 +260,7 @@ private fun HfAccountsSection(
         )
         Text(
             "Birden fazla hesap ekleyebilirsiniz. Aktif hesabin depolama kotasi dolarsa " +
-                "yukleme otomatik olarak listedeki bir sonraki hesaba gecer — depolama " +
-                "tukenmeden yeni bir Hugging Face hesabi acip token'ini buraya eklemeniz " +
-                "yeterli, baska hicbir sey yapmaniza gerek kalmaz.",
+                "yukleme otomatik olarak listedeki bir sonraki hesaba gecer.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -197,11 +280,7 @@ private fun HfAccountsSection(
         }
 
         if (error != null) {
-            Text(
-                error,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
-            )
+            Text(error, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
         }
 
         Row(
@@ -248,9 +327,7 @@ private fun HfAccountsSection(
             }
         }
         Text(
-            "Token yapistirilinca hangi hesaba ait oldugu otomatik tespit edilir (whoami) — " +
-                "kullanici adini elle yazmaniza gerek yok. \"Write\" yetkili bir token gerekli " +
-                "(huggingface.co/settings/tokens).",
+            "Token yapistirilinca hangi hesaba ait oldugu otomatik tespit edilir. Write yetkili token gerekir.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -265,18 +342,12 @@ private fun HfAccountRow(account: HfAccountToken, onRemove: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
-                Text(
-                    account.namespace,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+                Text(account.namespace, style = MaterialTheme.typography.bodyMedium)
                 if (!account.fullname.isNullOrBlank()) {
                     Text(
                         account.fullname,
@@ -285,9 +356,7 @@ private fun HfAccountRow(account: HfAccountToken, onRemove: () -> Unit) {
                     )
                 }
             }
-            OutlinedButton(onClick = onRemove) {
-                Text("Kaldir")
-            }
+            OutlinedButton(onClick = onRemove) { Text("Kaldir") }
         }
     }
 }
