@@ -14,6 +14,7 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
+import androidx.media3.common.text.CueGroup
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
@@ -61,7 +62,7 @@ class PlayerViewModel(
     private val app = application as Film2PlayerApplication
     private val offlineRepository = app.offlineDownloadRepository
     private val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-        .setUserAgent("film2-android-player/1.4-ux")
+        .setUserAgent("film2-android-player/1.4.2-ux")
         .setAllowCrossProtocolRedirects(true)
     private val dataSourceFactory = DefaultDataSource.Factory(application, httpDataSourceFactory)
 
@@ -79,6 +80,13 @@ class PlayerViewModel(
     private val _runtime = MutableStateFlow(PlayerRuntimeState())
     val runtime: StateFlow<PlayerRuntimeState> = _runtime.asStateFlow()
 
+    /**
+     * Text currently active on the Media3 subtitle timeline. PlayerScreen renders this in
+     * Film2's own overlay so VTT cue positioning cannot override the user's height setting.
+     */
+    private val _subtitleText = MutableStateFlow("")
+    val subtitleText: StateFlow<String> = _subtitleText.asStateFlow()
+
     private val savedRecord: PlaybackRecord? = userLibrary.record(titleId, seasonNumber, episodeNumber)
     private var activeAsset: PlayableAsset? = null
     private var currentVideoUrl: String? = null
@@ -92,6 +100,16 @@ class PlayerViewModel(
             override fun onTracksChanged(tracks: Tracks) {
                 _currentTracks.value = tracks
                 updateRuntime()
+            }
+
+            override fun onCues(cueGroup: CueGroup) {
+                _subtitleText.value = if (subtitlesDisabled) {
+                    ""
+                } else {
+                    cueGroup.cues
+                        .mapNotNull { it.text?.toString()?.trim()?.takeIf(String::isNotBlank) }
+                        .joinToString("\n")
+                }
             }
 
             override fun onIsPlayingChanged(isPlaying: Boolean) = updateRuntime()
@@ -215,6 +233,7 @@ class PlayerViewModel(
     }
 
     private fun start(mediaSource: MediaSource, startPositionMs: Long, shouldPlay: Boolean) {
+        _subtitleText.value = ""
         player.stop()
         player.clearMediaItems()
         player.volume = 1f
@@ -281,6 +300,7 @@ class PlayerViewModel(
     fun selectSubtitleTrack(group: Tracks.Group, trackIndex: Int) {
         subtitlesDisabled = false
         preferredSubtitleLanguage = group.getTrackFormat(trackIndex).language
+        _subtitleText.value = ""
         val override = TrackSelectionOverride(group.mediaTrackGroup, trackIndex)
         player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
             .setOverrideForType(override)
@@ -292,6 +312,7 @@ class PlayerViewModel(
     fun disableSubtitles() {
         subtitlesDisabled = true
         preferredSubtitleLanguage = null
+        _subtitleText.value = ""
         player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
             .clearOverridesOfType(C.TRACK_TYPE_TEXT)
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
