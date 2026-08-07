@@ -23,6 +23,12 @@ class CatalogRepository(
         null
     }
 
+    suspend fun fetchHomeConfig(): HomeConfig = try {
+        client.getHomeConfig()
+    } catch (_: Throwable) {
+        HomeConfig.DEFAULT
+    }
+
     suspend fun fetchRevision(): String? = try {
         client.getRevision()
     } catch (_: Throwable) {
