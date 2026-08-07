@@ -11,12 +11,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 /**
- * Kotlin port of packages/catalog-client/src/index.js.
- *
- * Reads the public film2 GitHub repo's catalog straight from GitHub — no local
- * download/cache, always fetched fresh, matching the JS client's behavior. No auth
- * needed for public repo reads. GitHub's unauthenticated Contents API is rate limited
- * to 60 req/hour per IP; fine for personal-scale use, same caveat as the JS version.
+ * Reads the public Film2 catalog. Full directory listing is only used on initial load or
+ * when catalog/version.json changes; the tiny revision file can be polled frequently
+ * without burning GitHub Contents API requests.
  */
 class CatalogClient(
     private val repo: String = DEFAULT_REPO,
@@ -32,10 +29,16 @@ class CatalogClient(
         @SerialName("path") val path: String? = null,
     )
 
+    @Serializable
+    private data class CatalogRevision(val revision: String)
+
     /** Lists all title ids under catalog/titles/ (excluding `_`-prefixed example files). */
     suspend fun listTitleIds(): List<String> = withContext(Dispatchers.IO) {
         val url = "https://api.github.com/repos/$repo/contents/catalog/titles?ref=$branch"
-        val request = Request.Builder().url(url).build()
+        val request = Request.Builder()
+            .url(url)
+            .header("Cache-Control", "no-cache")
+            .build()
         httpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
                 throw CatalogException("Katalog listelenemedi: ${response.code}")
@@ -48,10 +51,14 @@ class CatalogClient(
         }
     }
 
-    /** Fetches one title's full JSON from the raw content CDN. */
+    /** Fetches one title fresh; the nonce prevents raw.githubusercontent CDN staleness. */
     suspend fun getTitle(id: String): Title = withContext(Dispatchers.IO) {
-        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/titles/$id.json"
-        val request = Request.Builder().url(url).build()
+        val nonce = System.currentTimeMillis()
+        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/titles/$id.json?v=$nonce"
+        val request = Request.Builder()
+            .url(url)
+            .header("Cache-Control", "no-cache")
+            .build()
         httpClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
                 throw CatalogException("Title bulunamadi: $id (${response.code})")
@@ -62,9 +69,24 @@ class CatalogClient(
     }
 
     /**
-     * Fetches the entire catalog (all titles). N+1 requests, same as the JS client —
-     * fine for a small personal catalog (a handful of series/films).
+     * Tiny, cache-busted signal. Player can ask every few seconds; only a changed revision
+     * triggers the more expensive catalog directory + title fetches.
      */
+    suspend fun getRevision(): String? = withContext(Dispatchers.IO) {
+        val nonce = System.currentTimeMillis()
+        val url = "https://raw.githubusercontent.com/$repo/$branch/catalog/version.json?v=$nonce"
+        val request = Request.Builder()
+            .url(url)
+            .header("Cache-Control", "no-cache")
+            .build()
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) return@use null
+            runCatching {
+                json.decodeFromString(CatalogRevision.serializer(), response.body?.string().orEmpty()).revision
+            }.getOrNull()
+        }
+    }
+
     suspend fun listTitles(): List<Title> = withContext(Dispatchers.IO) {
         val ids = listTitleIds()
         ids.map { id -> async { getTitle(id) } }.awaitAll()
