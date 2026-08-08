@@ -102,7 +102,7 @@
   "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T14:39:40.441735Z",
-  "updatedAt": "2026-08-08T10:11:21.236199Z",
+  "updatedAt": "2026-08-08T10:13:05.844569Z",
   "seasons": [
     {
       "seasonNumber": 1,
@@ -203,7 +203,7 @@
           "status": "ready",
           "shardId": "mfilms12/film2-media-01",
           "asset": {
-            "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e3/video_1786183393168.mp4",
+            "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e3/video_1786183905989.mp4",
             "durationSeconds": 2549.568239,
             "audioLanguages": [
               "eng",
@@ -217,13 +217,13 @@
             "externalSubtitleTracks": [
               {
                 "language": "eng",
-                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e3/subs_eng_1786183393168_1.vtt",
+                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e3/subs_eng_1786183905989_1.vtt",
                 "label": "Ingilizce",
                 "mimeType": "text/vtt"
               },
               {
                 "language": "tur",
-                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e3/subs_tur_1786183393168_2.vtt",
+                "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/s1e3/subs_tur_1786183905989_2.vtt",
                 "label": "Turkce",
                 "mimeType": "text/vtt"
               }
