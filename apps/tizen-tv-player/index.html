@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Film2 TV</title>
+    <link rel="stylesheet" href="css/app.css">
+    <script type="text/javascript" src="$WEBAPIS/webapis/webapis.js"></script>
+</head>
+<body>
+<div id="app">
+    <section id="splash" class="screen splash-screen active">
+        <div class="brand-mark">FILM<span>2</span></div>
+        <div id="splash-message" class="splash-message">Katalog yükleniyor…</div>
+    </section>
+
+    <section id="home-screen" class="screen home-screen">
+        <header class="topbar">
+            <button class="focusable brand-button" data-nav="home"><span class="brand-mark small">FILM<span>2</span></span></button>
+            <nav class="topnav">
+                <button class="focusable nav-button" data-nav="search">Ara</button>
+                <button class="focusable nav-button" data-nav="library">Listem</button>
+                <button class="focusable nav-button" data-nav="refresh">Yenile</button>
+                <span id="catalog-status" class="catalog-status">Çevrimiçi</span>
+            </nav>
+        </header>
+        <div id="home-content" class="home-content"></div>
+    </section>
+
+    <section id="search-screen" class="screen page-screen">
+        <header class="topbar solid">
+            <button class="focusable brand-button" data-nav="home"><span class="brand-mark small">FILM<span>2</span></span></button>
+            <nav class="topnav"><button class="focusable nav-button" data-nav="home">Ana Sayfa</button><button class="focusable nav-button" data-nav="library">Listem</button></nav>
+        </header>
+        <div class="search-page">
+            <h1>Ara</h1>
+            <input id="search-input" class="focusable search-input" type="text" autocomplete="off" placeholder="Film, dizi, tür veya oyuncu ara">
+            <div id="search-results" class="result-grid"></div>
+        </div>
+    </section>
+
+    <section id="library-screen" class="screen page-screen">
+        <header class="topbar solid">
+            <button class="focusable brand-button" data-nav="home"><span class="brand-mark small">FILM<span>2</span></span></button>
+            <nav class="topnav"><button class="focusable nav-button" data-nav="home">Ana Sayfa</button><button class="focusable nav-button" data-nav="search">Ara</button></nav>
+        </header>
+        <div id="library-content" class="library-page"></div>
+    </section>
+
+    <section id="detail-screen" class="screen detail-screen">
+        <div id="detail-backdrop" class="detail-backdrop"></div>
+        <video id="detail-trailer" class="detail-trailer hidden" muted loop playsinline preload="metadata"></video>
+        <div class="detail-shade"></div>
+        <div id="detail-content" class="detail-content"></div>
+    </section>
+
+    <section id="player-screen" class="screen player-screen">
+        <object id="av-player" type="application/avplayer"></object>
+        <audio id="sidecar-audio" preload="auto"></audio>
+        <div id="subtitle-layer" class="subtitle-layer"></div>
+        <div id="buffering" class="buffering hidden"><div class="spinner"></div><div id="buffering-text">Yükleniyor…</div></div>
+        <div id="player-controls" class="player-controls visible">
+            <div class="player-title-row">
+                <div><div id="player-title" class="player-title"></div><div id="player-subtitle-title" class="player-subtitle-title"></div></div>
+                <div id="player-badge" class="player-badge"></div>
+            </div>
+            <div class="timeline-wrap">
+                <div class="timeline"><div id="timeline-progress" class="timeline-progress"></div></div>
+                <div class="time-row"><span id="time-current">00:00</span><span id="time-duration">00:00</span></div>
+                <div class="control-row">
+                    <button class="focusable control-button" data-action="rewind">−10 sn</button>
+                    <button class="focusable control-button primary" data-action="toggle-play">Duraklat</button>
+                    <button class="focusable control-button" data-action="forward">+10 sn</button>
+                    <button class="focusable control-button" data-action="audio">Ses</button>
+                    <button class="focusable control-button" data-action="subtitles">Altyazı</button>
+                    <button class="focusable control-button" data-action="quality">Kalite</button>
+                    <button class="focusable control-button" data-action="display">Ekran</button>
+                    <button class="focusable control-button" data-action="appearance">Altyazı Stili</button>
+                    <button class="focusable control-button" data-action="back">Geri</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="modal" class="modal hidden" aria-hidden="true">
+        <div class="modal-panel">
+            <div class="modal-header"><div id="modal-title" class="modal-title"></div><div id="modal-hint" class="modal-hint">OK: Seç • Geri: Kapat</div></div>
+            <div id="modal-list" class="modal-list"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+</div>
+<script src="js/catalog.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/offline.js"></script>
+<script src="js/player.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
