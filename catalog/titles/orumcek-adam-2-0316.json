@@ -1,0 +1,165 @@
+{
+  "id": "orumcek-adam-2-0316",
+  "type": "movie",
+  "imdbId": "tt0316654",
+  "tmdbId": 558,
+  "title": "Örümcek Adam 2",
+  "originalTitle": "Spider-Man 2",
+  "overview": "Sevgilisi Mary Jane'den ayrılan Peter ona gerçek kimliğini açıklayıp açıklamamak arasında kaldığı için oldukça zor bir dönem geçirmektedir. kararsızlık içine düştüğü bu esnada Mary Jane'in, patronun oğlu John'la birlikte olmaya başlaması iyice canını sıkar. Bunlara, halasının mali sıkıntıları ve hayattaki tek dostu Harry Osborne'un, babasının ölümünden kendisini sorumlu tuttuğu için Peterdan uzaklaşması onu depresyonun eşiğine getirmiştir. Bu esnada, yeni düşmanı Doktor Ahtapot'un ortaya çıkmasıyla Peter Parker'ın hayatı içinden çıkılmaz bir hal alacaktır.",
+  "releaseYear": 2004,
+  "genres": [
+    "Aksiyon",
+    "Macera",
+    "Bilim-Kurgu"
+  ],
+  "runtimeMinutes": 202,
+  "posterUrl": "https://image.tmdb.org/t/p/w780/up4mcu95N91I7SnylVCIIMTWZYq.jpg",
+  "posterUrls": [],
+  "backdropUrl": "https://image.tmdb.org/t/p/w1280/6al048Lat3eLVQOuKtc9h6Tu94d.jpg",
+  "backdropUrls": [],
+  "cast": [
+    {
+      "name": "Tobey Maguire",
+      "character": "Spider-Man / Peter Parker",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/s6PwSvq6gC7PGEjIku69tPbvR8M.jpg"
+    },
+    {
+      "name": "Kirsten Dunst",
+      "character": "Mary Jane Watson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/yhLKGjuiMMdbGnFrR8AREkCZcVF.jpg"
+    },
+    {
+      "name": "James Franco",
+      "character": "Harry Osborn",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/bjmAntHGiibLZixH8nTNVBzaFQn.jpg"
+    },
+    {
+      "name": "Alfred Molina",
+      "character": "Doc Ock / Otto Octavius",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/nJo91Czesn6z0d0pkfbDoVZY3sg.jpg"
+    },
+    {
+      "name": "Rosemary Harris",
+      "character": "May Parker",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/3Mu02enwaF8dFuT195f7esILXns.jpg"
+    },
+    {
+      "name": "J.K. Simmons",
+      "character": "J. Jonah Jameson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ScmKoJ9eiSUOthAt1PDNLi8Fkw.jpg"
+    },
+    {
+      "name": "Donna Murphy",
+      "character": "Rosalie Octavius",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/tmre2oZkIHGqnLhWeldpX2Ujgl0.jpg"
+    },
+    {
+      "name": "Daniel Gillies",
+      "character": "John Jameson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/3EVKjIDFZOHeLzxOvJ4DmAVYMXg.jpg"
+    },
+    {
+      "name": "Dylan Baker",
+      "character": "Dr. Curt Connors",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/4mw6xj8Aj3ixjjeUj9pZdZPTbvz.jpg"
+    },
+    {
+      "name": "Bill Nunn",
+      "character": "Joseph 'Robbie' Robertson",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/trxNvS6g5yvwbXzx2LK6JqutE5z.jpg"
+    },
+    {
+      "name": "Vanessa Ferlito",
+      "character": "Louise",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/i128WKjZ3JkoJBOLw48hF4Uwu5V.jpg"
+    },
+    {
+      "name": "Aasif Mandvi",
+      "character": "Mr. Aziz",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/hoBCqgxK2JqV3MOQYncHRMfwu8V.jpg"
+    },
+    {
+      "name": "Willem Dafoe",
+      "character": "Green Goblin / Norman Osborn",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg"
+    },
+    {
+      "name": "Cliff Robertson",
+      "character": "Ben Parker",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/8pH2RWCPtXKzT9P33MbzgnzPlF0.jpg"
+    },
+    {
+      "name": "Ted Raimi",
+      "character": "Hoffman",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/juhz6ajCjjHlLPzYBxPtDxwX6em.jpg"
+    },
+    {
+      "name": "Elizabeth Banks",
+      "character": "Miss Brant",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg"
+    },
+    {
+      "name": "Bruce Campbell",
+      "character": "Snooty Usher",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/p9335ljr7luOWsfwZSOlsIzFJKE.jpg"
+    },
+    {
+      "name": "Gregg Edelman",
+      "character": "Dr. Davis",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/jvdye1mZkBb5x4xjjtmtuLRmXzy.jpg"
+    },
+    {
+      "name": "Elya Baskin",
+      "character": "Mr. Ditkovitch",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/30RVRgcJTZlJBKeSCZN2tg0ryvE.jpg"
+    },
+    {
+      "name": "Mageina Tovah",
+      "character": "Ursula",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/AiGQaF7tpr2m1jU0sZm0kZOQI7h.jpg"
+    }
+  ],
+  "crew": [
+    {
+      "name": "Sam Raimi",
+      "job": "Director",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
+    },
+    {
+      "name": "Stan Lee",
+      "job": "Executive Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
+    },
+    {
+      "name": "Joseph M. Caracciolo Jr.",
+      "job": "Executive Producer"
+    },
+    {
+      "name": "Avi Arad",
+      "job": "Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
+    },
+    {
+      "name": "Laura Ziskin",
+      "job": "Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/nw6ZfMnDdoeWJCMiM4mQp8arZD1.jpg"
+    },
+    {
+      "name": "Lorne Orleans",
+      "job": "Producer"
+    },
+    {
+      "name": "Kevin Feige",
+      "job": "Executive Producer",
+      "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
+    },
+    {
+      "name": "Joseph M. Caracciolo",
+      "job": "Executive Producer"
+    }
+  ],
+  "status": "pending",
+  "manualEntry": false,
+  "createdAt": "2026-08-08T09:27:43.298939Z",
+  "updatedAt": "2026-08-08T09:27:45.081671Z"
+}
