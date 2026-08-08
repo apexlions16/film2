@@ -3,29 +3,58 @@ package com.apexlions.film2.studio.hf
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.util.Base64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okio.BufferedSink
+import java.io.EOFException
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
 import java.security.MessageDigest
-import java.util.Base64
 import java.util.concurrent.TimeUnit
 
+/** A visible phase in the Android upload pipeline. */
+enum class HfUploadStage {
+    PREPARING,
+    CHECKING,
+    UPLOADING,
+    FINALIZING,
+}
+
+data class HfUploadProgress(
+    val stage: HfUploadStage,
+    val bytesProcessed: Long,
+    val totalBytes: Long,
+    val message: String,
+)
+
 /**
- * Uploads a local file (picked via Storage Access Framework) into a Hugging Face dataset
- * repo under incoming/{titleId}/... . Isolated behind this interface so the rest of the
- * app (UploadWorker, new-title flow) never talks to Hugging Face's HTTP shape directly.
+ * Uploads one Storage Access Framework Uri into a Hugging Face dataset repository.
  *
- * Returns the resolve URL of the uploaded file (same shape used by the JS hf-storage
- * package: https://huggingface.co/datasets/{shardId}/resolve/main/{repoPath}).
+ * The implementation follows the same public Hub protocol used by the official
+ * huggingface_hub client:
+ *  1. preupload (path + first 512 byte sample + size)
+ *  2. Git LFS batch API for large files (basic or multipart transfer)
+ *  3. optional verify action
+ *  4. newline-delimited JSON commit
+ *
+ * Files are copied and SHA-256 hashed in one pass into app external cache. That makes a
+ * potentially long preparation phase visible instead of appearing frozen, and gives the
+ * upload body a seekable source required by multipart/retry requests.
  */
 interface HfUploader {
     suspend fun uploadFile(
@@ -33,32 +62,20 @@ interface HfUploader {
         shardId: String,
         repoPath: String,
         localUri: Uri,
-        onProgress: (bytesSent: Long, totalBytes: Long) -> Unit = { _, _ -> },
+        onProgress: (HfUploadProgress) -> Unit = {},
     ): String
 }
 
 fun resolveHfUrl(shardId: String, pathInRepo: String): String =
     "https://huggingface.co/datasets/$shardId/resolve/main/$pathInRepo"
 
-/**
- * Real implementation of the Hugging Face Hub "commit" API, as best-effort reconstructed
- * from the written spec handed down for this app (no live HF_TOKEN was available while
- * building this — nobody could test it against the real API yet).
- *
- * TODO: verify every request/response shape below against the current
- * https://huggingface.co/docs/hub/api docs (and/or the @huggingface/hub JS SDK source,
- * which packages/hf-storage wraps) against a real HF_TOKEN before relying on this in
- * production. Things most likely to be wrong: exact field names in the preupload
- * response, whether LFS uploads go straight to `uploadUrl`(s) from preupload or require
- * a separate git-lfs batch-API round trip, and whether multi-part (chunked) LFS uploads
- * need an explicit "complete multipart upload" call with collected ETags.
- */
 class HuggingFaceUploader(
     private val context: Context,
     private val httpClient: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
-        .writeTimeout(0, TimeUnit.SECONDS) // uploads can be many GB; no fixed write timeout
-        .readTimeout(120, TimeUnit.SECONDS)
+        .writeTimeout(0, TimeUnit.SECONDS)
+        .readTimeout(180, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
         .build(),
 ) : HfUploader {
 
@@ -69,278 +86,554 @@ class HuggingFaceUploader(
         shardId: String,
         repoPath: String,
         localUri: Uri,
-        onProgress: (Long, Long) -> Unit,
+        onProgress: (HfUploadProgress) -> Unit,
     ): String = withContext(Dispatchers.IO) {
-        require(token.isNotBlank()) { "Hugging Face yazma tokeni ayarlanmamis (Ayarlar ekranindan girin)" }
-
-        val size = querySize(localUri)
-        if (size <= SMALL_FILE_THRESHOLD_BYTES) {
-            uploadSmall(token, shardId, repoPath, localUri, size, onProgress)
-        } else {
-            uploadLarge(token, shardId, repoPath, localUri, size, onProgress)
+        require(token.isNotBlank()) {
+            "Hugging Face write token'i ayarlanmamis. Ayarlar ekranindan bir hesap ekleyin."
         }
-        resolveHfUrl(shardId, repoPath)
-    }
 
-    // ---- Small files: inline base64 content in a single commit call ----
+        val prepared = prepareFile(localUri, onProgress)
+        try {
+            val preupload = requestPreupload(
+                token = token,
+                shardId = shardId,
+                repoPath = repoPath,
+                prepared = prepared,
+                onProgress = onProgress,
+            )
 
-    private fun uploadSmall(
-        token: String,
-        shardId: String,
-        repoPath: String,
-        localUri: Uri,
-        size: Long,
-        onProgress: (Long, Long) -> Unit,
-    ) {
-        val bytes = context.contentResolver.openInputStream(localUri)?.use { it.readBytes() }
-            ?: error("Dosya okunamadi: $localUri")
-        val base64 = Base64.getEncoder().encodeToString(bytes)
-        onProgress(size, size)
-
-        val headerOp = json.encodeToString(CommitHeaderOp.serializer(), CommitHeaderOp(value = CommitHeader("upload from android-studio")))
-        val fileOp = json.encodeToString(
-            CommitFileOp.serializer(),
-            CommitFileOp(value = CommitFileValue(path = repoPath, content = base64, encoding = "base64")),
-        )
-
-        postCommit(token, shardId, listOf(headerOp, fileOp))
-    }
-
-    // ---- Large files: preupload -> upload bytes to returned URL(s) -> commit lfsFile op ----
-
-    private fun uploadLarge(
-        token: String,
-        shardId: String,
-        repoPath: String,
-        localUri: Uri,
-        size: Long,
-        onProgress: (Long, Long) -> Unit,
-    ) {
-        val sha256 = sha256Hex(localUri)
-
-        val preuploadBody = json.encodeToString(
-            PreuploadRequest.serializer(),
-            PreuploadRequest(files = listOf(PreuploadFileInput(path = repoPath, size = size, sha256 = sha256))),
-        )
-        val preuploadRequest = Request.Builder()
-            .url("https://huggingface.co/api/datasets/$shardId/preupload/main")
-            .header("Authorization", "Bearer $token")
-            .post(preuploadBody.toRequestBody(JSON_MEDIA_TYPE))
-            .build()
-
-        val preuploadResult = httpClient.newCall(preuploadRequest).execute().use { response ->
-            if (!response.isSuccessful) {
+            if (preupload.shouldIgnore) {
                 throw HfUploadException(
-                    "Hugging Face preupload basarisiz (${response.code}): ${response.body?.string().orEmpty()}",
-                    statusCode = response.code,
+                    "Hugging Face '$repoPath' dosyasini repo kurallari nedeniyle yok saydi. " +
+                        "Hedef dosya adini veya repo .gitignore ayarini kontrol edin.",
                 )
             }
-            json.decodeFromString(PreuploadResponse.serializer(), response.body?.string().orEmpty())
+
+            when (preupload.uploadMode) {
+                "regular" -> uploadRegular(token, shardId, repoPath, prepared, onProgress)
+                "lfs" -> uploadLfs(token, shardId, repoPath, prepared, onProgress)
+                else -> throw HfUploadException(
+                    "Hugging Face bilinmeyen yukleme modu dondurdu: ${preupload.uploadMode}",
+                )
+            }
+
+            onProgress(
+                HfUploadProgress(
+                    stage = HfUploadStage.FINALIZING,
+                    bytesProcessed = prepared.size,
+                    totalBytes = prepared.size,
+                    message = "Hugging Face commit'i tamamlandi",
+                ),
+            )
+            resolveHfUrl(shardId, repoPath)
+        } finally {
+            prepared.file.delete()
+        }
+    }
+
+    private fun prepareFile(
+        uri: Uri,
+        onProgress: (HfUploadProgress) -> Unit,
+    ): PreparedFile {
+        val expectedSize = querySize(uri)
+        val cacheRoot = context.externalCacheDir ?: context.cacheDir
+        if (expectedSize > 0L && cacheRoot.usableSpace < expectedSize + CACHE_SAFETY_BYTES) {
+            throw HfUploadException(
+                "Dosyayi yuklemeye hazirlamak icin gecici depolama yetersiz. " +
+                    "Gerekli: ${formatBytes(expectedSize + CACHE_SAFETY_BYTES)}, " +
+                    "bos: ${formatBytes(cacheRoot.usableSpace)}.",
+            )
         }
 
-        val fileResult = preuploadResult.files.firstOrNull { it.path == repoPath }
-            ?: throw HfUploadException("Preupload yanitinda $repoPath icin sonuc bulunamadi")
+        val temp = File.createTempFile("film2_hf_", ".upload", cacheRoot)
+        val digest = MessageDigest.getInstance("SHA-256")
+        val sample = ByteArray(PREUPLOAD_SAMPLE_BYTES)
+        var sampleLength = 0
+        var copied = 0L
 
-        if (fileResult.uploadMode == "lfs" && !fileResult.shouldIgnore) {
-            uploadLfsBytes(localUri, size, fileResult, onProgress)
-        } else {
-            onProgress(size, size)
-        }
-
-        val headerOp = json.encodeToString(CommitHeaderOp.serializer(), CommitHeaderOp(value = CommitHeader("upload from android-studio")))
-        val lfsOp = json.encodeToString(
-            CommitLfsFileOp.serializer(),
-            CommitLfsFileOp(value = CommitLfsFileValue(path = repoPath, algo = "sha256", oid = sha256, size = size)),
+        onProgress(
+            HfUploadProgress(
+                HfUploadStage.PREPARING,
+                0,
+                expectedSize,
+                "Dosya hazirlaniyor ve dogrulaniyor",
+            ),
         )
-        postCommit(token, shardId, listOf(headerOp, lfsOp))
-    }
 
-    /** Uploads raw bytes to the URL(s) returned by preupload. Supports simple chunked PUT
-     *  when multiple upload URLs are returned (very large files); each chunk gets an equal
-     *  byte range except the last, which takes the remainder. */
-    private fun uploadLfsBytes(
-        localUri: Uri,
-        size: Long,
-        fileResult: PreuploadFileResult,
-        onProgress: (Long, Long) -> Unit,
-    ) {
-        val singleUrl = fileResult.uploadUrl
-        val multiUrls = fileResult.uploadUrls
+        try {
+            val input = context.contentResolver.openInputStream(uri)
+                ?: throw HfUploadException("Secilen dosya okunamadi: $uri")
+            input.use { source ->
+                temp.outputStream().buffered(COPY_BUFFER_BYTES).use { output ->
+                    val buffer = ByteArray(COPY_BUFFER_BYTES)
+                    while (true) {
+                        val read = source.read(buffer)
+                        if (read < 0) break
+                        if (read == 0) continue
+                        output.write(buffer, 0, read)
+                        digest.update(buffer, 0, read)
 
-        when {
-            !multiUrls.isNullOrEmpty() -> {
-                val chunkCount = multiUrls.size
-                val chunkSize = (size + chunkCount - 1) / chunkCount
-                var uploaded = 0L
-                val localFile = materializeToTempFile(localUri)
-                try {
-                    multiUrls.forEachIndexed { index, uploadUrl ->
-                        val start = index * chunkSize
-                        val end = minOf(start + chunkSize, size)
-                        if (start >= end) return@forEachIndexed
-                        val chunkBytes = localFile.inputStream().use { input ->
-                            input.skip(start)
-                            readExactly(input, (end - start).toInt())
+                        if (sampleLength < sample.size) {
+                            val sampleBytes = minOf(read, sample.size - sampleLength)
+                            buffer.copyInto(sample, sampleLength, 0, sampleBytes)
+                            sampleLength += sampleBytes
                         }
-                        val request = Request.Builder()
-                            .url(uploadUrl)
-                            .put(chunkBytes.toRequestBody(OCTET_STREAM))
-                            .build()
-                        httpClient.newCall(request).execute().use { response ->
-                            if (!response.isSuccessful) {
-                                throw HfUploadException(
-                                    "LFS parca yuklemesi basarisiz (${response.code}) [$index]",
-                                    statusCode = response.code,
-                                )
-                            }
-                        }
-                        uploaded += (end - start)
-                        onProgress(uploaded, size)
+
+                        copied += read
+                        onProgress(
+                            HfUploadProgress(
+                                HfUploadStage.PREPARING,
+                                copied,
+                                if (expectedSize > 0L) expectedSize else copied,
+                                "Dosya hazirlaniyor ve SHA-256 hesaplaniyor",
+                            ),
+                        )
                     }
-                    // TODO: real S3-style multipart uploads usually need a "complete multipart
-                    // upload" call with the collected ETags from each PUT response. That shape
-                    // isn't specified here — verify against real HF responses once available.
-                } finally {
-                    localFile.delete()
                 }
             }
-
-            !singleUrl.isNullOrBlank() -> {
-                val localFile = materializeToTempFile(localUri)
-                try {
-                    val request = Request.Builder()
-                        .url(singleUrl)
-                        .put(localFile.asRequestBody(OCTET_STREAM))
-                        .build()
-                    httpClient.newCall(request).execute().use { response ->
-                        if (!response.isSuccessful) {
-                            throw HfUploadException(
-                                "LFS yuklemesi basarisiz (${response.code}): ${response.body?.string().orEmpty()}",
-                                statusCode = response.code,
-                            )
-                        }
-                    }
-                    onProgress(size, size)
-                } finally {
-                    localFile.delete()
-                }
-            }
-
-            else -> throw HfUploadException("Preupload yaniti LFS icin yukleme URL'i icermiyor")
+        } catch (t: Throwable) {
+            temp.delete()
+            if (t is HfUploadException) throw t
+            throw HfUploadException("Dosya hazirlanamadi: ${t.message}", cause = t)
         }
+
+        if (expectedSize > 0L && copied != expectedSize) {
+            temp.delete()
+            throw HfUploadException(
+                "Dosya boyutu okuma sirasinda degisti (beklenen $expectedSize, okunan $copied bayt).",
+            )
+        }
+
+        return PreparedFile(
+            file = temp,
+            size = copied,
+            sha256 = digest.digest().joinToString("") { "%02x".format(it) },
+            sample = sample.copyOf(sampleLength),
+        )
     }
 
-    private fun postCommit(token: String, shardId: String, ndjsonOps: List<String>) {
-        val multipartBuilder = MultipartBody.Builder().setType(MultipartBody.FORM)
-        ndjsonOps.forEach { op -> multipartBuilder.addPart(op.toRequestBody(JSON_MEDIA_TYPE)) }
+    private fun requestPreupload(
+        token: String,
+        shardId: String,
+        repoPath: String,
+        prepared: PreparedFile,
+        onProgress: (HfUploadProgress) -> Unit,
+    ): PreuploadFileResult {
+        onProgress(
+            HfUploadProgress(
+                HfUploadStage.CHECKING,
+                prepared.size,
+                prepared.size,
+                "Hugging Face yukleme turu kontrol ediliyor",
+            ),
+        )
 
+        val payload = PreuploadRequest(
+            files = listOf(
+                PreuploadFileInput(
+                    path = repoPath,
+                    sample = Base64.encodeToString(prepared.sample, Base64.NO_WRAP),
+                    size = prepared.size,
+                ),
+            ),
+        )
         val request = Request.Builder()
-            .url("https://huggingface.co/api/datasets/$shardId/commit/main")
-            .header("Authorization", "Bearer $token")
-            .post(multipartBuilder.build())
+            .url("$HF_ENDPOINT/api/datasets/$shardId/preupload/main")
+            .hfAuthorization(token)
+            .post(json.encodeToString(payload).toRequestBody(JSON_MEDIA_TYPE))
             .build()
 
-        httpClient.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                throw HfUploadException(
-                    "Hugging Face commit basarisiz (${response.code}): ${response.body?.string().orEmpty()}",
-                    statusCode = response.code,
+        return execute(request, "Hugging Face preupload") { body ->
+            val response = json.decodeFromString(PreuploadResponse.serializer(), body)
+            response.files.firstOrNull { it.path == repoPath }
+                ?: throw HfUploadException("Preupload yanitinda '$repoPath' icin sonuc bulunamadi")
+        }
+    }
+
+    private fun uploadRegular(
+        token: String,
+        shardId: String,
+        repoPath: String,
+        prepared: PreparedFile,
+        onProgress: (HfUploadProgress) -> Unit,
+    ) {
+        if (prepared.size > REGULAR_FILE_MEMORY_LIMIT_BYTES) {
+            throw HfUploadException(
+                "Hugging Face ${formatBytes(prepared.size)} dosyayi 'regular' olarak isaretledi; " +
+                    "bu boyut Android belleginde guvenli bicimde commit edilemez.",
+            )
+        }
+
+        onProgress(
+            HfUploadProgress(
+                HfUploadStage.UPLOADING,
+                0,
+                prepared.size,
+                "Kucuk dosya commit icin hazirlaniyor",
+            ),
+        )
+        val base64 = Base64.encodeToString(prepared.file.readBytes(), Base64.NO_WRAP)
+        onProgress(
+            HfUploadProgress(
+                HfUploadStage.UPLOADING,
+                prepared.size,
+                prepared.size,
+                "Kucuk dosya Hugging Face'e gonderiliyor",
+            ),
+        )
+        postCommit(
+            token = token,
+            shardId = shardId,
+            operation = buildJsonObject {
+                put("key", "file")
+                put("value", buildJsonObject {
+                    put("path", repoPath)
+                    put("content", base64)
+                    put("encoding", "base64")
+                })
+            },
+        )
+    }
+
+    private fun uploadLfs(
+        token: String,
+        shardId: String,
+        repoPath: String,
+        prepared: PreparedFile,
+        onProgress: (HfUploadProgress) -> Unit,
+    ) {
+        val batch = requestLfsBatch(token, shardId, prepared)
+        batch.error?.let { error ->
+            throw HfUploadException(
+                "Hugging Face LFS batch hatasi (${error.code}): ${error.message}",
+                statusCode = error.code,
+            )
+        }
+
+        val actions = batch.actions
+        if (actions?.upload != null) {
+            val uploadAction = actions.upload
+            val chunkSize = uploadAction.header.orEmpty()["chunk_size"]?.jsonPrimitive?.content?.toLongOrNull()
+            if (chunkSize != null) {
+                uploadMultipart(prepared, uploadAction, chunkSize, onProgress)
+            } else {
+                uploadSinglePart(prepared, uploadAction, onProgress)
+            }
+        } else {
+            onProgress(
+                HfUploadProgress(
+                    HfUploadStage.UPLOADING,
+                    prepared.size,
+                    prepared.size,
+                    "Dosya Hugging Face deposunda zaten mevcut; aktarim atlandi",
+                ),
+            )
+        }
+
+        actions?.verify?.let { verifyAction ->
+            verifyLfsUpload(token, verifyAction, prepared)
+        }
+
+        onProgress(
+            HfUploadProgress(
+                HfUploadStage.FINALIZING,
+                prepared.size,
+                prepared.size,
+                "Hugging Face commit'i olusturuluyor",
+            ),
+        )
+        postCommit(
+            token = token,
+            shardId = shardId,
+            operation = buildJsonObject {
+                put("key", "lfsFile")
+                put("value", buildJsonObject {
+                    put("path", repoPath)
+                    put("algo", "sha256")
+                    put("oid", prepared.sha256)
+                    put("size", prepared.size)
+                })
+            },
+        )
+    }
+
+    private fun requestLfsBatch(
+        token: String,
+        shardId: String,
+        prepared: PreparedFile,
+    ): LfsBatchObject {
+        val payload = LfsBatchRequest(
+            objects = listOf(LfsObjectInput(oid = prepared.sha256, size = prepared.size)),
+            ref = LfsRef(name = "main"),
+        )
+        val request = Request.Builder()
+            .url("$HF_ENDPOINT/datasets/$shardId.git/info/lfs/objects/batch")
+            .hfAuthorization(token)
+            .header("Accept", LFS_MEDIA_TYPE_STRING)
+            .post(json.encodeToString(payload).toRequestBody(LFS_MEDIA_TYPE))
+            .build()
+
+        return execute(request, "Hugging Face LFS batch") { body ->
+            val response = json.decodeFromString(LfsBatchResponse.serializer(), body)
+            response.objects.firstOrNull { it.oid.equals(prepared.sha256, ignoreCase = true) }
+                ?: throw HfUploadException("LFS batch yanitinda dosya icin yukleme talimati bulunamadi")
+        }
+    }
+
+    private fun uploadSinglePart(
+        prepared: PreparedFile,
+        action: LfsAction,
+        onProgress: (HfUploadProgress) -> Unit,
+    ) {
+        val body = ProgressFileRequestBody(
+            file = prepared.file,
+            offset = 0,
+            byteCount = prepared.size,
+            onProgress = { sent ->
+                onProgress(
+                    HfUploadProgress(
+                        HfUploadStage.UPLOADING,
+                        sent,
+                        prepared.size,
+                        "Dosya Hugging Face'e yukleniyor",
+                    ),
                 )
+            },
+        )
+        val builder = Request.Builder().url(resolveActionUrl(action.href)).put(body)
+        action.header.orEmpty().forEach { (name, value) ->
+            if (!name.equals("chunk_size", ignoreCase = true) && !name.all(Char::isDigit)) {
+                builder.header(name, value.jsonPrimitive.content)
             }
         }
+        executeNoBody(builder.build(), "Hugging Face LFS yuklemesi")
+    }
+
+    private fun uploadMultipart(
+        prepared: PreparedFile,
+        action: LfsAction,
+        chunkSize: Long,
+        onProgress: (HfUploadProgress) -> Unit,
+    ) {
+        require(chunkSize > 0L) { "Gecersiz LFS parca boyutu: $chunkSize" }
+        val partUrls = action.header.orEmpty().entries
+            .mapNotNull { (key, value) -> key.toIntOrNull()?.let { it to value.jsonPrimitive.content } }
+            .sortedBy { it.first }
+
+        val expectedParts = ((prepared.size + chunkSize - 1L) / chunkSize).toInt()
+        if (partUrls.size != expectedParts) {
+            throw HfUploadException(
+                "Hugging Face multipart yaniti gecersiz: $expectedParts parca bekleniyordu, ${partUrls.size} geldi.",
+            )
+        }
+
+        val completedParts = mutableListOf<CompletedPart>()
+        var uploadedBefore = 0L
+        partUrls.forEachIndexed { index, (_, partUrl) ->
+            val offset = index * chunkSize
+            val length = minOf(chunkSize, prepared.size - offset)
+            val body = ProgressFileRequestBody(
+                file = prepared.file,
+                offset = offset,
+                byteCount = length,
+                onProgress = { partSent ->
+                    onProgress(
+                        HfUploadProgress(
+                            HfUploadStage.UPLOADING,
+                            uploadedBefore + partSent,
+                            prepared.size,
+                            "Dosya yukleniyor: parca ${index + 1}/$expectedParts",
+                        ),
+                    )
+                },
+            )
+            val request = Request.Builder().url(resolveActionUrl(partUrl)).put(body).build()
+            val etag = httpClient.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    throw responseException("LFS parca ${index + 1} yuklemesi", response.code, response.body?.string())
+                }
+                response.header("ETag")
+                    ?: response.header("etag")
+                    ?: throw HfUploadException("LFS parca ${index + 1} yanitinda ETag yok")
+            }
+            completedParts += CompletedPart(partNumber = index + 1, etag = etag)
+            uploadedBefore += length
+        }
+
+        val completion = MultipartCompletion(oid = prepared.sha256, parts = completedParts)
+        val request = Request.Builder()
+            .url(resolveActionUrl(action.href))
+            .header("Accept", LFS_MEDIA_TYPE_STRING)
+            .post(json.encodeToString(completion).toRequestBody(LFS_MEDIA_TYPE))
+            .build()
+        executeNoBody(request, "Hugging Face multipart tamamlama")
+    }
+
+    private fun verifyLfsUpload(token: String, action: LfsAction, prepared: PreparedFile) {
+        val payload = LfsVerifyRequest(oid = prepared.sha256, size = prepared.size)
+        val builder = Request.Builder()
+            .url(resolveActionUrl(action.href))
+            .hfAuthorization(token)
+            .post(json.encodeToString(payload).toRequestBody(JSON_MEDIA_TYPE))
+        action.header.orEmpty().forEach { (name, value) -> builder.header(name, value.jsonPrimitive.content) }
+        executeNoBody(builder.build(), "Hugging Face LFS dogrulama")
+    }
+
+    private fun postCommit(token: String, shardId: String, operation: JsonObject) {
+        val header = buildJsonObject {
+            put("key", "header")
+            put("value", buildJsonObject {
+                put("summary", "upload from android-studio")
+                put("description", "")
+            })
+        }
+        val ndjson = buildString {
+            append(json.encodeToString(JsonObject.serializer(), header))
+            append('\n')
+            append(json.encodeToString(JsonObject.serializer(), operation))
+            append('\n')
+        }
+        val request = Request.Builder()
+            .url("$HF_ENDPOINT/api/datasets/$shardId/commit/main")
+            .hfAuthorization(token)
+            .post(ndjson.toRequestBody(NDJSON_MEDIA_TYPE))
+            .build()
+        executeNoBody(request, "Hugging Face commit")
     }
 
     private fun querySize(uri: Uri): Long {
         context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { cursor ->
-            val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
-            if (sizeIndex >= 0 && cursor.moveToFirst()) {
-                val value = cursor.getLong(sizeIndex)
-                if (value > 0) return value
+            val index = cursor.getColumnIndex(OpenableColumns.SIZE)
+            if (index >= 0 && cursor.moveToFirst() && !cursor.isNull(index)) {
+                return cursor.getLong(index).coerceAtLeast(0L)
             }
         }
-        // Fallback: stream the whole file once just to measure it.
-        return context.contentResolver.openInputStream(uri)?.use { input ->
-            var total = 0L
-            val buffer = ByteArray(64 * 1024)
-            while (true) {
-                val read = input.read(buffer)
-                if (read < 0) break
-                total += read
-            }
-            total
-        } ?: 0L
+        return -1L
     }
 
-    private fun sha256Hex(uri: Uri): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        context.contentResolver.openInputStream(uri)?.use { input ->
-            val buffer = ByteArray(64 * 1024)
-            while (true) {
-                val read = input.read(buffer)
-                if (read < 0) break
-                digest.update(buffer, 0, read)
-            }
-        }
-        return digest.digest().joinToString("") { "%02x".format(it) }
+    private fun Request.Builder.hfAuthorization(token: String): Request.Builder =
+        header("Authorization", "Bearer $token")
+            .header("User-Agent", USER_AGENT)
+
+    private fun resolveActionUrl(raw: String): String = when {
+        raw.startsWith("https://") || raw.startsWith("http://") -> raw
+        raw.startsWith("/") -> "$HF_ENDPOINT$raw"
+        else -> "$HF_ENDPOINT/$raw"
     }
 
-    /** SAF content:// Uris can't be re-opened as a java.io.File directly; materialize once
-     *  into the app's cache dir so we can PUT it with a known length / re-read for chunking. */
-    private fun materializeToTempFile(uri: Uri): File {
-        val temp = File.createTempFile("hf_upload_", ".bin", context.cacheDir)
-        context.contentResolver.openInputStream(uri)?.use { input ->
-            temp.outputStream().use { output -> input.copyTo(output) }
+    private fun executeNoBody(request: Request, label: String) {
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw responseException(label, response.code, response.body?.string())
+            }
         }
-        return temp
+    }
+
+    private fun <T> execute(request: Request, label: String, transform: (String) -> T): T {
+        return httpClient.newCall(request).execute().use { response ->
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) throw responseException(label, response.code, body)
+            try {
+                transform(body)
+            } catch (t: HfUploadException) {
+                throw t
+            } catch (t: Throwable) {
+                throw HfUploadException("$label yaniti okunamadi: ${t.message}", cause = t)
+            }
+        }
+    }
+
+    private fun responseException(label: String, statusCode: Int, body: String?): HfUploadException {
+        val compact = body.orEmpty().replace('\n', ' ').take(800)
+        return HfUploadException(
+            "$label basarisiz ($statusCode)${if (compact.isBlank()) "" else ": $compact"}",
+            statusCode = statusCode,
+        )
     }
 
     companion object {
-        /** Files at or under this size are sent inline as base64 in the commit call.
-         *  Above it, the LFS pre-upload flow is used. Matches the spec's "~10MB" guidance. */
-        const val SMALL_FILE_THRESHOLD_BYTES = 10L * 1024 * 1024
-        private val JSON_MEDIA_TYPE = "application/json".toMediaType()
-        private val OCTET_STREAM = "application/octet-stream".toMediaType()
+        private const val HF_ENDPOINT = "https://huggingface.co"
+        private const val USER_AGENT = "film2-android-studio/1.1"
+        private const val PREUPLOAD_SAMPLE_BYTES = 512
+        private const val COPY_BUFFER_BYTES = 256 * 1024
+        private const val CACHE_SAFETY_BYTES = 64L * 1024 * 1024
+        private const val REGULAR_FILE_MEMORY_LIMIT_BYTES = 20L * 1024 * 1024
+        private const val LFS_MEDIA_TYPE_STRING = "application/vnd.git-lfs+json"
+        private val JSON_MEDIA_TYPE = "application/json; charset=utf-8".toMediaType()
+        private val NDJSON_MEDIA_TYPE = "application/x-ndjson; charset=utf-8".toMediaType()
+        private val LFS_MEDIA_TYPE = LFS_MEDIA_TYPE_STRING.toMediaType()
     }
 }
 
-class HfUploadException(message: String, val statusCode: Int? = null) : Exception(message)
+class HfUploadException(
+    message: String,
+    val statusCode: Int? = null,
+    cause: Throwable? = null,
+) : Exception(message, cause)
 
-/** minSdk-safe equivalent of InputStream.readNBytes (that method needs API 33+). */
-private fun readExactly(input: java.io.InputStream, count: Int): ByteArray {
-    val buffer = ByteArray(count)
-    var offset = 0
-    while (offset < count) {
-        val read = input.read(buffer, offset, count - offset)
-        if (read < 0) break
-        offset += read
+private data class PreparedFile(
+    val file: File,
+    val size: Long,
+    val sha256: String,
+    val sample: ByteArray,
+)
+
+private class ProgressFileRequestBody(
+    private val file: File,
+    private val offset: Long,
+    private val byteCount: Long,
+    private val mediaType: MediaType = "application/octet-stream".toMediaType(),
+    private val onProgress: (Long) -> Unit,
+) : RequestBody() {
+    override fun contentType(): MediaType = mediaType
+    override fun contentLength(): Long = byteCount
+
+    override fun writeTo(sink: BufferedSink) {
+        FileInputStream(file).use { input ->
+            skipFully(input, offset)
+            var remaining = byteCount
+            var sent = 0L
+            val buffer = ByteArray(256 * 1024)
+            while (remaining > 0L) {
+                val read = input.read(buffer, 0, minOf(buffer.size.toLong(), remaining).toInt())
+                if (read < 0) throw EOFException("Dosya beklenenden erken bitti")
+                if (read == 0) continue
+                sink.write(buffer, 0, read)
+                sent += read
+                remaining -= read
+                onProgress(sent)
+            }
+        }
     }
-    return if (offset == count) buffer else buffer.copyOf(offset)
 }
 
-// ---- Commit API operation payloads (NDJSON-style, one JSON object per multipart part) ----
+private fun skipFully(input: InputStream, byteCount: Long) {
+    var remaining = byteCount
+    while (remaining > 0L) {
+        val skipped = input.skip(remaining)
+        if (skipped > 0L) {
+            remaining -= skipped
+        } else {
+            if (input.read() < 0) throw EOFException("Dosya icinde istenen konuma gidilemedi")
+            remaining--
+        }
+    }
+}
+
+private fun formatBytes(bytes: Long): String {
+    if (bytes < 1024L) return "$bytes B"
+    val units = arrayOf("KB", "MB", "GB", "TB")
+    var value = bytes.toDouble()
+    var unit = -1
+    while (value >= 1024.0 && unit < units.lastIndex) {
+        value /= 1024.0
+        unit++
+    }
+    return "%.1f %s".format(value, units[unit])
+}
 
 @Serializable
-private data class CommitHeader(val summary: String)
-
-@Serializable
-private data class CommitHeaderOp(val key: String = "header", val value: CommitHeader)
-
-@Serializable
-private data class CommitFileValue(val path: String, val content: String, val encoding: String)
-
-@Serializable
-private data class CommitFileOp(val key: String = "file", val value: CommitFileValue)
-
-@Serializable
-private data class CommitLfsFileValue(val path: String, val algo: String, val oid: String, val size: Long)
-
-@Serializable
-private data class CommitLfsFileOp(val key: String = "lfsFile", val value: CommitLfsFileValue)
-
-// ---- Preupload API payloads ----
-
-@Serializable
-private data class PreuploadFileInput(val path: String, val size: Long, val sha256: String)
+private data class PreuploadFileInput(val path: String, val sample: String, val size: Long)
 
 @Serializable
 private data class PreuploadRequest(val files: List<PreuploadFileInput>)
@@ -348,11 +641,63 @@ private data class PreuploadRequest(val files: List<PreuploadFileInput>)
 @Serializable
 private data class PreuploadFileResult(
     val path: String,
-    val uploadMode: String = "regular", // "regular" | "lfs" — TODO verify field name
+    val uploadMode: String,
     val shouldIgnore: Boolean = false,
-    val uploadUrl: String? = null, // TODO verify: single-URL LFS upload target
-    val uploadUrls: List<String>? = null, // TODO verify: chunked multipart LFS upload targets
+    val oid: String? = null,
 )
 
 @Serializable
 private data class PreuploadResponse(val files: List<PreuploadFileResult> = emptyList())
+
+@Serializable
+private data class LfsObjectInput(val oid: String, val size: Long)
+
+@Serializable
+private data class LfsRef(val name: String)
+
+@Serializable
+private data class LfsBatchRequest(
+    val operation: String = "upload",
+    val transfers: List<String> = listOf("basic", "multipart"),
+    val objects: List<LfsObjectInput>,
+    val hash_algo: String = "sha256",
+    val ref: LfsRef,
+)
+
+@Serializable
+private data class LfsBatchResponse(
+    val transfer: String? = null,
+    val objects: List<LfsBatchObject> = emptyList(),
+)
+
+@Serializable
+private data class LfsBatchObject(
+    val oid: String,
+    val size: Long,
+    val actions: LfsActions? = null,
+    val error: LfsError? = null,
+)
+
+@Serializable
+private data class LfsActions(
+    val upload: LfsAction? = null,
+    val verify: LfsAction? = null,
+)
+
+@Serializable
+private data class LfsAction(
+    val href: String,
+    val header: JsonObject? = null,
+)
+
+@Serializable
+private data class LfsError(val code: Int, val message: String)
+
+@Serializable
+private data class LfsVerifyRequest(val oid: String, val size: Long)
+
+@Serializable
+private data class CompletedPart(val partNumber: Int, val etag: String)
+
+@Serializable
+private data class MultipartCompletion(val oid: String, val parts: List<CompletedPart>)
