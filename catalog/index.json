@@ -1,829 +1,8 @@
 {
-  "revision": "2026-08-08T09:56:10.973065Z",
-  "generatedAt": "2026-08-08T09:56:30.366Z",
+  "revision": "2026-08-08T10:02:02.515618Z",
+  "generatedAt": "2026-08-08T10:02:17.197Z",
   "count": 8,
   "titles": [
-    {
-      "id": "orumcek-adam-3-0413",
-      "type": "movie",
-      "imdbId": "tt0413300",
-      "tmdbId": 559,
-      "title": "Örümcek Adam 3",
-      "originalTitle": "Spider-Man 3",
-      "overview": "Efsanevi Marvel Comics dizisine dayanan filmde, Peter Parker nihayet Mary Jane'e duyduğu tutku ile süper kahramanlık görevleri arasındaki dengeyi kurar. Ancak, ufukta belirmeye başlayan bir fırtına vardır. Peter'ın Örümcek Adam kostümü birden bire değişip siyaha dönüşerek güçlerini pekiştirmeye başlayınca, Peter da değişmeye başlar. Kostümün etkisi altındaki Peter, kibirli ve kendine aşırı güvenli biri olur; en değer verdiği kişileri ihmal etmeye başlar. Bugüne dek en korkulan iki kötü kahraman Kumadam ve Venom benzersiz güçler edinip, intikam ateşiyle yanarken, Peter en büyük savaşını kendi içinde yapmaktadır. Örümcek Adam'ın onu o yapan, onu bir kahraman yapan özelliğini, yani şefkati yeniden keşfetmesi gerekecektir.",
-      "releaseYear": 2007,
-      "genres": [
-        "Aksiyon",
-        "Macera",
-        "Bilim-Kurgu"
-      ],
-      "runtimeMinutes": 195,
-      "posterUrl": "https://image.tmdb.org/t/p/w780/dxAWGyDADSazvz9pfPWPjryIVoE.jpg",
-      "posterUrls": [],
-      "backdropUrl": "https://image.tmdb.org/t/p/w1280/xslNxb3T3HW8dt70ybbR5lrBJRj.jpg",
-      "backdropUrls": [],
-      "cast": [
-        {
-          "name": "Tobey Maguire",
-          "character": "Spider-Man / Peter Parker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/s6PwSvq6gC7PGEjIku69tPbvR8M.jpg"
-        },
-        {
-          "name": "Kirsten Dunst",
-          "character": "Mary Jane Watson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/yhLKGjuiMMdbGnFrR8AREkCZcVF.jpg"
-        },
-        {
-          "name": "James Franco",
-          "character": "New Goblin / Harry Osborn",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/bjmAntHGiibLZixH8nTNVBzaFQn.jpg"
-        },
-        {
-          "name": "Thomas Haden Church",
-          "character": "Sandman / Flint Marko",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/74NK9HCYvNafMggSp1PAK5Nwkpe.jpg"
-        },
-        {
-          "name": "Topher Grace",
-          "character": "Venom / Eddie Brock",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/oJQxl4DG0KSCtOGrpWNhYz9gUZA.jpg"
-        },
-        {
-          "name": "Bryce Dallas Howard",
-          "character": "Gwen Stacy",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/6yhDkPXythZavS6Wk57XQ2sg5AW.jpg"
-        },
-        {
-          "name": "Rosemary Harris",
-          "character": "May Parker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/3Mu02enwaF8dFuT195f7esILXns.jpg"
-        },
-        {
-          "name": "J.K. Simmons",
-          "character": "J. Jonah Jameson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/ScmKoJ9eiSUOthAt1PDNLi8Fkw.jpg"
-        },
-        {
-          "name": "James Cromwell",
-          "character": "Captain Stacy",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/vpNQQbM5PtxsYmVm4oh79SGFyUK.jpg"
-        },
-        {
-          "name": "Dylan Baker",
-          "character": "Dr. Curt Connors",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/4mw6xj8Aj3ixjjeUj9pZdZPTbvz.jpg"
-        },
-        {
-          "name": "Theresa Russell",
-          "character": "Emma Marko",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/v0s86Nh5IMqYk5oazosuAwXAiO5.jpg"
-        },
-        {
-          "name": "Bill Nunn",
-          "character": "Joseph 'Robbie' Robertson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/trxNvS6g5yvwbXzx2LK6JqutE5z.jpg"
-        },
-        {
-          "name": "Bruce Campbell",
-          "character": "Maître D'",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/p9335ljr7luOWsfwZSOlsIzFJKE.jpg"
-        },
-        {
-          "name": "Elizabeth Banks",
-          "character": "Miss Brant",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg"
-        },
-        {
-          "name": "Ted Raimi",
-          "character": "Hoffman",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/juhz6ajCjjHlLPzYBxPtDxwX6em.jpg"
-        },
-        {
-          "name": "Perla Haney-Jardine",
-          "character": "Penny Marko",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/8hXve6yjLDwXJ6njTPz44n9zXQV.jpg"
-        },
-        {
-          "name": "Willem Dafoe",
-          "character": "Green Goblin / Norman Osborn",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg"
-        },
-        {
-          "name": "Cliff Robertson",
-          "character": "Ben Parker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/8pH2RWCPtXKzT9P33MbzgnzPlF0.jpg"
-        },
-        {
-          "name": "Elya Baskin",
-          "character": "Mr. Ditkovitch",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/30RVRgcJTZlJBKeSCZN2tg0ryvE.jpg"
-        },
-        {
-          "name": "Mageina Tovah",
-          "character": "Ursula",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/AiGQaF7tpr2m1jU0sZm0kZOQI7h.jpg"
-        }
-      ],
-      "crew": [
-        {
-          "name": "Avi Arad",
-          "job": "Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
-        },
-        {
-          "name": "Stan Lee",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
-        },
-        {
-          "name": "Kevin Feige",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
-        },
-        {
-          "name": "Joseph M. Caracciolo Jr.",
-          "job": "Executive Producer"
-        },
-        {
-          "name": "Grant Curtis",
-          "job": "Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/j3WoGrmImpEtSWP0FvDl1nHbQWI.jpg"
-        },
-        {
-          "name": "Laura Ziskin",
-          "job": "Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/nw6ZfMnDdoeWJCMiM4mQp8arZD1.jpg"
-        },
-        {
-          "name": "Sam Raimi",
-          "job": "Director",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
-        }
-      ],
-      "status": "ready",
-      "manualEntry": false,
-      "createdAt": "2026-08-08T09:41:22.310751Z",
-      "updatedAt": "2026-08-08T09:51:45.468954Z",
-      "shardId": "mfilms12/film2-media-01",
-      "asset": {
-        "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-3-0413/video_1786182638682.mp4",
-        "durationSeconds": 8352.761377,
-        "audioLanguages": [
-          "eng",
-          "tur"
-        ],
-        "subtitleLanguages": [
-          "tur",
-          "eng"
-        ],
-        "externalAudioTracks": [],
-        "externalSubtitleTracks": [
-          {
-            "language": "tur",
-            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-3-0413/subs_tur_1786182638682_1.vtt",
-            "label": "Turkce",
-            "mimeType": "text/vtt"
-          },
-          {
-            "language": "eng",
-            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-3-0413/subs_eng_1786182638682_2.vtt",
-            "label": "Ingilizce",
-            "mimeType": "text/vtt"
-          }
-        ],
-        "videoVariants": []
-      }
-    },
-    {
-      "id": "orumcek-adam-2-0316",
-      "type": "movie",
-      "imdbId": "tt0316654",
-      "tmdbId": 558,
-      "title": "Örümcek Adam 2",
-      "originalTitle": "Spider-Man 2",
-      "overview": "Sevgilisi Mary Jane'den ayrılan Peter ona gerçek kimliğini açıklayıp açıklamamak arasında kaldığı için oldukça zor bir dönem geçirmektedir. kararsızlık içine düştüğü bu esnada Mary Jane'in, patronun oğlu John'la birlikte olmaya başlaması iyice canını sıkar. Bunlara, halasının mali sıkıntıları ve hayattaki tek dostu Harry Osborne'un, babasının ölümünden kendisini sorumlu tuttuğu için Peterdan uzaklaşması onu depresyonun eşiğine getirmiştir. Bu esnada, yeni düşmanı Doktor Ahtapot'un ortaya çıkmasıyla Peter Parker'ın hayatı içinden çıkılmaz bir hal alacaktır.",
-      "releaseYear": 2004,
-      "genres": [
-        "Aksiyon",
-        "Macera",
-        "Bilim-Kurgu"
-      ],
-      "runtimeMinutes": 202,
-      "posterUrl": "https://image.tmdb.org/t/p/w780/up4mcu95N91I7SnylVCIIMTWZYq.jpg",
-      "posterUrls": [],
-      "backdropUrl": "https://image.tmdb.org/t/p/w1280/6al048Lat3eLVQOuKtc9h6Tu94d.jpg",
-      "backdropUrls": [],
-      "cast": [
-        {
-          "name": "Tobey Maguire",
-          "character": "Spider-Man / Peter Parker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/s6PwSvq6gC7PGEjIku69tPbvR8M.jpg"
-        },
-        {
-          "name": "Kirsten Dunst",
-          "character": "Mary Jane Watson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/yhLKGjuiMMdbGnFrR8AREkCZcVF.jpg"
-        },
-        {
-          "name": "James Franco",
-          "character": "Harry Osborn",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/bjmAntHGiibLZixH8nTNVBzaFQn.jpg"
-        },
-        {
-          "name": "Alfred Molina",
-          "character": "Doc Ock / Otto Octavius",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/nJo91Czesn6z0d0pkfbDoVZY3sg.jpg"
-        },
-        {
-          "name": "Rosemary Harris",
-          "character": "May Parker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/3Mu02enwaF8dFuT195f7esILXns.jpg"
-        },
-        {
-          "name": "J.K. Simmons",
-          "character": "J. Jonah Jameson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/ScmKoJ9eiSUOthAt1PDNLi8Fkw.jpg"
-        },
-        {
-          "name": "Donna Murphy",
-          "character": "Rosalie Octavius",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/tmre2oZkIHGqnLhWeldpX2Ujgl0.jpg"
-        },
-        {
-          "name": "Daniel Gillies",
-          "character": "John Jameson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/3EVKjIDFZOHeLzxOvJ4DmAVYMXg.jpg"
-        },
-        {
-          "name": "Dylan Baker",
-          "character": "Dr. Curt Connors",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/4mw6xj8Aj3ixjjeUj9pZdZPTbvz.jpg"
-        },
-        {
-          "name": "Bill Nunn",
-          "character": "Joseph 'Robbie' Robertson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/trxNvS6g5yvwbXzx2LK6JqutE5z.jpg"
-        },
-        {
-          "name": "Vanessa Ferlito",
-          "character": "Louise",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/i128WKjZ3JkoJBOLw48hF4Uwu5V.jpg"
-        },
-        {
-          "name": "Aasif Mandvi",
-          "character": "Mr. Aziz",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/hoBCqgxK2JqV3MOQYncHRMfwu8V.jpg"
-        },
-        {
-          "name": "Willem Dafoe",
-          "character": "Green Goblin / Norman Osborn",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg"
-        },
-        {
-          "name": "Cliff Robertson",
-          "character": "Ben Parker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/8pH2RWCPtXKzT9P33MbzgnzPlF0.jpg"
-        },
-        {
-          "name": "Ted Raimi",
-          "character": "Hoffman",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/juhz6ajCjjHlLPzYBxPtDxwX6em.jpg"
-        },
-        {
-          "name": "Elizabeth Banks",
-          "character": "Miss Brant",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg"
-        },
-        {
-          "name": "Bruce Campbell",
-          "character": "Snooty Usher",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/p9335ljr7luOWsfwZSOlsIzFJKE.jpg"
-        },
-        {
-          "name": "Gregg Edelman",
-          "character": "Dr. Davis",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/jvdye1mZkBb5x4xjjtmtuLRmXzy.jpg"
-        },
-        {
-          "name": "Elya Baskin",
-          "character": "Mr. Ditkovitch",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/30RVRgcJTZlJBKeSCZN2tg0ryvE.jpg"
-        },
-        {
-          "name": "Mageina Tovah",
-          "character": "Ursula",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/AiGQaF7tpr2m1jU0sZm0kZOQI7h.jpg"
-        }
-      ],
-      "crew": [
-        {
-          "name": "Sam Raimi",
-          "job": "Director",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
-        },
-        {
-          "name": "Stan Lee",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
-        },
-        {
-          "name": "Joseph M. Caracciolo Jr.",
-          "job": "Executive Producer"
-        },
-        {
-          "name": "Avi Arad",
-          "job": "Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
-        },
-        {
-          "name": "Laura Ziskin",
-          "job": "Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/nw6ZfMnDdoeWJCMiM4mQp8arZD1.jpg"
-        },
-        {
-          "name": "Lorne Orleans",
-          "job": "Producer"
-        },
-        {
-          "name": "Kevin Feige",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
-        },
-        {
-          "name": "Joseph M. Caracciolo",
-          "job": "Executive Producer"
-        }
-      ],
-      "status": "ready",
-      "manualEntry": false,
-      "createdAt": "2026-08-08T09:27:43.298939Z",
-      "updatedAt": "2026-08-08T09:31:10.010632Z",
-      "shardId": "mfilms12/film2-media-01",
-      "asset": {
-        "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-2-0316/video_1786181405804.mp4",
-        "durationSeconds": 7647.389788,
-        "audioLanguages": [
-          "eng",
-          "tur"
-        ],
-        "subtitleLanguages": [
-          "eng",
-          "tur"
-        ],
-        "externalAudioTracks": [],
-        "externalSubtitleTracks": [
-          {
-            "language": "eng",
-            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-2-0316/subs_eng_1786181405804_1.vtt",
-            "label": "Ingilizce",
-            "mimeType": "text/vtt"
-          },
-          {
-            "language": "tur",
-            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-2-0316/subs_tur_1786181405804_2.vtt",
-            "label": "Turkce",
-            "mimeType": "text/vtt"
-          }
-        ],
-        "videoVariants": []
-      }
-    },
-    {
-      "id": "orumcek-adam-0145",
-      "type": "movie",
-      "imdbId": "tt0145487",
-      "tmdbId": 557,
-      "title": "Örümcek Adam",
-      "originalTitle": "Spider-Man",
-      "overview": "Sıradan bir lise öğrencisi olan Peter Parker'ın hayatı bir gün bir örümcek tarafından ısırılmasıyla tamamen değişir. Çünkü bu örümcek sıradan bir örümcek değildir, genetik olarak özelikle geliştirilmiş, bilimsel amaçlarla kullanılan bir denektir. Öte yandan olan olmuştur ve Parker'da tuhaf değişiklikler başgöstermektedir.",
-      "releaseYear": 2002,
-      "genres": [
-        "Aksiyon",
-        "Bilim-Kurgu"
-      ],
-      "runtimeMinutes": 189,
-      "posterUrl": "https://image.tmdb.org/t/p/w780/5FyIHcUTLFNSk4D5rfsGRTkSwie.jpg",
-      "posterUrls": [],
-      "backdropUrl": "https://image.tmdb.org/t/p/w1280/zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg",
-      "backdropUrls": [],
-      "cast": [
-        {
-          "name": "Tobey Maguire",
-          "character": "Spider-Man / Peter Parker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/s6PwSvq6gC7PGEjIku69tPbvR8M.jpg"
-        },
-        {
-          "name": "Willem Dafoe",
-          "character": "Green Goblin / Norman Osborn",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg"
-        },
-        {
-          "name": "Kirsten Dunst",
-          "character": "Mary Jane Watson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/yhLKGjuiMMdbGnFrR8AREkCZcVF.jpg"
-        },
-        {
-          "name": "James Franco",
-          "character": "Harry Osborn",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/bjmAntHGiibLZixH8nTNVBzaFQn.jpg"
-        },
-        {
-          "name": "Cliff Robertson",
-          "character": "Ben Parker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/8pH2RWCPtXKzT9P33MbzgnzPlF0.jpg"
-        },
-        {
-          "name": "Rosemary Harris",
-          "character": "May Parker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/3Mu02enwaF8dFuT195f7esILXns.jpg"
-        },
-        {
-          "name": "J.K. Simmons",
-          "character": "J. Jonah Jameson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/ScmKoJ9eiSUOthAt1PDNLi8Fkw.jpg"
-        },
-        {
-          "name": "Joe Manganiello",
-          "character": "Flash Thompson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/mTdACmitdrwor0Nrv5sr0u123vZ.jpg"
-        },
-        {
-          "name": "Gerry Becker",
-          "character": "Maximilian Fargas",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/il1r1Iym5WFJyo8SQon60aqu4nC.jpg"
-        },
-        {
-          "name": "Bill Nunn",
-          "character": "Joseph 'Robbie' Robertson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/trxNvS6g5yvwbXzx2LK6JqutE5z.jpg"
-        },
-        {
-          "name": "Jack Betts",
-          "character": "Henry Balkan",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/aC8uOwxVW2NJ5sYUvQImFZuVKQ7.jpg"
-        },
-        {
-          "name": "Stanley Anderson",
-          "character": "General Slocum",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/6kHp1SlLRw0NobVdY8X6DbBAPt8.jpg"
-        },
-        {
-          "name": "Ron Perkins",
-          "character": "Dr. Mendel Stromm",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/ld3OJ0WpMv0Rcml59WuVzKoQWaB.jpg"
-        },
-        {
-          "name": "Michael Papajohn",
-          "character": "Carjacker",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/hdTJBfIXfvRdlD1p8y6rra207UP.jpg"
-        },
-        {
-          "name": "K.K. Dodds",
-          "character": "Simkins",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/nGou7wXgXAKr5oJEyUIuX9RCgFl.jpg"
-        },
-        {
-          "name": "Ted Raimi",
-          "character": "Hoffman",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/juhz6ajCjjHlLPzYBxPtDxwX6em.jpg"
-        },
-        {
-          "name": "Bruce Campbell",
-          "character": "Ring Announcer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/p9335ljr7luOWsfwZSOlsIzFJKE.jpg"
-        },
-        {
-          "name": "Elizabeth Banks",
-          "character": "Miss Brant",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg"
-        },
-        {
-          "name": "John Paxton",
-          "character": "Houseman",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/ndSd4nnukk03loB6RKx3iuP5xfx.jpg"
-        },
-        {
-          "name": "Tim DeZarn",
-          "character": "Philip Watson",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/tduRqomAU3LARfuDa2OMKFAd1rR.jpg"
-        }
-      ],
-      "crew": [
-        {
-          "name": "Ian Bryce",
-          "job": "Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/y45uZM4RTXmC02XwsMseFMObUAF.jpg"
-        },
-        {
-          "name": "Laura Ziskin",
-          "job": "Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/nw6ZfMnDdoeWJCMiM4mQp8arZD1.jpg"
-        },
-        {
-          "name": "Avi Arad",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
-        },
-        {
-          "name": "Sam Raimi",
-          "job": "Director",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
-        },
-        {
-          "name": "Stan Lee",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
-        }
-      ],
-      "status": "ready",
-      "manualEntry": false,
-      "createdAt": "2026-08-07T23:37:25.035980Z",
-      "updatedAt": "2026-08-07T23:41:11.150220Z",
-      "shardId": "mfilms12/film2-media-01",
-      "asset": {
-        "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-0145/video_1786145994532.mp4",
-        "durationSeconds": 7274.934122,
-        "audioLanguages": [
-          "eng",
-          "tur"
-        ],
-        "subtitleLanguages": [
-          "eng",
-          "tur"
-        ],
-        "externalAudioTracks": [],
-        "externalSubtitleTracks": [
-          {
-            "language": "eng",
-            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-0145/subs_eng_1786145994532_1.vtt",
-            "label": "Ingilizce",
-            "mimeType": "text/vtt"
-          },
-          {
-            "language": "tur",
-            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-0145/subs_tur_1786145994532_2.vtt",
-            "label": "Turkce",
-            "mimeType": "text/vtt"
-          }
-        ],
-        "videoVariants": []
-      }
-    },
-    {
-      "id": "ay-sovalyesi-1023",
-      "imdbId": "tt10234724",
-      "manualEntry": false,
-      "status": "ready",
-      "createdAt": "2026-08-07T19:51:10.235Z",
-      "updatedAt": "2026-08-07T23:10:10.203Z",
-      "type": "series",
-      "tmdbId": 92749,
-      "title": "Ay Şövalyesi",
-      "originalTitle": "Moon Knight",
-      "overview": "Yumuşak huylu hediyelik eşya dükkanı çalışanı Steven Grant, bayılmalarla ve başka bir hayatın anılarıyla boğuşmaya başlayınca, çoklu kişilik bozukluğuna sahip olduğunu ve paralı asker Marc Spector ile aynı bedeni paylaştığını keşfeder. Steven/Marc'in düşmanları birleşirken, onlar karmaşık kimliklerinde salınarak Mısır'ın güçlü tanrıları arasında ölümcül bir gizemin içine itilir.",
-      "releaseYear": 2022,
-      "genres": [
-        "Bilim Kurgu & Fantazi",
-        "Gizem",
-        "Aksiyon & Macera"
-      ],
-      "posterUrl": "https://image.tmdb.org/t/p/w780/bJ7GUEAaOuX90Py88wuGWFot4Fs.jpg",
-      "backdropUrl": "https://image.tmdb.org/t/p/w1280/1uegR4uAxRxiMyX4nQnpzbXhrTw.jpg",
-      "cast": [
-        {
-          "name": "Oscar Isaac",
-          "character": "Marc Spector / Steven Grant / Moon Knight / Mr. Knight",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/dW5U5yrIIPmMjRThR9KT2xH6nTz.jpg"
-        },
-        {
-          "name": "Ethan Hawke",
-          "character": "Arthur Harrow",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/oojD9jSshvUT4t6AUySsBxoekHk.jpg"
-        },
-        {
-          "name": "May Calamawy",
-          "character": "Layla El-Faouly",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/5S3nNkH5p85xK7k7AaXBZ0ouyOR.jpg"
-        },
-        {
-          "name": "Ann Akinjirin",
-          "character": "Bobbi",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/o4Tbudvow3rzgxmlilnRral5fpr.jpg"
-        },
-        {
-          "name": "David Ganly",
-          "character": "Billy",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/e9NUAspQ306cmyhkl3gG5LU1LHi.jpg"
-        },
-        {
-          "name": "Karim El Hakim",
-          "character": "Khonshu Performer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/2K3iP4pm6RFZ29kQxjXZQl40hCF.jpg"
-        },
-        {
-          "name": "F. Murray Abraham",
-          "character": "Khonshu (voice)",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/p2RYVGdrcP0m70BkkiKcwyrDeim.jpg"
-        }
-      ],
-      "crew": [
-        {
-          "name": "Kevin Feige",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
-        },
-        {
-          "name": "Jeremy Slater",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/iRey6rQs0C2Dd8HAfY6IkDnzqQu.jpg"
-        },
-        {
-          "name": "Grant Curtis",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/j3WoGrmImpEtSWP0FvDl1nHbQWI.jpg"
-        },
-        {
-          "name": "Louis D'Esposito",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/ewtzT2ZMIX2DNyGUUkHLn36fjgF.jpg"
-        },
-        {
-          "name": "Victoria Alonso",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/xF7Qe1tqgk9KtY8kThKHBWhMqxc.jpg"
-        },
-        {
-          "name": "Brad Winderbaum",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/5cDwxRkPuRRiHw6TVlaIobnX5aC.jpg"
-        },
-        {
-          "name": "محمد دياب",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/mJ8USiA1sNnexWtDxcDbjTyiNDe.jpg"
-        },
-        {
-          "name": "Oscar Isaac",
-          "job": "Executive Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/dW5U5yrIIPmMjRThR9KT2xH6nTz.jpg"
-        },
-        {
-          "name": "Peter Cameron",
-          "job": "Producer",
-          "profileUrl": "https://image.tmdb.org/t/p/w300/cmiMMiN6zC489Re2JQ3RcKsT3A2.jpg"
-        }
-      ],
-      "seasons": [
-        {
-          "seasonNumber": 1,
-          "name": "Sezon 1",
-          "overview": "Moon Knight, Oscar Isaac’in canladırdığı Steven Grant isimli çoklu kişilik bozukluğundan müzdarip bir adamın hikayesini anlatıyor. Bushman adında bir terörist tarafından öldürülen eski CIA ajanı Marc Spector, Mısır Ay Tanrısı Konshu tarafından Grant’in bedeninde hayata döndürülmüştür. Kendi halinde bir adam olan Grant, Spector’ın eski düşmanları peşine düşmüşken hem Spector ile karmaşık kimlik bozukluğunu hem de eski Mısır Tanrıları arasındaki ölümcül bir sırrı çözmenin yolunu bulmak zorundadır.",
-          "posterUrl": "https://image.tmdb.org/t/p/w780/zPFm8ZbvdzoViRHnLi8cH7TBS1B.jpg",
-          "episodes": [
-            {
-              "episodeNumber": 1,
-              "title": "Japon Balığı Sorunu",
-              "overview": "Sıradan bir işte çalışan yumuşak huylu bir adam olan Steven Grant, içinde yaşayan bir alter ortaya çıkmaya başlayınca hayatının kendisine ait olmayabileceğinden şüphelenmeye başlar.",
-              "airDate": "2022-03-30",
-              "stillUrl": "https://image.tmdb.org/t/p/w500/h88DZpKIDo66Tvt556HCvq2BdR0.jpg",
-              "runtimeMinutes": 48,
-              "status": "ready",
-              "shardId": "mfilms12/film2-media-01",
-              "asset": {
-                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/video_1786137305099.mp4",
-                "audioLanguages": [
-                  "tur",
-                  "eng"
-                ],
-                "subtitleLanguages": [
-                  "tur",
-                  "eng"
-                ],
-                "externalAudioTracks": [],
-                "externalSubtitleTracks": [
-                  {
-                    "language": "tur",
-                    "label": "Türkçe",
-                    "mimeType": "text/vtt",
-                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/subs_tur_1786137305099_1.vtt"
-                  },
-                  {
-                    "language": "eng",
-                    "label": "İngilizce",
-                    "mimeType": "text/vtt",
-                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/subs_eng_1786137305099_2.vtt"
-                  }
-                ],
-                "videoVariants": []
-              }
-            },
-            {
-              "episodeNumber": 2,
-              "title": "Kostümü Çağır",
-              "overview": "Steven, hayatının kendisine ait olmayabileceği gerçeğinden sarsılırken, tanrıların savaşı ufukta belirirken geçmişten gizemli bir ortak ortaya çıkar.",
-              "airDate": "2022-04-06",
-              "stillUrl": "https://image.tmdb.org/t/p/w500/oLmV6R7PoEMLJJ62bE4idOoG9WX.jpg",
-              "runtimeMinutes": 53,
-              "status": "ready",
-              "shardId": "mfilms12/film2-media-01",
-              "asset": {
-                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e2/video_1786138528954.mp4",
-                "audioLanguages": [
-                  "tur",
-                  "eng"
-                ],
-                "subtitleLanguages": [
-                  "tur",
-                  "eng"
-                ],
-                "externalAudioTracks": [],
-                "externalSubtitleTracks": [
-                  {
-                    "language": "tur",
-                    "label": "Türkçe",
-                    "mimeType": "text/vtt",
-                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e2/subs_tur_1786138528954_1.vtt"
-                  },
-                  {
-                    "language": "eng",
-                    "label": "İngilizce",
-                    "mimeType": "text/vtt",
-                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e2/subs_eng_1786138528954_2.vtt"
-                  }
-                ],
-                "videoVariants": []
-              }
-            },
-            {
-              "episodeNumber": 3,
-              "title": "Cana Yakın",
-              "overview": "Marc ön planda ve Harrow Ammit'in mezarının yakınındayken, Marc'ın Kahire'ye gitmesi ve Layla ve Steven'la olan farklılıklarını görevlerini tehlikeye atmadan bir kenara bırakması gerekiyor.",
-              "airDate": "2022-04-13",
-              "stillUrl": "https://image.tmdb.org/t/p/w500/xMiab3gxnz9XJpcadVZLkqdrkSu.jpg",
-              "runtimeMinutes": 53,
-              "status": "ready",
-              "shardId": "mfilms12/film2-media-01",
-              "asset": {
-                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e3/video_1786144063921.mp4",
-                "audioLanguages": [
-                  "tur",
-                  "eng"
-                ],
-                "subtitleLanguages": [
-                  "tur",
-                  "eng"
-                ],
-                "externalAudioTracks": [],
-                "externalSubtitleTracks": [
-                  {
-                    "language": "tur",
-                    "label": "Türkçe",
-                    "mimeType": "text/vtt",
-                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e3/subs_tur_1786144063921_1.vtt"
-                  },
-                  {
-                    "language": "eng",
-                    "label": "İngilizce",
-                    "mimeType": "text/vtt",
-                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e3/subs_eng_1786144063921_2.vtt"
-                  }
-                ],
-                "videoVariants": []
-              }
-            },
-            {
-              "episodeNumber": 4,
-              "title": "Mezar",
-              "overview": "Doğaüstü tehditler onları durdurmaya çalışırken, Marc ve Steven dengeyi bulmalıdır.",
-              "airDate": "2022-04-20",
-              "stillUrl": "https://image.tmdb.org/t/p/w500/ujPdwFsye9ojzFjPTcJ2yk227K7.jpg",
-              "runtimeMinutes": 54,
-              "status": "pending"
-            },
-            {
-              "episodeNumber": 5,
-              "title": "Akıl Hastanesi",
-              "overview": "Marc ve Steven, gerçeklerini bulmak ya da geride kalmak için anılarını araştırırlar.",
-              "airDate": "2022-04-27",
-              "stillUrl": "https://image.tmdb.org/t/p/w500/3sFSWqyn3CM7sDJTaLizzrWEhVE.jpg",
-              "runtimeMinutes": 50,
-              "status": "pending"
-            },
-            {
-              "episodeNumber": 6,
-              "title": "Tanrılar ve Canavarlar",
-              "overview": "Moon Knight mücadeleye katılırken Marc, Steven ve Khonshu, Ammit'i durdurmak için birlikte çalışmalıdır.",
-              "airDate": "2022-05-04",
-              "stillUrl": "https://image.tmdb.org/t/p/w500/p1ZZRvqhhdQeHowarTcDC4r2Moy.jpg",
-              "runtimeMinutes": 44,
-              "status": "pending"
-            }
-          ]
-        }
-      ],
-      "posterUrls": [],
-      "backdropUrls": []
-    },
     {
       "id": "the-flash-3107",
       "type": "series",
@@ -841,6 +20,7 @@
       "posterUrls": [],
       "backdropUrl": "https://image.tmdb.org/t/p/w1280/gFkHcIh7iE5G0oVOgpmY8ONQjhl.jpg",
       "backdropUrls": [],
+      "trailerUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/trailer_1786137728274.mp4",
       "cast": [
         {
           "name": "Grant Gustin",
@@ -927,7 +107,7 @@
       "status": "ready",
       "manualEntry": false,
       "createdAt": "2026-08-07T14:39:40.441735Z",
-      "updatedAt": "2026-08-07T21:22:12.963Z",
+      "updatedAt": "2026-08-08T10:02:00.861402Z",
       "seasons": [
         {
           "seasonNumber": 1,
@@ -1025,7 +205,7 @@
               "airDate": "2014-10-21",
               "stillUrl": "https://image.tmdb.org/t/p/w500/wY1omkKIuqZILjniPssbGlfZ0NY.jpg",
               "runtimeMinutes": 41,
-              "status": "pending"
+              "status": "processing"
             },
             {
               "episodeNumber": 4,
@@ -2722,8 +1902,828 @@
             }
           ]
         }
+      ]
+    },
+    {
+      "id": "orumcek-adam-3-0413",
+      "type": "movie",
+      "imdbId": "tt0413300",
+      "tmdbId": 559,
+      "title": "Örümcek Adam 3",
+      "originalTitle": "Spider-Man 3",
+      "overview": "Efsanevi Marvel Comics dizisine dayanan filmde, Peter Parker nihayet Mary Jane'e duyduğu tutku ile süper kahramanlık görevleri arasındaki dengeyi kurar. Ancak, ufukta belirmeye başlayan bir fırtına vardır. Peter'ın Örümcek Adam kostümü birden bire değişip siyaha dönüşerek güçlerini pekiştirmeye başlayınca, Peter da değişmeye başlar. Kostümün etkisi altındaki Peter, kibirli ve kendine aşırı güvenli biri olur; en değer verdiği kişileri ihmal etmeye başlar. Bugüne dek en korkulan iki kötü kahraman Kumadam ve Venom benzersiz güçler edinip, intikam ateşiyle yanarken, Peter en büyük savaşını kendi içinde yapmaktadır. Örümcek Adam'ın onu o yapan, onu bir kahraman yapan özelliğini, yani şefkati yeniden keşfetmesi gerekecektir.",
+      "releaseYear": 2007,
+      "genres": [
+        "Aksiyon",
+        "Macera",
+        "Bilim-Kurgu"
       ],
-      "trailerUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/trailer_1786137728274.mp4"
+      "runtimeMinutes": 195,
+      "posterUrl": "https://image.tmdb.org/t/p/w780/dxAWGyDADSazvz9pfPWPjryIVoE.jpg",
+      "posterUrls": [],
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/xslNxb3T3HW8dt70ybbR5lrBJRj.jpg",
+      "backdropUrls": [],
+      "cast": [
+        {
+          "name": "Tobey Maguire",
+          "character": "Spider-Man / Peter Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/s6PwSvq6gC7PGEjIku69tPbvR8M.jpg"
+        },
+        {
+          "name": "Kirsten Dunst",
+          "character": "Mary Jane Watson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/yhLKGjuiMMdbGnFrR8AREkCZcVF.jpg"
+        },
+        {
+          "name": "James Franco",
+          "character": "New Goblin / Harry Osborn",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/bjmAntHGiibLZixH8nTNVBzaFQn.jpg"
+        },
+        {
+          "name": "Thomas Haden Church",
+          "character": "Sandman / Flint Marko",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/74NK9HCYvNafMggSp1PAK5Nwkpe.jpg"
+        },
+        {
+          "name": "Topher Grace",
+          "character": "Venom / Eddie Brock",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/oJQxl4DG0KSCtOGrpWNhYz9gUZA.jpg"
+        },
+        {
+          "name": "Bryce Dallas Howard",
+          "character": "Gwen Stacy",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/6yhDkPXythZavS6Wk57XQ2sg5AW.jpg"
+        },
+        {
+          "name": "Rosemary Harris",
+          "character": "May Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/3Mu02enwaF8dFuT195f7esILXns.jpg"
+        },
+        {
+          "name": "J.K. Simmons",
+          "character": "J. Jonah Jameson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ScmKoJ9eiSUOthAt1PDNLi8Fkw.jpg"
+        },
+        {
+          "name": "James Cromwell",
+          "character": "Captain Stacy",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vpNQQbM5PtxsYmVm4oh79SGFyUK.jpg"
+        },
+        {
+          "name": "Dylan Baker",
+          "character": "Dr. Curt Connors",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/4mw6xj8Aj3ixjjeUj9pZdZPTbvz.jpg"
+        },
+        {
+          "name": "Theresa Russell",
+          "character": "Emma Marko",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/v0s86Nh5IMqYk5oazosuAwXAiO5.jpg"
+        },
+        {
+          "name": "Bill Nunn",
+          "character": "Joseph 'Robbie' Robertson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/trxNvS6g5yvwbXzx2LK6JqutE5z.jpg"
+        },
+        {
+          "name": "Bruce Campbell",
+          "character": "Maître D'",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/p9335ljr7luOWsfwZSOlsIzFJKE.jpg"
+        },
+        {
+          "name": "Elizabeth Banks",
+          "character": "Miss Brant",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg"
+        },
+        {
+          "name": "Ted Raimi",
+          "character": "Hoffman",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/juhz6ajCjjHlLPzYBxPtDxwX6em.jpg"
+        },
+        {
+          "name": "Perla Haney-Jardine",
+          "character": "Penny Marko",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8hXve6yjLDwXJ6njTPz44n9zXQV.jpg"
+        },
+        {
+          "name": "Willem Dafoe",
+          "character": "Green Goblin / Norman Osborn",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg"
+        },
+        {
+          "name": "Cliff Robertson",
+          "character": "Ben Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8pH2RWCPtXKzT9P33MbzgnzPlF0.jpg"
+        },
+        {
+          "name": "Elya Baskin",
+          "character": "Mr. Ditkovitch",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/30RVRgcJTZlJBKeSCZN2tg0ryvE.jpg"
+        },
+        {
+          "name": "Mageina Tovah",
+          "character": "Ursula",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/AiGQaF7tpr2m1jU0sZm0kZOQI7h.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Avi Arad",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
+        },
+        {
+          "name": "Stan Lee",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
+        },
+        {
+          "name": "Kevin Feige",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
+        },
+        {
+          "name": "Joseph M. Caracciolo Jr.",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Grant Curtis",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/j3WoGrmImpEtSWP0FvDl1nHbQWI.jpg"
+        },
+        {
+          "name": "Laura Ziskin",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/nw6ZfMnDdoeWJCMiM4mQp8arZD1.jpg"
+        },
+        {
+          "name": "Sam Raimi",
+          "job": "Director",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
+        }
+      ],
+      "status": "ready",
+      "manualEntry": false,
+      "createdAt": "2026-08-08T09:41:22.310751Z",
+      "updatedAt": "2026-08-08T09:51:45.468954Z",
+      "shardId": "mfilms12/film2-media-01",
+      "asset": {
+        "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-3-0413/video_1786182638682.mp4",
+        "durationSeconds": 8352.761377,
+        "audioLanguages": [
+          "eng",
+          "tur"
+        ],
+        "subtitleLanguages": [
+          "tur",
+          "eng"
+        ],
+        "externalAudioTracks": [],
+        "externalSubtitleTracks": [
+          {
+            "language": "tur",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-3-0413/subs_tur_1786182638682_1.vtt",
+            "label": "Turkce",
+            "mimeType": "text/vtt"
+          },
+          {
+            "language": "eng",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-3-0413/subs_eng_1786182638682_2.vtt",
+            "label": "Ingilizce",
+            "mimeType": "text/vtt"
+          }
+        ],
+        "videoVariants": []
+      }
+    },
+    {
+      "id": "orumcek-adam-2-0316",
+      "type": "movie",
+      "imdbId": "tt0316654",
+      "tmdbId": 558,
+      "title": "Örümcek Adam 2",
+      "originalTitle": "Spider-Man 2",
+      "overview": "Sevgilisi Mary Jane'den ayrılan Peter ona gerçek kimliğini açıklayıp açıklamamak arasında kaldığı için oldukça zor bir dönem geçirmektedir. kararsızlık içine düştüğü bu esnada Mary Jane'in, patronun oğlu John'la birlikte olmaya başlaması iyice canını sıkar. Bunlara, halasının mali sıkıntıları ve hayattaki tek dostu Harry Osborne'un, babasının ölümünden kendisini sorumlu tuttuğu için Peterdan uzaklaşması onu depresyonun eşiğine getirmiştir. Bu esnada, yeni düşmanı Doktor Ahtapot'un ortaya çıkmasıyla Peter Parker'ın hayatı içinden çıkılmaz bir hal alacaktır.",
+      "releaseYear": 2004,
+      "genres": [
+        "Aksiyon",
+        "Macera",
+        "Bilim-Kurgu"
+      ],
+      "runtimeMinutes": 202,
+      "posterUrl": "https://image.tmdb.org/t/p/w780/up4mcu95N91I7SnylVCIIMTWZYq.jpg",
+      "posterUrls": [],
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/6al048Lat3eLVQOuKtc9h6Tu94d.jpg",
+      "backdropUrls": [],
+      "cast": [
+        {
+          "name": "Tobey Maguire",
+          "character": "Spider-Man / Peter Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/s6PwSvq6gC7PGEjIku69tPbvR8M.jpg"
+        },
+        {
+          "name": "Kirsten Dunst",
+          "character": "Mary Jane Watson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/yhLKGjuiMMdbGnFrR8AREkCZcVF.jpg"
+        },
+        {
+          "name": "James Franco",
+          "character": "Harry Osborn",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/bjmAntHGiibLZixH8nTNVBzaFQn.jpg"
+        },
+        {
+          "name": "Alfred Molina",
+          "character": "Doc Ock / Otto Octavius",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/nJo91Czesn6z0d0pkfbDoVZY3sg.jpg"
+        },
+        {
+          "name": "Rosemary Harris",
+          "character": "May Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/3Mu02enwaF8dFuT195f7esILXns.jpg"
+        },
+        {
+          "name": "J.K. Simmons",
+          "character": "J. Jonah Jameson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ScmKoJ9eiSUOthAt1PDNLi8Fkw.jpg"
+        },
+        {
+          "name": "Donna Murphy",
+          "character": "Rosalie Octavius",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/tmre2oZkIHGqnLhWeldpX2Ujgl0.jpg"
+        },
+        {
+          "name": "Daniel Gillies",
+          "character": "John Jameson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/3EVKjIDFZOHeLzxOvJ4DmAVYMXg.jpg"
+        },
+        {
+          "name": "Dylan Baker",
+          "character": "Dr. Curt Connors",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/4mw6xj8Aj3ixjjeUj9pZdZPTbvz.jpg"
+        },
+        {
+          "name": "Bill Nunn",
+          "character": "Joseph 'Robbie' Robertson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/trxNvS6g5yvwbXzx2LK6JqutE5z.jpg"
+        },
+        {
+          "name": "Vanessa Ferlito",
+          "character": "Louise",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/i128WKjZ3JkoJBOLw48hF4Uwu5V.jpg"
+        },
+        {
+          "name": "Aasif Mandvi",
+          "character": "Mr. Aziz",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/hoBCqgxK2JqV3MOQYncHRMfwu8V.jpg"
+        },
+        {
+          "name": "Willem Dafoe",
+          "character": "Green Goblin / Norman Osborn",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg"
+        },
+        {
+          "name": "Cliff Robertson",
+          "character": "Ben Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8pH2RWCPtXKzT9P33MbzgnzPlF0.jpg"
+        },
+        {
+          "name": "Ted Raimi",
+          "character": "Hoffman",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/juhz6ajCjjHlLPzYBxPtDxwX6em.jpg"
+        },
+        {
+          "name": "Elizabeth Banks",
+          "character": "Miss Brant",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg"
+        },
+        {
+          "name": "Bruce Campbell",
+          "character": "Snooty Usher",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/p9335ljr7luOWsfwZSOlsIzFJKE.jpg"
+        },
+        {
+          "name": "Gregg Edelman",
+          "character": "Dr. Davis",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/jvdye1mZkBb5x4xjjtmtuLRmXzy.jpg"
+        },
+        {
+          "name": "Elya Baskin",
+          "character": "Mr. Ditkovitch",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/30RVRgcJTZlJBKeSCZN2tg0ryvE.jpg"
+        },
+        {
+          "name": "Mageina Tovah",
+          "character": "Ursula",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/AiGQaF7tpr2m1jU0sZm0kZOQI7h.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Sam Raimi",
+          "job": "Director",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
+        },
+        {
+          "name": "Stan Lee",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
+        },
+        {
+          "name": "Joseph M. Caracciolo Jr.",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Avi Arad",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
+        },
+        {
+          "name": "Laura Ziskin",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/nw6ZfMnDdoeWJCMiM4mQp8arZD1.jpg"
+        },
+        {
+          "name": "Lorne Orleans",
+          "job": "Producer"
+        },
+        {
+          "name": "Kevin Feige",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
+        },
+        {
+          "name": "Joseph M. Caracciolo",
+          "job": "Executive Producer"
+        }
+      ],
+      "status": "ready",
+      "manualEntry": false,
+      "createdAt": "2026-08-08T09:27:43.298939Z",
+      "updatedAt": "2026-08-08T09:31:10.010632Z",
+      "shardId": "mfilms12/film2-media-01",
+      "asset": {
+        "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-2-0316/video_1786181405804.mp4",
+        "durationSeconds": 7647.389788,
+        "audioLanguages": [
+          "eng",
+          "tur"
+        ],
+        "subtitleLanguages": [
+          "eng",
+          "tur"
+        ],
+        "externalAudioTracks": [],
+        "externalSubtitleTracks": [
+          {
+            "language": "eng",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-2-0316/subs_eng_1786181405804_1.vtt",
+            "label": "Ingilizce",
+            "mimeType": "text/vtt"
+          },
+          {
+            "language": "tur",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-2-0316/subs_tur_1786181405804_2.vtt",
+            "label": "Turkce",
+            "mimeType": "text/vtt"
+          }
+        ],
+        "videoVariants": []
+      }
+    },
+    {
+      "id": "orumcek-adam-0145",
+      "type": "movie",
+      "imdbId": "tt0145487",
+      "tmdbId": 557,
+      "title": "Örümcek Adam",
+      "originalTitle": "Spider-Man",
+      "overview": "Sıradan bir lise öğrencisi olan Peter Parker'ın hayatı bir gün bir örümcek tarafından ısırılmasıyla tamamen değişir. Çünkü bu örümcek sıradan bir örümcek değildir, genetik olarak özelikle geliştirilmiş, bilimsel amaçlarla kullanılan bir denektir. Öte yandan olan olmuştur ve Parker'da tuhaf değişiklikler başgöstermektedir.",
+      "releaseYear": 2002,
+      "genres": [
+        "Aksiyon",
+        "Bilim-Kurgu"
+      ],
+      "runtimeMinutes": 189,
+      "posterUrl": "https://image.tmdb.org/t/p/w780/5FyIHcUTLFNSk4D5rfsGRTkSwie.jpg",
+      "posterUrls": [],
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/zQ8AxTPiCiS5nnwXpwTBPBHSaa5.jpg",
+      "backdropUrls": [],
+      "cast": [
+        {
+          "name": "Tobey Maguire",
+          "character": "Spider-Man / Peter Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/s6PwSvq6gC7PGEjIku69tPbvR8M.jpg"
+        },
+        {
+          "name": "Willem Dafoe",
+          "character": "Green Goblin / Norman Osborn",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg"
+        },
+        {
+          "name": "Kirsten Dunst",
+          "character": "Mary Jane Watson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/yhLKGjuiMMdbGnFrR8AREkCZcVF.jpg"
+        },
+        {
+          "name": "James Franco",
+          "character": "Harry Osborn",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/bjmAntHGiibLZixH8nTNVBzaFQn.jpg"
+        },
+        {
+          "name": "Cliff Robertson",
+          "character": "Ben Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8pH2RWCPtXKzT9P33MbzgnzPlF0.jpg"
+        },
+        {
+          "name": "Rosemary Harris",
+          "character": "May Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/3Mu02enwaF8dFuT195f7esILXns.jpg"
+        },
+        {
+          "name": "J.K. Simmons",
+          "character": "J. Jonah Jameson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ScmKoJ9eiSUOthAt1PDNLi8Fkw.jpg"
+        },
+        {
+          "name": "Joe Manganiello",
+          "character": "Flash Thompson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/mTdACmitdrwor0Nrv5sr0u123vZ.jpg"
+        },
+        {
+          "name": "Gerry Becker",
+          "character": "Maximilian Fargas",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/il1r1Iym5WFJyo8SQon60aqu4nC.jpg"
+        },
+        {
+          "name": "Bill Nunn",
+          "character": "Joseph 'Robbie' Robertson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/trxNvS6g5yvwbXzx2LK6JqutE5z.jpg"
+        },
+        {
+          "name": "Jack Betts",
+          "character": "Henry Balkan",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/aC8uOwxVW2NJ5sYUvQImFZuVKQ7.jpg"
+        },
+        {
+          "name": "Stanley Anderson",
+          "character": "General Slocum",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/6kHp1SlLRw0NobVdY8X6DbBAPt8.jpg"
+        },
+        {
+          "name": "Ron Perkins",
+          "character": "Dr. Mendel Stromm",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ld3OJ0WpMv0Rcml59WuVzKoQWaB.jpg"
+        },
+        {
+          "name": "Michael Papajohn",
+          "character": "Carjacker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/hdTJBfIXfvRdlD1p8y6rra207UP.jpg"
+        },
+        {
+          "name": "K.K. Dodds",
+          "character": "Simkins",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/nGou7wXgXAKr5oJEyUIuX9RCgFl.jpg"
+        },
+        {
+          "name": "Ted Raimi",
+          "character": "Hoffman",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/juhz6ajCjjHlLPzYBxPtDxwX6em.jpg"
+        },
+        {
+          "name": "Bruce Campbell",
+          "character": "Ring Announcer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/p9335ljr7luOWsfwZSOlsIzFJKE.jpg"
+        },
+        {
+          "name": "Elizabeth Banks",
+          "character": "Miss Brant",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg"
+        },
+        {
+          "name": "John Paxton",
+          "character": "Houseman",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ndSd4nnukk03loB6RKx3iuP5xfx.jpg"
+        },
+        {
+          "name": "Tim DeZarn",
+          "character": "Philip Watson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/tduRqomAU3LARfuDa2OMKFAd1rR.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Ian Bryce",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/y45uZM4RTXmC02XwsMseFMObUAF.jpg"
+        },
+        {
+          "name": "Laura Ziskin",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/nw6ZfMnDdoeWJCMiM4mQp8arZD1.jpg"
+        },
+        {
+          "name": "Avi Arad",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
+        },
+        {
+          "name": "Sam Raimi",
+          "job": "Director",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
+        },
+        {
+          "name": "Stan Lee",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
+        }
+      ],
+      "status": "ready",
+      "manualEntry": false,
+      "createdAt": "2026-08-07T23:37:25.035980Z",
+      "updatedAt": "2026-08-07T23:41:11.150220Z",
+      "shardId": "mfilms12/film2-media-01",
+      "asset": {
+        "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-0145/video_1786145994532.mp4",
+        "durationSeconds": 7274.934122,
+        "audioLanguages": [
+          "eng",
+          "tur"
+        ],
+        "subtitleLanguages": [
+          "eng",
+          "tur"
+        ],
+        "externalAudioTracks": [],
+        "externalSubtitleTracks": [
+          {
+            "language": "eng",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-0145/subs_eng_1786145994532_1.vtt",
+            "label": "Ingilizce",
+            "mimeType": "text/vtt"
+          },
+          {
+            "language": "tur",
+            "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/orumcek-adam-0145/subs_tur_1786145994532_2.vtt",
+            "label": "Turkce",
+            "mimeType": "text/vtt"
+          }
+        ],
+        "videoVariants": []
+      }
+    },
+    {
+      "id": "ay-sovalyesi-1023",
+      "imdbId": "tt10234724",
+      "manualEntry": false,
+      "status": "ready",
+      "createdAt": "2026-08-07T19:51:10.235Z",
+      "updatedAt": "2026-08-07T23:10:10.203Z",
+      "type": "series",
+      "tmdbId": 92749,
+      "title": "Ay Şövalyesi",
+      "originalTitle": "Moon Knight",
+      "overview": "Yumuşak huylu hediyelik eşya dükkanı çalışanı Steven Grant, bayılmalarla ve başka bir hayatın anılarıyla boğuşmaya başlayınca, çoklu kişilik bozukluğuna sahip olduğunu ve paralı asker Marc Spector ile aynı bedeni paylaştığını keşfeder. Steven/Marc'in düşmanları birleşirken, onlar karmaşık kimliklerinde salınarak Mısır'ın güçlü tanrıları arasında ölümcül bir gizemin içine itilir.",
+      "releaseYear": 2022,
+      "genres": [
+        "Bilim Kurgu & Fantazi",
+        "Gizem",
+        "Aksiyon & Macera"
+      ],
+      "posterUrl": "https://image.tmdb.org/t/p/w780/bJ7GUEAaOuX90Py88wuGWFot4Fs.jpg",
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/1uegR4uAxRxiMyX4nQnpzbXhrTw.jpg",
+      "cast": [
+        {
+          "name": "Oscar Isaac",
+          "character": "Marc Spector / Steven Grant / Moon Knight / Mr. Knight",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/dW5U5yrIIPmMjRThR9KT2xH6nTz.jpg"
+        },
+        {
+          "name": "Ethan Hawke",
+          "character": "Arthur Harrow",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/oojD9jSshvUT4t6AUySsBxoekHk.jpg"
+        },
+        {
+          "name": "May Calamawy",
+          "character": "Layla El-Faouly",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/5S3nNkH5p85xK7k7AaXBZ0ouyOR.jpg"
+        },
+        {
+          "name": "Ann Akinjirin",
+          "character": "Bobbi",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/o4Tbudvow3rzgxmlilnRral5fpr.jpg"
+        },
+        {
+          "name": "David Ganly",
+          "character": "Billy",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/e9NUAspQ306cmyhkl3gG5LU1LHi.jpg"
+        },
+        {
+          "name": "Karim El Hakim",
+          "character": "Khonshu Performer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/2K3iP4pm6RFZ29kQxjXZQl40hCF.jpg"
+        },
+        {
+          "name": "F. Murray Abraham",
+          "character": "Khonshu (voice)",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/p2RYVGdrcP0m70BkkiKcwyrDeim.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Kevin Feige",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
+        },
+        {
+          "name": "Jeremy Slater",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/iRey6rQs0C2Dd8HAfY6IkDnzqQu.jpg"
+        },
+        {
+          "name": "Grant Curtis",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/j3WoGrmImpEtSWP0FvDl1nHbQWI.jpg"
+        },
+        {
+          "name": "Louis D'Esposito",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ewtzT2ZMIX2DNyGUUkHLn36fjgF.jpg"
+        },
+        {
+          "name": "Victoria Alonso",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/xF7Qe1tqgk9KtY8kThKHBWhMqxc.jpg"
+        },
+        {
+          "name": "Brad Winderbaum",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/5cDwxRkPuRRiHw6TVlaIobnX5aC.jpg"
+        },
+        {
+          "name": "محمد دياب",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/mJ8USiA1sNnexWtDxcDbjTyiNDe.jpg"
+        },
+        {
+          "name": "Oscar Isaac",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/dW5U5yrIIPmMjRThR9KT2xH6nTz.jpg"
+        },
+        {
+          "name": "Peter Cameron",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/cmiMMiN6zC489Re2JQ3RcKsT3A2.jpg"
+        }
+      ],
+      "seasons": [
+        {
+          "seasonNumber": 1,
+          "name": "Sezon 1",
+          "overview": "Moon Knight, Oscar Isaac’in canladırdığı Steven Grant isimli çoklu kişilik bozukluğundan müzdarip bir adamın hikayesini anlatıyor. Bushman adında bir terörist tarafından öldürülen eski CIA ajanı Marc Spector, Mısır Ay Tanrısı Konshu tarafından Grant’in bedeninde hayata döndürülmüştür. Kendi halinde bir adam olan Grant, Spector’ın eski düşmanları peşine düşmüşken hem Spector ile karmaşık kimlik bozukluğunu hem de eski Mısır Tanrıları arasındaki ölümcül bir sırrı çözmenin yolunu bulmak zorundadır.",
+          "posterUrl": "https://image.tmdb.org/t/p/w780/zPFm8ZbvdzoViRHnLi8cH7TBS1B.jpg",
+          "episodes": [
+            {
+              "episodeNumber": 1,
+              "title": "Japon Balığı Sorunu",
+              "overview": "Sıradan bir işte çalışan yumuşak huylu bir adam olan Steven Grant, içinde yaşayan bir alter ortaya çıkmaya başlayınca hayatının kendisine ait olmayabileceğinden şüphelenmeye başlar.",
+              "airDate": "2022-03-30",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/h88DZpKIDo66Tvt556HCvq2BdR0.jpg",
+              "runtimeMinutes": 48,
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/video_1786137305099.mp4",
+                "audioLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "subtitleLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": [
+                  {
+                    "language": "tur",
+                    "label": "Türkçe",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/subs_tur_1786137305099_1.vtt"
+                  },
+                  {
+                    "language": "eng",
+                    "label": "İngilizce",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e1/subs_eng_1786137305099_2.vtt"
+                  }
+                ],
+                "videoVariants": []
+              }
+            },
+            {
+              "episodeNumber": 2,
+              "title": "Kostümü Çağır",
+              "overview": "Steven, hayatının kendisine ait olmayabileceği gerçeğinden sarsılırken, tanrıların savaşı ufukta belirirken geçmişten gizemli bir ortak ortaya çıkar.",
+              "airDate": "2022-04-06",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/oLmV6R7PoEMLJJ62bE4idOoG9WX.jpg",
+              "runtimeMinutes": 53,
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e2/video_1786138528954.mp4",
+                "audioLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "subtitleLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": [
+                  {
+                    "language": "tur",
+                    "label": "Türkçe",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e2/subs_tur_1786138528954_1.vtt"
+                  },
+                  {
+                    "language": "eng",
+                    "label": "İngilizce",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e2/subs_eng_1786138528954_2.vtt"
+                  }
+                ],
+                "videoVariants": []
+              }
+            },
+            {
+              "episodeNumber": 3,
+              "title": "Cana Yakın",
+              "overview": "Marc ön planda ve Harrow Ammit'in mezarının yakınındayken, Marc'ın Kahire'ye gitmesi ve Layla ve Steven'la olan farklılıklarını görevlerini tehlikeye atmadan bir kenara bırakması gerekiyor.",
+              "airDate": "2022-04-13",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/xMiab3gxnz9XJpcadVZLkqdrkSu.jpg",
+              "runtimeMinutes": 53,
+              "status": "ready",
+              "shardId": "mfilms12/film2-media-01",
+              "asset": {
+                "videoUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e3/video_1786144063921.mp4",
+                "audioLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "subtitleLanguages": [
+                  "tur",
+                  "eng"
+                ],
+                "externalAudioTracks": [],
+                "externalSubtitleTracks": [
+                  {
+                    "language": "tur",
+                    "label": "Türkçe",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e3/subs_tur_1786144063921_1.vtt"
+                  },
+                  {
+                    "language": "eng",
+                    "label": "İngilizce",
+                    "mimeType": "text/vtt",
+                    "url": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/ay-sovalyesi-1023/s1e3/subs_eng_1786144063921_2.vtt"
+                  }
+                ],
+                "videoVariants": []
+              }
+            },
+            {
+              "episodeNumber": 4,
+              "title": "Mezar",
+              "overview": "Doğaüstü tehditler onları durdurmaya çalışırken, Marc ve Steven dengeyi bulmalıdır.",
+              "airDate": "2022-04-20",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/ujPdwFsye9ojzFjPTcJ2yk227K7.jpg",
+              "runtimeMinutes": 54,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 5,
+              "title": "Akıl Hastanesi",
+              "overview": "Marc ve Steven, gerçeklerini bulmak ya da geride kalmak için anılarını araştırırlar.",
+              "airDate": "2022-04-27",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/3sFSWqyn3CM7sDJTaLizzrWEhVE.jpg",
+              "runtimeMinutes": 50,
+              "status": "pending"
+            },
+            {
+              "episodeNumber": 6,
+              "title": "Tanrılar ve Canavarlar",
+              "overview": "Moon Knight mücadeleye katılırken Marc, Steven ve Khonshu, Ammit'i durdurmak için birlikte çalışmalıdır.",
+              "airDate": "2022-05-04",
+              "stillUrl": "https://image.tmdb.org/t/p/w500/p1ZZRvqhhdQeHowarTcDC4r2Moy.jpg",
+              "runtimeMinutes": 44,
+              "status": "pending"
+            }
+          ]
+        }
+      ],
+      "posterUrls": [],
+      "backdropUrls": []
     },
     {
       "id": "demir-adam-0371",
