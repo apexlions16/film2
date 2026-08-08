@@ -48,7 +48,19 @@
       "enabled": true,
       "shuffle": true,
       "maxItems": 20
+    },
+    {
+      "id": "custom-9b1edf9c",
+      "title": "Örümcek Adam Serisi",
+      "titleIds": [
+        "orumcek-adam-0145",
+        "orumcek-adam-2-0316",
+        "orumcek-adam-3-0413"
+      ],
+      "enabled": true,
+      "shuffle": false,
+      "maxItems": 30
     }
   ],
-  "updatedAt": "2026-08-07T21:50:41.593Z"
+  "updatedAt": "2026-08-08T09:56:09.779346Z"
 }
