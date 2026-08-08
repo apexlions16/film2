@@ -1,6 +1,6 @@
 {
-  "revision": "2026-08-08T10:04:56.330676Z",
-  "generatedAt": "2026-08-08T10:05:04.623Z",
+  "revision": "2026-08-08T10:11:23.334801Z",
+  "generatedAt": "2026-08-08T10:11:32.483Z",
   "count": 8,
   "titles": [
     {
@@ -107,7 +107,7 @@
       "status": "ready",
       "manualEntry": false,
       "createdAt": "2026-08-07T14:39:40.441735Z",
-      "updatedAt": "2026-08-08T10:04:54.577620Z",
+      "updatedAt": "2026-08-08T10:11:21.236199Z",
       "seasons": [
         {
           "seasonNumber": 1,
