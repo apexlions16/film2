@@ -1,0 +1,100 @@
+name: Build Film2 Tizen TV v1.1
+
+on:
+  push:
+    branches:
+      - agent/tizen-tv-player-v2
+    paths:
+      - 'apps/tizen-tv-player/**'
+      - '.github/workflows/build-tizen-tv-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Tizen v2 branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/tizen-tv-player-v2
+
+      - name: Validate JavaScript syntax
+        run: |
+          node --check apps/tizen-tv-player/js/catalog.js
+          node --check apps/tizen-tv-player/js/storage.js
+          node --check apps/tizen-tv-player/js/offline.js
+          node --check apps/tizen-tv-player/js/player.js
+          node --check apps/tizen-tv-player/js/app-core.js
+          node --check apps/tizen-tv-player/js/app-browse.js
+          node --check apps/tizen-tv-player/js/app-player-ui.js
+          node --check apps/tizen-tv-player/js/app-navigation.js
+
+      - name: Validate Tizen project
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import xml.etree.ElementTree as ET
+
+          root = pathlib.Path('apps/tizen-tv-player')
+          required = [
+              root / 'config.xml', root / 'index.html', root / 'css' / 'app.css',
+              root / 'js' / 'catalog.js', root / 'js' / 'storage.js', root / 'js' / 'offline.js',
+              root / 'js' / 'player.js',
+              root / 'js' / 'app-core.js', root / 'js' / 'app-browse.js',
+              root / 'js' / 'app-player-ui.js', root / 'js' / 'app-navigation.js',
+          ]
+          missing = [str(p) for p in required if not p.is_file()]
+          if missing:
+              raise SystemExit('Missing required files: ' + ', '.join(missing))
+          ET.parse(root / 'config.xml')
+          html = (root / 'index.html').read_text(encoding='utf-8')
+          for rel in ['css/app.css','js/catalog.js','js/storage.js','js/offline.js','js/player.js','js/app-core.js','js/app-browse.js','js/app-player-ui.js','js/app-navigation.js']:
+              if rel not in html:
+                  raise SystemExit(f'index.html does not reference {rel}')
+          print('Tizen project structure OK')
+          PY
+
+      - name: Build unsigned WGT
+        run: |
+          rm -rf dist/tizen-v2
+          mkdir -p dist/tizen-v2
+          cd apps/tizen-tv-player
+          zip -q -r ../../dist/tizen-v2/Film2TV-v1.1.0-development-unsigned.wgt . \
+            -x '*.DS_Store' '*.git*' 'README.md' 'tools/*' 'tools/**' '*.ps1'
+          cd ../..
+          unzip -t dist/tizen-v2/Film2TV-v1.1.0-development-unsigned.wgt
+          sha256sum dist/tizen-v2/Film2TV-v1.1.0-development-unsigned.wgt | tee dist/tizen-v2/SHA256SUMS.txt
+
+      - name: Add signing note
+        run: |
+          cat > dist/tizen-v2/SIGNING_REQUIRED.txt <<'EOF_NOTE'
+          Film2 TV v1.1 source/package validation passed. This CI package is unsigned.
+          Samsung TV Developer Mode does not remove the Tizen package signing requirement.
+          Sign the source project with a Samsung Author + Distributor certificate profile containing the target TV DUID before installing on a physical TV.
+          EOF_NOTE
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Film2TV-Tizen-v1.1-development
+          path: |
+            dist/tizen-v2/Film2TV-v1.1.0-development-unsigned.wgt
+            dist/tizen-v2/SHA256SUMS.txt
+            dist/tizen-v2/SIGNING_REQUIRED.txt
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish latest unsigned package to branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f dist/tizen-v2/Film2TV-v1.1.0-development-unsigned.wgt dist/tizen-v2/SHA256SUMS.txt dist/tizen-v2/SIGNING_REQUIRED.txt
+          if git diff --cached --quiet; then
+            echo "Build output unchanged"
+          else
+            git commit -m "build(tizen-v2): publish development WGT"
+            git push origin HEAD:agent/tizen-tv-player-v2
+          fi
