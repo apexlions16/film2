@@ -1,0 +1,3 @@
+Film2 TV v1.1 source/package validation passed. This CI package is unsigned.
+Samsung TV Developer Mode does not remove the Tizen package signing requirement.
+Sign the source project with a Samsung Author + Distributor certificate profile containing the target TV DUID before installing on a physical TV.
