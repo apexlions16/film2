@@ -1,6 +1,6 @@
 {
-  "revision": "2026-08-08T09:41:24.840775Z",
-  "generatedAt": "2026-08-08T09:41:35.016Z",
+  "revision": "2026-08-08T09:49:03.142524Z",
+  "generatedAt": "2026-08-08T09:49:13.514Z",
   "count": 8,
   "titles": [
     {
@@ -160,10 +160,10 @@
           "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
         }
       ],
-      "status": "pending",
+      "status": "processing",
       "manualEntry": false,
       "createdAt": "2026-08-08T09:41:22.310751Z",
-      "updatedAt": "2026-08-08T09:41:23.771097Z"
+      "updatedAt": "2026-08-08T09:49:02.120167Z"
     },
     {
       "id": "orumcek-adam-2-0316",
