@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets"
+        xmlns:tizen="http://tizen.org/ns/widgets"
+        id="http://apexlions16.github.io/film2/tizen-tv-player"
+        version="1.1.0"
+        viewmodes="maximized">
+    <tizen:application id="F2TVPlayer.Film2TV" package="F2TVPlayer" required_version="3.0"/>
+    <content src="index.html"/>
+    <name>Film2 TV</name>
+    <tizen:profile name="tv-samsung"/>
+    <feature name="http://tizen.org/feature/screen.size.normal.1080.1920"/>
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+    <tizen:privilege name="http://tizen.org/privilege/download"/>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.write"/>
+    <access origin="*" subdomains="true"/>
+    <tizen:metadata key="http://samsung.com/tv/metadata/use.network" value="true"/>
+    <tizen:setting screen-orientation="landscape"
+                   context-menu="disable"
+                   background-support="disable"
+                   encryption="disable"
+                   install-location="auto"
+                   hwkey-event="enable"
+                   pointing-device-support="disable"/>
+</widget>
