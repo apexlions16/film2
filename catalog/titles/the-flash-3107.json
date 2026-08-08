@@ -15,6 +15,7 @@
   "posterUrls": [],
   "backdropUrl": "https://image.tmdb.org/t/p/w1280/gFkHcIh7iE5G0oVOgpmY8ONQjhl.jpg",
   "backdropUrls": [],
+  "trailerUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/trailer_1786137728274.mp4",
   "cast": [
     {
       "name": "Grant Gustin",
@@ -101,7 +102,7 @@
   "status": "ready",
   "manualEntry": false,
   "createdAt": "2026-08-07T14:39:40.441735Z",
-  "updatedAt": "2026-08-07T21:22:12.963Z",
+  "updatedAt": "2026-08-08T10:02:00.861402Z",
   "seasons": [
     {
       "seasonNumber": 1,
@@ -199,7 +200,7 @@
           "airDate": "2014-10-21",
           "stillUrl": "https://image.tmdb.org/t/p/w500/wY1omkKIuqZILjniPssbGlfZ0NY.jpg",
           "runtimeMinutes": 41,
-          "status": "pending"
+          "status": "processing"
         },
         {
           "episodeNumber": 4,
@@ -1896,6 +1897,5 @@
         }
       ]
     }
-  ],
-  "trailerUrl": "https://huggingface.co/datasets/mfilms12/film2-media-01/resolve/main/media/the-flash-3107/trailer_1786137728274.mp4"
+  ]
 }
