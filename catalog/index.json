@@ -1,8 +1,170 @@
 {
-  "revision": "2026-08-08T09:31:11.214130Z",
-  "generatedAt": "2026-08-08T09:31:21.228Z",
-  "count": 7,
+  "revision": "2026-08-08T09:41:24.840775Z",
+  "generatedAt": "2026-08-08T09:41:35.016Z",
+  "count": 8,
   "titles": [
+    {
+      "id": "orumcek-adam-3-0413",
+      "type": "movie",
+      "imdbId": "tt0413300",
+      "tmdbId": 559,
+      "title": "Örümcek Adam 3",
+      "originalTitle": "Spider-Man 3",
+      "overview": "Efsanevi Marvel Comics dizisine dayanan filmde, Peter Parker nihayet Mary Jane'e duyduğu tutku ile süper kahramanlık görevleri arasındaki dengeyi kurar. Ancak, ufukta belirmeye başlayan bir fırtına vardır. Peter'ın Örümcek Adam kostümü birden bire değişip siyaha dönüşerek güçlerini pekiştirmeye başlayınca, Peter da değişmeye başlar. Kostümün etkisi altındaki Peter, kibirli ve kendine aşırı güvenli biri olur; en değer verdiği kişileri ihmal etmeye başlar. Bugüne dek en korkulan iki kötü kahraman Kumadam ve Venom benzersiz güçler edinip, intikam ateşiyle yanarken, Peter en büyük savaşını kendi içinde yapmaktadır. Örümcek Adam'ın onu o yapan, onu bir kahraman yapan özelliğini, yani şefkati yeniden keşfetmesi gerekecektir.",
+      "releaseYear": 2007,
+      "genres": [
+        "Aksiyon",
+        "Macera",
+        "Bilim-Kurgu"
+      ],
+      "runtimeMinutes": 195,
+      "posterUrl": "https://image.tmdb.org/t/p/w780/dxAWGyDADSazvz9pfPWPjryIVoE.jpg",
+      "posterUrls": [],
+      "backdropUrl": "https://image.tmdb.org/t/p/w1280/xslNxb3T3HW8dt70ybbR5lrBJRj.jpg",
+      "backdropUrls": [],
+      "cast": [
+        {
+          "name": "Tobey Maguire",
+          "character": "Spider-Man / Peter Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/s6PwSvq6gC7PGEjIku69tPbvR8M.jpg"
+        },
+        {
+          "name": "Kirsten Dunst",
+          "character": "Mary Jane Watson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/yhLKGjuiMMdbGnFrR8AREkCZcVF.jpg"
+        },
+        {
+          "name": "James Franco",
+          "character": "New Goblin / Harry Osborn",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/bjmAntHGiibLZixH8nTNVBzaFQn.jpg"
+        },
+        {
+          "name": "Thomas Haden Church",
+          "character": "Sandman / Flint Marko",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/74NK9HCYvNafMggSp1PAK5Nwkpe.jpg"
+        },
+        {
+          "name": "Topher Grace",
+          "character": "Venom / Eddie Brock",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/oJQxl4DG0KSCtOGrpWNhYz9gUZA.jpg"
+        },
+        {
+          "name": "Bryce Dallas Howard",
+          "character": "Gwen Stacy",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/6yhDkPXythZavS6Wk57XQ2sg5AW.jpg"
+        },
+        {
+          "name": "Rosemary Harris",
+          "character": "May Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/3Mu02enwaF8dFuT195f7esILXns.jpg"
+        },
+        {
+          "name": "J.K. Simmons",
+          "character": "J. Jonah Jameson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ScmKoJ9eiSUOthAt1PDNLi8Fkw.jpg"
+        },
+        {
+          "name": "James Cromwell",
+          "character": "Captain Stacy",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vpNQQbM5PtxsYmVm4oh79SGFyUK.jpg"
+        },
+        {
+          "name": "Dylan Baker",
+          "character": "Dr. Curt Connors",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/4mw6xj8Aj3ixjjeUj9pZdZPTbvz.jpg"
+        },
+        {
+          "name": "Theresa Russell",
+          "character": "Emma Marko",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/v0s86Nh5IMqYk5oazosuAwXAiO5.jpg"
+        },
+        {
+          "name": "Bill Nunn",
+          "character": "Joseph 'Robbie' Robertson",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/trxNvS6g5yvwbXzx2LK6JqutE5z.jpg"
+        },
+        {
+          "name": "Bruce Campbell",
+          "character": "Maître D'",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/p9335ljr7luOWsfwZSOlsIzFJKE.jpg"
+        },
+        {
+          "name": "Elizabeth Banks",
+          "character": "Miss Brant",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/zrkI1dYucpTM8Qydtrtro9MgQPb.jpg"
+        },
+        {
+          "name": "Ted Raimi",
+          "character": "Hoffman",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/juhz6ajCjjHlLPzYBxPtDxwX6em.jpg"
+        },
+        {
+          "name": "Perla Haney-Jardine",
+          "character": "Penny Marko",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8hXve6yjLDwXJ6njTPz44n9zXQV.jpg"
+        },
+        {
+          "name": "Willem Dafoe",
+          "character": "Green Goblin / Norman Osborn",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/ui8e4sgZAwMPi3hzEO53jyBJF9B.jpg"
+        },
+        {
+          "name": "Cliff Robertson",
+          "character": "Ben Parker",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8pH2RWCPtXKzT9P33MbzgnzPlF0.jpg"
+        },
+        {
+          "name": "Elya Baskin",
+          "character": "Mr. Ditkovitch",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/30RVRgcJTZlJBKeSCZN2tg0ryvE.jpg"
+        },
+        {
+          "name": "Mageina Tovah",
+          "character": "Ursula",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/AiGQaF7tpr2m1jU0sZm0kZOQI7h.jpg"
+        }
+      ],
+      "crew": [
+        {
+          "name": "Avi Arad",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/cxmqw0anGfxC7RwUNQj3EwhX9pP.jpg"
+        },
+        {
+          "name": "Stan Lee",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/kKeyWoFtTqOPsbmwylNHmuB3En9.jpg"
+        },
+        {
+          "name": "Kevin Feige",
+          "job": "Executive Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/vbCNOAGNqox21Q462rY4w2WL9Eo.jpg"
+        },
+        {
+          "name": "Joseph M. Caracciolo Jr.",
+          "job": "Executive Producer"
+        },
+        {
+          "name": "Grant Curtis",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/j3WoGrmImpEtSWP0FvDl1nHbQWI.jpg"
+        },
+        {
+          "name": "Laura Ziskin",
+          "job": "Producer",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/nw6ZfMnDdoeWJCMiM4mQp8arZD1.jpg"
+        },
+        {
+          "name": "Sam Raimi",
+          "job": "Director",
+          "profileUrl": "https://image.tmdb.org/t/p/w300/8gssvwiPrFRuFRlr5ruKx68k1Jl.jpg"
+        }
+      ],
+      "status": "pending",
+      "manualEntry": false,
+      "createdAt": "2026-08-08T09:41:22.310751Z",
+      "updatedAt": "2026-08-08T09:41:23.771097Z"
+    },
     {
       "id": "orumcek-adam-2-0316",
       "type": "movie",
