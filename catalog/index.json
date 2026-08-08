@@ -1,6 +1,6 @@
 {
-  "revision": "2026-08-08T09:27:46.314649Z",
-  "generatedAt": "2026-08-08T09:27:56.693Z",
+  "revision": "2026-08-08T09:28:28.822320Z",
+  "generatedAt": "2026-08-08T09:28:38.469Z",
   "count": 7,
   "titles": [
     {
@@ -163,10 +163,10 @@
           "job": "Executive Producer"
         }
       ],
-      "status": "pending",
+      "status": "processing",
       "manualEntry": false,
       "createdAt": "2026-08-08T09:27:43.298939Z",
-      "updatedAt": "2026-08-08T09:27:45.081671Z"
+      "updatedAt": "2026-08-08T09:28:27.785627Z"
     },
     {
       "id": "orumcek-adam-0145",
